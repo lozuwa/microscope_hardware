@@ -21,9 +21,9 @@ def show_image_debug(frame, val):
  cv2.waitKey(1)
 
 def take_picture():
- for i in range(5):
+ for i in range(10):
   _, frame = cap.read()
-  cv2.waitKey(10)
+  cv2.waitKey(5)
  return frame
 
 def laplacian(frame, debug = False, gaussian = False):

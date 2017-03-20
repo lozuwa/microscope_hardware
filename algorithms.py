@@ -1,7 +1,7 @@
 import numpy as np
 import os, sys, time
 
-def get_max(list = []):
+def get_max(list):
  max = 0
  index = 0
  for i in range(len(list)):

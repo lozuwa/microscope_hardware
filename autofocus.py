@@ -4,6 +4,60 @@ import algorithms as alg
 import numpy as np
 import time, os, sys 
 
+def autofocus_v1():
+ zz.activate_control_loop()
+
+ print("Reset z")
+ zz.z_reset()
+
+ print("Analysis")
+ fields = []
+ img = []
+ for i in range(35):
+  frame = vis.take_picture()
+  vis.show_picture(frame)
+
+  img.append(frame)
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
+  fields.append(frame_var)
+
+  zz.z_up()
+  print(frame_var, i)
+
+ m = max(fields)
+ index = fields.index(m)
+ print("Start focus")
+ print("Max: ", m, "Index: ", index)
+
+ count = 0
+ while(True):
+  frame = vis.take_picture()
+  vis.show_picture(frame)
+ 
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
+  fields.append(frame_var)
+
+  print(frame_var, count, (frame_var-m)**2)
+  count+=1
+
+  if frame_var > m:
+   print('done!')
+   break
+  elif ( (frame_var-m)**2 < 2):
+   print('done!')
+   break 
+  elif ( (frame_var-m)**2 >= 2 and (frame_var-m)**2 < 150 ):
+   zz.z_fine_down()
+  else:
+   zz.z_down()
+
+ zz.deactivate_control_loop()
+
+ while(True):
+  frame = vis.take_picture()
+  vis.show_picture(frame)
+  vis.debug("Image in sequence max", img[index])
+
 def autofocus_v0():
  zz.activate_control_loop()
 
@@ -16,31 +70,33 @@ def autofocus_v0():
  print('Analysis')
  mic_fields = []
  img = []
- for i in range(50):
+ for i in range(30):
   frame = vis.take_picture()
   vis.show_picture(frame)
   
   img.append(frame)
   frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
-  mic_fields.append((frame_var, i))
+  mic_fields.append(frame_var)
   
-  zz.activate_control_loop()
   zz.z_up()
-  zz.deactivate_control_loop()
   
-  print(i, frame_var)
+  print(frame_var, i)
+
  
  # Analyse fields 
- r_ = alg.get_max(mic_fields) #alg.get_max([(1,1),(2,2),(1,3)])
- print('Focus point at: ', 50-r_[1], 'Coordinates: ', r_[0], ',' ,r_[1])
- for i in range((50-r_[1]) + 15):
+ m = max(mic_fields)
+ index = mic_fields.index(m)
+ print('Focus point at: ', 30-index, 'Coordinates: ', index, ',', m)
+
+ for i in range(np.abs(30-index)):
   frame = vis.take_picture()
   vis.show_picture(frame)
 
-  print('Focusing ...', i)
-  zz.activate_control_loop()
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
+
   zz.z_down()
-  zz.deactivate_control_loop()
+
+  print(frame_var, i)
 
  zz.deactivate_control_loop()
 
@@ -48,9 +104,9 @@ def autofocus_v0():
  while(1):
   frame = vis.take_picture()
   vis.show_picture(frame)
-  vis.debug('Stored_image', img[r_[1]])
+  vis.debug('Stored_image', img[index])
 
-def autofocus_v1():
+def autofocus_v2():
  zz.activate_control_loop()
 
  # Z positioner has been already reseted?
@@ -121,4 +177,4 @@ def autofocus_v1():
   #vis.debug('Stored_image', img[r_[1]])
 
 if __name__ == '__main__':
- autofocus_v0()
+ autofocus_v1()
