@@ -4,7 +4,7 @@ import algorithms as alg
 import numpy as np
 import time, os, sys 
 
-def autofocus_v1():
+def autofocus_v1(c):
  zz.activate_control_loop()
 
  print("Reset z")
@@ -13,12 +13,12 @@ def autofocus_v1():
  print("Analysis")
  fields = []
  img = []
- for i in range(35):
+ for i in range(45):
   frame = vis.take_picture()
   vis.show_picture(frame)
 
   img.append(frame)
-  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
   fields.append(frame_var)
 
   zz.z_up()
@@ -33,30 +33,39 @@ def autofocus_v1():
  while(True):
   frame = vis.take_picture()
   vis.show_picture(frame)
- 
-  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
+
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
   fields.append(frame_var)
 
   print(frame_var, count, (frame_var-m)**2)
   count+=1
-
-  if frame_var > m:
-   print('done!')
+  if ((40+40*1.5)-count < 0):
    break
-  elif ( (frame_var-m)**2 < 2):
-   print('done!')
-   break 
-  elif ( (frame_var-m)**2 >= 2 and (frame_var-m)**2 < 150 ):
+
+  if (frame_var > m) or ( (frame_var-m)**2 < 1 ):
+   print('done! ', frame_var, m)
+   break
+  elif ( (frame_var-m)**2 >= 1 and (frame_var-m)**2 < 30 ):
+   print('fine focus')
    zz.z_fine_down()
+  elif ( (frame_var-m)**2 >= 30 and (frame_var-m)**2 < 100 ):
+   print('mid focus')
+   zz.z_mid_down()
   else:
+   print('macro focus')
    zz.z_down()
 
  zz.deactivate_control_loop()
 
- while(True):
+ #while(True):
+ for i in range(1):
   frame = vis.take_picture()
   vis.show_picture(frame)
-  vis.debug("Image in sequence max", img[index])
+  #vis.debug("Image in sequence max", img[index])
+
+ vis.save_image(frame, c)
+
+ vis.exit()
 
 def autofocus_v0():
  zz.activate_control_loop()

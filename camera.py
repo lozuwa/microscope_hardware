@@ -22,3 +22,6 @@ def vision():
 
 def exit():
  cap.release()
+ cv2.destroyAllWindows()
+ sys.exit()
+

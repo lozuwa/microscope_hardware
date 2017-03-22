@@ -44,6 +44,28 @@ def z_down():
   ser.write('z')
   wait()
 
+def z_mid_up():
+ ser.write('B')
+ wait()
+
+def z_mid_down():
+ if GPIO.input(18) == GPIO.LOW:
+  pass 
+ else:
+  ser.write('Z')
+  wait()
+
+def z_fine_up():
+ ser.write('6')
+ wait()
+
+def z_fine_down():
+ if GPIO.input(18) == GPIO.LOW:
+  pass 
+ else:
+  ser.write('3')
+  wait()
+
 def wait():
  while (ser.read() != 'o'):
   continue
@@ -51,22 +73,11 @@ def wait():
 def z_reset():
  while(GPIO.input(18) != GPIO.LOW):
   z_down()
- for i in range(40):
+ for i in range(65):
   z_up()
- while(GPIO.input(18) != GPIO.LOW):
-  z_down()
+ #while(GPIO.input(18) != GPIO.LOW):
+ # z_down()
 
 def exit():
  ser.close()
  sys.exit()
-
-def z_fine_up():
- ser.write('B')
- wait()
-
-def z_fine_down():
- if GPIO.input(18):
-  pass 
- else:
-  ser.write('Z')
-  wait()
