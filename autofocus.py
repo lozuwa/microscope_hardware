@@ -11,7 +11,7 @@ def autofocus_v1(c):
  zz.z_reset()
 
  print("Analysis")
- fields = []
+ samples = []
  img = []
  for i in range(45):
   frame = vis.take_picture()
@@ -19,7 +19,7 @@ def autofocus_v1(c):
 
   img.append(frame)
   frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
-  fields.append(frame_var)
+  samples.append(frame_var)
 
   zz.z_up()
   print(frame_var, i)
@@ -29,13 +29,14 @@ def autofocus_v1(c):
  print("Start focus")
  print("Max: ", m, "Index: ", index)
 
+ refocus = []
  count = 0
  while(True):
   frame = vis.take_picture()
   vis.show_picture(frame)
 
   frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
-  fields.append(frame_var)
+  refocus.append(frame_var)
 
   print(frame_var, count, (frame_var-m)**2)
   count+=1
@@ -63,7 +64,10 @@ def autofocus_v1(c):
   vis.show_picture(frame)
   #vis.debug("Image in sequence max", img[index])
 
+ # Save data
  vis.save_image(frame, c)
+ db.insert_one(c)
+ db.update(c, samples, refocus)
 
  vis.exit()
 
