@@ -23,3 +23,4 @@ def find_val(list = [], val = 0):
  for each in list:
   if each == val:
    found = each
+ return found

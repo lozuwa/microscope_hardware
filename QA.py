@@ -85,7 +85,6 @@ def test_xy_positioner():
 
 def test_z_positioner():
  zz.activate_control_loop()
-
  for i in range(10):
   [zz.z_up() for i in range(20)]
   [zz.z_down() for i in range(20)]
