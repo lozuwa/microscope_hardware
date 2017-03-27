@@ -35,7 +35,7 @@ volatile float DTerm;
 
 
 char mode;
-volatile bool dir = false;  
+volatile bool dir = false;
 
 bool print_yw = false;      //for step response, under development...
 

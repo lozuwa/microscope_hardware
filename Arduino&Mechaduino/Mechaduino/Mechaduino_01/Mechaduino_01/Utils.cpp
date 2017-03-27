@@ -142,9 +142,9 @@ void calibrate() {   /// this is the calibration routine
   int iStart = 0;     //encoder zero position index
   int jStart = 0;
   int stepNo = 0;
-  
+
   int fullStepReadings[spr];
-    
+
   int fullStep = 0;
   int ticks = 0;
   float lookupAngle = 0.0;
@@ -392,7 +392,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       case 'k':
         parameterEditmain();
         break;
-        
+
       case 'g':
         sineGen();
         break;
@@ -400,7 +400,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       case 'm':
         serialMenu();
         break;
-        
+
       case 'j':
         stepResponse();
         break;
@@ -412,7 +412,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       }
       SerialUSB.println('o');
       break;
-      
+
       case 'b':
       for (int i = 0; i < 3; i++) {
         r += 1.8;
@@ -423,32 +423,32 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
 
       case 'Z':
       for (int i = 0; i < 2; i++){
-	r -= 1.8
-	delayMicroseconds(100);
+      	r -= 1.8;
+      	delayMicroseconds(100);
       }
       SerialUSB.println('o');
       break;
 
       case 'B':
       for (int i = 0; i < 2; i++){
-	r += 1.8
-	delayMicroseconds(100);
+      	r += 1.8;
+      	delayMicroseconds(100);
       }
       SerialUSB.println('o');
       break;
 
       case '6':
       for (int i = 0; i < 1; i++){
-	r += 1.8
-	delayMicroseconds(100);
+      	r += 1.8;
+      	delayMicroseconds(100);
       }
       SerialUSB.println('o');
       break;
 
       case '9':
       for (int i = 0; i < 1; i++){
-	r -= 1.8
-	delayMicroseconds(100);
+      	r -= 1.8;
+      	delayMicroseconds(100);
       }
       SerialUSB.println('o');
       break;
@@ -526,7 +526,7 @@ void parameterQuery() {         //print current parameters in a format that can 
 
 
 void oneStep() {           /////////////////////////////////   oneStep    ///////////////////////////////
-  
+ 
   if (!dir) {
     stepNumber += 1;
   }
