@@ -90,7 +90,3 @@ void loop()                 // main loop
   //r=0.1125*step_count;      //Don't use this anymore. Step interrupts enabled above by "configureStepDir()", adjust step size in parameters.cpp
 
 }
-
-
-
-
