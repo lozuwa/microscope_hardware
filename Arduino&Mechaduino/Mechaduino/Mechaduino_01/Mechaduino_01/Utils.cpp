@@ -406,7 +406,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
         break;
 
       case 'z':
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 2; i++) {
         r -= 1.8;
         delayMicroseconds(100);
       }
@@ -414,7 +414,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       break;
 
       case 'b':
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 2; i++) {
         r += 1.8;
         delayMicroseconds(100);
       }
@@ -422,7 +422,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       break;
 
       case 'Z':
-      for (int i = 0; i < 2; i++){
+      for (int i = 0; i < 1; i++){
       	r -= 1.8;
       	delayMicroseconds(100);
       }
@@ -430,16 +430,17 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       break;
 
       case 'B':
-      for (int i = 0; i < 2; i++){
+      for (int i = 0; i < 1; i++){
       	r += 1.8;
       	delayMicroseconds(100);
       }
       SerialUSB.println('o');
       break;
 
+      //// This does not work ok, don't use it //////
       case '6':
       for (int i = 0; i < 1; i++){
-      	r += 1.8;
+      	r += 0.9;
       	delayMicroseconds(100);
       }
       SerialUSB.println('o');
@@ -447,11 +448,16 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
 
       case '9':
       for (int i = 0; i < 1; i++){
-      	r -= 1.8;
+      	r -= 0.9;
       	delayMicroseconds(100);
       }
       SerialUSB.println('o');
       break;
+
+      /////////////------------------/////////////////
+      
+      
+      /////////////------------------/////////////////
 
       default:
         break;

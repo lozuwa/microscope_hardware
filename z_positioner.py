@@ -63,7 +63,7 @@ def z_fine_down():
  if GPIO.input(18) == GPIO.LOW:
   pass 
  else:
-  ser.write('3')
+  ser.write('9')
   wait()
 
 def wait():
