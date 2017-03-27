@@ -3,6 +3,7 @@ import vision as vis
 import algorithms as alg
 import numpy as np
 import time, os, sys 
+import db as DB 
 
 def autofocus_v1(c):
  zz.activate_control_loop()
@@ -24,8 +25,8 @@ def autofocus_v1(c):
   zz.z_up()
   print(frame_var, i)
 
- m = max(fields)
- index = fields.index(m)
+ m = max(samples)
+ index = samples.index(m)
  print("Start focus")
  print("Max: ", m, "Index: ", index)
 
@@ -43,13 +44,13 @@ def autofocus_v1(c):
   if ((40+40*1.5)-count < 0):
    break
 
-  if (frame_var > m) or ( (frame_var-m)**2 < 1 ):
+  if (frame_var > m) or ( (frame_var-m)**2 < 0.5 ):
    print('done! ', frame_var, m)
    break
-  elif ( (frame_var-m)**2 >= 1 and (frame_var-m)**2 < 30 ):
+  elif ( (frame_var-m)**2 >= 0.5 and (frame_var-m)**2 < 1 ):
    print('fine focus')
    zz.z_fine_down()
-  elif ( (frame_var-m)**2 >= 30 and (frame_var-m)**2 < 100 ):
+  elif ( (frame_var-m)**2 >= 1 and (frame_var-m)**2 < 2 ):
    print('mid focus')
    zz.z_mid_down()
   else:
@@ -66,8 +67,8 @@ def autofocus_v1(c):
 
  # Save data
  vis.save_image(frame, c)
- db.insert_one(c)
- db.update(c, samples, refocus)
+ DB.insert(c)
+ DB.update(c, samples, refocus)
 
  vis.exit()
 

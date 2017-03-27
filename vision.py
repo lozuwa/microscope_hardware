@@ -44,4 +44,4 @@ def gaussian(frame):
 def exit():
  #cap.release()
  cv2.destroyAllWindows()
- sys.exit()
+ #sys.exit()
