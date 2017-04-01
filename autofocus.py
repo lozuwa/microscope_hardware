@@ -5,6 +5,77 @@ import numpy as np
 import time, os, sys 
 import db as DB 
 
+def autofocus_v3_debug(c):
+ zz.activate_control_loop()
+
+ print("Reset z")
+ zz.z_reset()
+
+ print("Analysis")
+ samples = []
+ img = []
+ for i in range(25):
+  frame = vis.take_picture()
+  vis.show_picture(frame)
+
+  img.append(frame)
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
+  samples.append(frame_var)
+
+  zz.z_up()
+  time.sleep(0.5)
+  print(frame_var, i)
+
+ m = max(samples)
+ index = samples.index(m)
+ print("Start focus")
+ print("Max: ", m, "Index: ", index)
+
+ refocus = []
+ count = 0
+ while(True):
+  frame = vis.take_picture()
+  vis.show_picture(frame)
+
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
+  refocus.append(frame_var)
+
+  print(frame_var, count, (frame_var-m)**2)
+  count+=1
+  if ((40+40*1.5)-count < 0):
+   break
+
+  if (frame_var > m) or ( (frame_var-m)**2 < 0.5 ):
+   print('done! ', frame_var, m)
+   break
+  elif ( (frame_var-m)**2 >= 0.5 and (frame_var-m)**2 < 2 ):
+   print('mid focus')
+   zz.z_mid_down()
+   time.sleep(0.5)
+  elif ( (frame_var-m)**2 >= 1 ) : 
+  #elif ( (frame_var-m)**2 >= 1 and (frame_var-m)**2 < 10 ):
+   print('normal focus')
+   zz.z_down()
+   time.sleep(0.5)
+  else:
+   pass 
+
+ zz.deactivate_control_loop()
+
+ #while(True):
+ for i in range(100):
+  frame = vis.take_picture()
+  vis.show_picture(frame)
+  vis.debug("Image in sequence max", img[index])
+
+ # Save data
+ #vis.save_image(frame, c)
+ #DB.inser_image(c)
+ #DB.insert_value(c)
+ #DB.update(c, samples, refocus)
+
+ vis.exit()
+
 def autofocus_v1(c):
  zz.activate_control_loop()
 
@@ -67,10 +138,13 @@ def autofocus_v1(c):
 
  # Save data
  vis.save_image(frame, c)
- DB.insert(c)
+ DB.inser_image(c)
+ DB.insert_value(c)
  DB.update(c, samples, refocus)
 
  vis.exit()
+
+""" ------------------ FAILED TESTS ------------------------ """
 
 def autofocus_v0():
  zz.activate_control_loop()
@@ -189,6 +263,11 @@ def autofocus_v2():
   frame = vis.take_picture()
   vis.show_picture(frame)
   #vis.debug('Stored_image', img[r_[1]])
+
+def exit():
+ vis.cap.release()
+ zz.ser.close()
+ vis.cv2.destroyAllWindows()
 
 if __name__ == '__main__':
  autofocus_v1()

@@ -32,7 +32,6 @@ def take_picture():
 def laplacian(frame, debug = False, gaussian = False):
  if debug == True:
   r_ = cv2.Laplacian(frame, cv2.CV_64F) if gaussian == False else cv2.Laplacian(cv2.GaussianBlur(frame, (5,5), 0), cv2.CV_64F)
-  
   show_image_debug(frame, r_.var())
   return r_, r_.var()
  else:

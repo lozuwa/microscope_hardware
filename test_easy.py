@@ -26,18 +26,19 @@ def down(x, ch):
   pass 
  #zz.deactivate_control_loop()
 
+def forw(x):
+ [xy.y_forward() for i in range(int(x))]
+
+def back(x):
+ [xy.y_backward() for i in range(int(x))]
+
 def right(x):
  [xy.x_right() for i in range(int(x))]
 
 def left(x):
  [xy.x_left() for i in range(int(x))]
 
-def seq(x):
- for i in range(int(x)):
-  up()
-  left()
-  down()
-  right()
+import autofocus as aut
 
 def exit():
  zz.ser.close()
