@@ -23,7 +23,6 @@ def autofocus_v3_debug(c):
   samples.append(frame_var)
 
   zz.z_up()
-  time.sleep(0.5)
   print(frame_var, i)
 
  m = max(samples)
@@ -63,14 +62,14 @@ def autofocus_v3_debug(c):
  zz.deactivate_control_loop()
 
  #while(True):
- for i in range(100):
+ for i in range(20):
   frame = vis.take_picture()
   vis.show_picture(frame)
   vis.debug("Image in sequence max", img[index])
 
  # Save data
- #vis.save_image(frame, c)
- #DB.inser_image(c)
+ vis.save_image(frame, c)
+ #DB.insert_image(c)
  #DB.insert_value(c)
  #DB.update(c, samples, refocus)
 

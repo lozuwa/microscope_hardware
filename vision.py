@@ -21,7 +21,7 @@ def show_image_debug(frame, val):
  cv2.waitKey(1)
 
 def save_image(frame, text):
- cv2.imwrite(str(text)+".png", frame)
+ cv2.imwrite('images/'+str(text)+".png", frame)
 
 def take_picture():
  for i in range(5):

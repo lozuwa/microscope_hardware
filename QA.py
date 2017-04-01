@@ -45,16 +45,15 @@ def seq():
    for i in range(25):
     aut.autofocus_v3_debug(count)
     count += 1
-    xy.x_right()
+    xy.x_left()
   else:
    for i in range(25):
     aut.autofocus_v3_debug(count)
     count += 1
-    xy.x_left()
+    xy.x_right()
   xy.y_forward()
   aut.autofocus_v3_debug(count)
   count += 1
-
                           
 def test_xy_positioner():
  for i in range(EPOCHS):
