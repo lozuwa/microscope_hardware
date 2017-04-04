@@ -38,8 +38,6 @@ def z_up():
  wait()
 
 def z_down():
- ser.write('z')
- wait()
  if GPIO.input(16) == GPIO.LOW:
   pass 
  else:

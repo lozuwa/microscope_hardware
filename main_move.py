@@ -32,7 +32,7 @@ if __name__ == '__main__':
   if data[0] > 215:
    print('Mover derecha')
    wii.x_right()
-  elif data[0] < 40:
+  elif data[0] < 55:
    print('Mover izquierda')
    wii.x_left()
   else:

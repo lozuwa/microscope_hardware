@@ -86,7 +86,7 @@ class nn:
    
   def read(self):
     self.bus.write_byte(0x52,0x00)
-    time.sleep(self.delay)
+    time.sleep(0.01)
     temp = [(0x17 + (0x17 ^ self.bus.read_byte(0x52))) for i in range(6)]
     return temp
 
