@@ -1,4 +1,4 @@
-  //Contains the declaration of the state variables for the control loop  
+//Contains the declaration of the state variables for the control loop
 
 
 //interrupt vars
@@ -35,7 +35,7 @@ volatile float DTerm;
 
 
 char mode;
-volatile bool dir = false;  
+volatile bool dir = false;
 
 bool print_yw = false;      //for step response, under development...
 

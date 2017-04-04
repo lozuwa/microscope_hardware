@@ -14,8 +14,8 @@ bus = smbus.SMBus(1)
 DEVICE_ADDRESS = 0x04 # 7 bit address (will be left shifted to add the read write bit)
 
 try:
- GPIO.setup(23, GPIO.IN, GPIO.PUD_UP) # x positioner 
- GPIO.setup(24, GPIO.IN, GPIO.PUD_UP) # y positioner 
+ GPIO.setup(23, GPIO.IN, GPIO.PUD_UP) # y positioner 
+ GPIO.setup(24, GPIO.IN, GPIO.PUD_UP) # x positioner 
 except:
  print('Failed GPIO initialization')
 
@@ -29,8 +29,8 @@ def wait():
   #print(r_)
 
 def x_right():
- if GPIO.input(23) == GPIO.LOW:
-  pass 
+ if GPIO.input(24) == GPIO.LOW:
+  pass
  else:
   bus.write_byte(DEVICE_ADDRESS, 0x07)
   wait()
@@ -40,11 +40,11 @@ def x_left():
  wait()
 
 def x_reset():
- while(GPIO.input(23) != GPIO.LOW):
+ while(GPIO.input(24) != GPIO.LOW):
   x_right()
  for i in range(5):
   x_left()
- while(GPIO.input(23) != GPIO.LOW):
+ while(GPIO.input(24) != GPIO.LOW):
   x_right()
 
 def y_forward():
@@ -52,16 +52,17 @@ def y_forward():
  wait()
 
 def y_backward():
- if GPIO.input(24) == GPIO.LOW:
+ if GPIO.input(23) == GPIO.LOW:
   pass 
  else:
   bus.write_byte(DEVICE_ADDRESS, 0x05)
   wait()
 
 def y_reset():
- while(GPIO.input(24) != GPIO.LOW):
+ while(GPIO.input(23) != GPIO.LOW):
+  print(GPIO.input(23))
   y_backward()
  for i in range(3):
   y_forward()
- while(GPIO.input(24) != GPIO.LOW):
+ while(GPIO.input(23) != GPIO.LOW):
   y_backward()

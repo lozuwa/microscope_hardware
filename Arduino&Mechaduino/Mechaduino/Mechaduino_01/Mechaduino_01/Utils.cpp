@@ -142,9 +142,9 @@ void calibrate() {   /// this is the calibration routine
   int iStart = 0;     //encoder zero position index
   int jStart = 0;
   int stepNo = 0;
-  
+
   int fullStepReadings[spr];
-    
+
   int fullStep = 0;
   int ticks = 0;
   float lookupAngle = 0.0;
@@ -392,7 +392,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       case 'k':
         parameterEditmain();
         break;
-        
+
       case 'g':
         sineGen();
         break;
@@ -400,26 +400,64 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       case 'm':
         serialMenu();
         break;
-        
+
       case 'j':
         stepResponse();
         break;
 
       case 'z':
-      for (int i = 0; i < 10000; i++) {
-        r -= 0.1;
+      for (int i = 0; i < 2; i++) {
+        r -= 1.8;
         delayMicroseconds(100);
       }
       SerialUSB.println('o');
       break;
-      
+
       case 'b':
-      for (int i = 0; i < 10000; i++) {
-        r += 0.1;
+      for (int i = 0; i < 2; i++) {
+        r += 1.8;
         delayMicroseconds(100);
       }
-      SerialUSB.println('o')
+      SerialUSB.println('o');
       break;
+
+      case 'Z':
+      for (int i = 0; i < 1; i++){
+      	r -= 1.8;
+      	delayMicroseconds(100);
+      }
+      SerialUSB.println('o');
+      break;
+
+      case 'B':
+      for (int i = 0; i < 1; i++){
+      	r += 1.8;
+      	delayMicroseconds(100);
+      }
+      SerialUSB.println('o');
+      break;
+
+      //// This does not work ok, don't use it //////
+      case '6':
+      for (int i = 0; i < 1; i++){
+      	r += 0.9;
+      	delayMicroseconds(100);
+      }
+      SerialUSB.println('o');
+      break;
+
+      case '9':
+      for (int i = 0; i < 1; i++){
+      	r -= 0.9;
+      	delayMicroseconds(100);
+      }
+      SerialUSB.println('o');
+      break;
+
+      /////////////------------------/////////////////
+      
+      
+      /////////////------------------/////////////////
 
       default:
         break;
@@ -494,7 +532,7 @@ void parameterQuery() {         //print current parameters in a format that can 
 
 
 void oneStep() {           /////////////////////////////////   oneStep    ///////////////////////////////
-  
+ 
   if (!dir) {
     stepNumber += 1;
   }

@@ -21,10 +21,10 @@ def show_image_debug(frame, val):
  cv2.waitKey(1)
 
 def save_image(frame, text):
- cv2.imwrite(str(text)+".png", frame)
+ cv2.imwrite('images/'+str(text)+".png", frame)
 
 def take_picture():
- for i in range(5):
+ for i in range(3):
   _, frame = cap.read()
   cv2.waitKey(1)
  return frame
@@ -32,7 +32,6 @@ def take_picture():
 def laplacian(frame, debug = False, gaussian = False):
  if debug == True:
   r_ = cv2.Laplacian(frame, cv2.CV_64F) if gaussian == False else cv2.Laplacian(cv2.GaussianBlur(frame, (5,5), 0), cv2.CV_64F)
-  
   show_image_debug(frame, r_.var())
   return r_, r_.var()
  else:
@@ -44,4 +43,4 @@ def gaussian(frame):
 def exit():
  #cap.release()
  cv2.destroyAllWindows()
- sys.exit()
+ #sys.exit()

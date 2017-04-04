@@ -23,7 +23,7 @@ except:
     print('Failed connection with device: ', ser)
     sys.exit()
 
-GPIO.setup(18, GPIO.IN, GPIO.PUD_UP) # z positioner 
+GPIO.setup(16, GPIO.IN, GPIO.PUD_UP) # z positioner 
 
 def deactivate_control_loop():
  ser.write('n')
@@ -38,7 +38,9 @@ def z_up():
  wait()
 
 def z_down():
- if GPIO.input(18) == GPIO.LOW:
+ ser.write('z')
+ wait()
+ if GPIO.input(16) == GPIO.LOW:
   pass 
  else:
   ser.write('z')
@@ -49,7 +51,7 @@ def z_mid_up():
  wait()
 
 def z_mid_down():
- if GPIO.input(18) == GPIO.LOW:
+ if GPIO.input(16) == GPIO.LOW:
   pass 
  else:
   ser.write('Z')
@@ -60,10 +62,10 @@ def z_fine_up():
  wait()
 
 def z_fine_down():
- if GPIO.input(18) == GPIO.LOW:
+ if GPIO.input(16) == GPIO.LOW:
   pass 
  else:
-  ser.write('3')
+  ser.write('9')
   wait()
 
 def wait():
@@ -71,7 +73,7 @@ def wait():
   continue
 
 def z_reset():
- while(GPIO.input(18) != GPIO.LOW):
+ while(GPIO.input(16) != GPIO.LOW):
   z_down()
  for i in range(65):
   z_up()
