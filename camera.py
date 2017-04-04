@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-import os, sys 
+import os, sys
+import main_move as mm
 
 try:
  cap = cv2.VideoCapture(0)

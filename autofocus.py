@@ -39,18 +39,16 @@ def refocus_v3():
   if ((20+20*1.5)-count < 0):
    break
 
-  if (frame_var > m) or ( (frame_var-m)**2 < 0.5 ):
+  if (frame_var > m) or ( (frame_var-m)**2 < 10 ):
    print('done! ', frame_var, m)
    break
-  elif ( (frame_var-m)**2 >= 0.5 and (frame_var-m)**2 < 2 ):
+  elif ( (frame_var-m)**2 >= 10 and (frame_var-m)**2 < 50 ):
    print('mid focus')
    zz.z_mid_down()
-   time.sleep(0.5)
-  elif ( (frame_var-m)**2 >= 1 ) : 
+  elif ( (frame_var-m)**2 >= 50 ) : 
   #elif ( (frame_var-m)**2 >= 1 and (frame_var-m)**2 < 10 ):
    print('normal focus')
    zz.z_down()
-   time.sleep(0.5)
   else:
    pass 
 
@@ -67,17 +65,17 @@ def autofocus_v3_debug(c):
  zz.activate_control_loop()
 
  #print("Reset z")
- #zz.z_reset()
+ zz.z_reset()
 
  print("------------------------Analysis---------------------------")
  samples = []
  img = []
- for i in range(25):
+ for i in range(35):
   frame = vis.take_picture()
   #vis.show_picture(frame)
 
-  #img.append(frame)
-  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
+  img.append(frame)
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
   samples.append(frame_var)
 
   zz.z_up()
@@ -94,7 +92,7 @@ def autofocus_v3_debug(c):
   frame = vis.take_picture()
   #vis.show_picture(frame)
 
-  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
+  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
   refocus.append(frame_var)
 
   print(frame_var, count, (frame_var-m)**2)
@@ -106,15 +104,13 @@ def autofocus_v3_debug(c):
   if (frame_var > m) or ( val < 0.5 ):
    print('done! ', frame_var, m)
    break
-  elif ( val >= 0.5 and val < 2.5 ):
+  elif ( val >= 0.5 and val < 6.5 ):
    print('mid focus')
    zz.z_mid_down()
-   time.sleep(0.5)
-  elif ( val >= 1 ) : 
+  elif ( val >= 6.5 ) : 
   #elif ( (frame_var-m)**2 >= 1 and (frame_var-m)**2 < 10 ):
    print('normal focus')
    zz.z_down()
-   time.sleep(0.5)
   else:
    pass 
 
@@ -124,7 +120,7 @@ def autofocus_v3_debug(c):
  for i in range(10):
   frame = vis.take_picture()
   vis.show_picture(frame)
-  #vis.debug("Image in sequence max", img[index])
+  vis.debug("Image in sequence max", img[index])
 
  # Save data
  #vis.save_image(frame, c)

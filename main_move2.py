@@ -43,14 +43,7 @@ if __name__ == '__main__':
   # Z axis (z button)
   if (data[5] & 0x01) == False:
    zz.activate_control_loop()
-   if data[1] > 195:
-    print('Mover arriba')
-    zz.z_up()
-   elif data[1] < 50:
-    print('Mover abajo')
-    zz.z_down()
-   else:
-    pass 
+   zz.z_up()
   # Y axis 
   elif (data[5] & 0x01) == True:
    zz.deactivate_control_loop()
@@ -66,10 +59,8 @@ if __name__ == '__main__':
    pass
 
   if (data[5] & 0x02) == False:
-   #[xy.,x_right() for i in range(10)]
-   #[xy.y_forward() for i in range(4)]
-   aut.autofocus_v3_debug(0)
-   print('Tomar fotografia')
+   zz.activate_control_loop()
+   zz.z_down()
   else:
    pass 
  

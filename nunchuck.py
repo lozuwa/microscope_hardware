@@ -92,7 +92,7 @@ class nn:
 
   def raw(self):
     self.bus.write_byte_data(0x52,0x40,0x00)
-    time.sleep(0.01)
+    time.sleep(0.03)
     data = self.read()
     return data
 
