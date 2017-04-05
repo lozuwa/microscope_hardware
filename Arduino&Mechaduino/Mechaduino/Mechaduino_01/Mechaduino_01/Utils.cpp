@@ -10,6 +10,8 @@
 #include "State.h"
 #include "analogFastWrite.h"
 
+#define SPEED 10
+
 void setupPins() {
 
   pinMode(VREF_2, OUTPUT);
@@ -21,8 +23,8 @@ void setupPins() {
 
   pinMode(chipSelectPin, OUTPUT); // CSn -- has to toggle high and low to signal chip to start data transfer
 
-  
-#ifdef ENABLE_PROFILE_IO  
+
+#ifdef ENABLE_PROFILE_IO
   pinMode(TEST1, OUTPUT);
 #endif
 
@@ -76,31 +78,31 @@ void dirInterrupt() {
 }
 
 void enableInterrupt() {            //enable pin interrupt handler
-  if (REG_PORT_IN0 & PORT_PA14){   // check if enable_pin is HIGH
+  if (REG_PORT_IN0 & PORT_PA14) {  // check if enable_pin is HIGH
     disableTCInterrupts();
     analogFastWrite(VREF_2, 0.33 * uMAX);
     analogFastWrite(VREF_1, 0.33 * uMAX);
-    }
-  else{
-    enableTCInterrupts();    
-    }
+  }
+  else {
+    enableTCInterrupts();
+  }
 }
 
 void output(float theta, int effort) {
-   int angle_1;
-   int angle_2;
-   int v_coil_A;
-   int v_coil_B;
+  int angle_1;
+  int angle_2;
+  int v_coil_A;
+  int v_coil_B;
 
-   int sin_coil_A;
-   int sin_coil_B;
-   int phase_multiplier = 10 * spr / 4;
+  int sin_coil_A;
+  int sin_coil_B;
+  int phase_multiplier = 10 * spr / 4;
 
   //REG_PORT_OUTCLR0 = PORT_PA09; for debugging/timing
 
   angle_1 = mod((phase_multiplier * theta) , 3600);   //
-  angle_2 = mod((phase_multiplier * theta)+900 , 3600);
-  
+  angle_2 = mod((phase_multiplier * theta) + 900 , 3600);
+
   sin_coil_A  = sin_1[angle_1];
 
   sin_coil_B = sin_1[angle_2];
@@ -177,7 +179,7 @@ void calibrate() {   /// this is the calibration routine
 
     encoderReading = 0;
     delay(100);                         //moving too fast may not give accurate readings.  Motor needs time to settle after each step.
-    
+
     for (int reading = 0; reading < avg; reading++) {  //average multple readings at each step
       encoderReading += readEncoder();
       delay(10);
@@ -185,15 +187,15 @@ void calibrate() {   /// this is the calibration routine
     encoderReading = encoderReading / avg;
 
     fullStepReadings[x] = encoderReading;
-   // SerialUSB.println(fullStepReadings[x], DEC);      //print readings as a sanity check
-    SerialUSB.print(100.0*x/spr,1);
+    // SerialUSB.println(fullStepReadings[x], DEC);      //print readings as a sanity check
+    SerialUSB.print(100.0 * x / spr, 1);
     SerialUSB.println("%");
-    
+
     oneStep();
   }
- // SerialUSB.println(" ");
- // SerialUSB.println("ticks:");                        //"ticks" represents the number of encoder counts between successive steps... these should be around 82 for a 1.8 degree stepper
- // SerialUSB.println(" ");
+  // SerialUSB.println(" ");
+  // SerialUSB.println("ticks:");                        //"ticks" represents the number of encoder counts between successive steps... these should be around 82 for a 1.8 degree stepper
+  // SerialUSB.println(" ");
   for (int i = 0; i < spr; i++) {
     ticks = fullStepReadings[mod((i + 1), spr)] - fullStepReadings[mod((i), spr)];
     if (ticks < -15000) {
@@ -203,7 +205,7 @@ void calibrate() {   /// this is the calibration routine
     else if (ticks > 15000) {
       ticks -= cpr;
     }
-   // SerialUSB.println(ticks);
+    // SerialUSB.println(ticks);
 
     if (ticks > 1) {                                    //note starting point with iStart,jStart
       for (int j = 0; j < ticks; j++) {
@@ -341,10 +343,10 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       case 'w':                //old command
         calibrate();           //cal routine
         break;
-        
+
       case 'c':
         calibrate();           //cal routine
-        break;        
+        break;
 
       case 'e':
         readEncoderDiagnostics();   //encoder error?
@@ -405,60 +407,40 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
         stepResponse();
         break;
 
+      /////--------------------------------------------------------------
       case 'z':
-      for (int i = 0; i < 2; i++) {
-        r -= 1.8;
-        delayMicroseconds(100);
-      }
-      SerialUSB.println('o');
-      break;
+        for (int i = 0; i < 1; i++) {
+          r -= 2;
+          delayMicroseconds(SPEED);
+        }
+        SerialUSB.println('o');
+        break;
 
       case 'b':
-      for (int i = 0; i < 2; i++) {
-        r += 1.8;
-        delayMicroseconds(100);
-      }
-      SerialUSB.println('o');
-      break;
+        for (int i = 0; i < 1; i++) {
+          r += 2;
+          delayMicroseconds(SPEED);
+        }
+        SerialUSB.println('o');
+        break;
 
       case 'Z':
-      for (int i = 0; i < 1; i++){
-      	r -= 1.8;
-      	delayMicroseconds(100);
-      }
-      SerialUSB.println('o');
-      break;
+        for (int i = 0; i < 1; i++) {
+          r -= 1;
+          delayMicroseconds(SPEED);
+        }
+        SerialUSB.println('o');
+        break;
 
       case 'B':
-      for (int i = 0; i < 1; i++){
-      	r += 1.8;
-      	delayMicroseconds(100);
-      }
-      SerialUSB.println('o');
-      break;
+        for (int i = 0; i < 1; i++) {
+          r += 1;
+          delayMicroseconds(SPEED);
+        }
+        SerialUSB.println('o');
+        break;
 
-      //// This does not work ok, don't use it //////
-      case '6':
-      for (int i = 0; i < 1; i++){
-      	r += 0.9;
-      	delayMicroseconds(100);
-      }
-      SerialUSB.println('o');
-      break;
-
-      case '9':
-      for (int i = 0; i < 1; i++){
-      	r -= 0.9;
-      	delayMicroseconds(100);
-      }
-      SerialUSB.println('o');
-      break;
-
-      /////////////------------------/////////////////
-      
-      
-      /////////////------------------/////////////////
-
+      /////------------------0--------------------------------------------
       default:
         break;
     }
@@ -481,7 +463,7 @@ void parameterQuery() {         //print current parameters in a format that can 
   SerialUSB.print("volatile float pKp = ");
   SerialUSB.print(pKp, DEC);
   SerialUSB.println(";      //position mode PID vallues.");
-  
+
   SerialUSB.print("volatile float pKi = ");
   SerialUSB.print(pKi, DEC);
   SerialUSB.println(";");
@@ -489,7 +471,7 @@ void parameterQuery() {         //print current parameters in a format that can 
   SerialUSB.print("volatile float pKd = ");
   SerialUSB.print(pKd, DEC);
   SerialUSB.println(";");
-  
+
   SerialUSB.print("volatile float pLPF = ");
   SerialUSB.print(pLPF, DEC);
   SerialUSB.println(";");
@@ -503,14 +485,14 @@ void parameterQuery() {         //print current parameters in a format that can 
   SerialUSB.print("volatile float vKi = ");
   SerialUSB.print(vKi , DEC);
   SerialUSB.println(";");
- // SerialUSB.println(vKi * Fs, DEC);
- // SerialUSB.println(" / Fs;");
+  // SerialUSB.println(vKi * Fs, DEC);
+  // SerialUSB.println(" / Fs;");
 
   SerialUSB.print("volatile float vKd = ");
   SerialUSB.print(vKd, DEC);
   SerialUSB.println(";");
- // SerialUSB.print(vKd / Fs);
- // SerialUSB.println(" * FS;");
+  // SerialUSB.print(vKd / Fs);
+  // SerialUSB.println(" * FS;");
   SerialUSB.print("volatile float vLPF = ");
   SerialUSB.print(vLPF, DEC);
   SerialUSB.println(";");
@@ -518,7 +500,7 @@ void parameterQuery() {         //print current parameters in a format that can 
   SerialUSB.println("");
   SerialUSB.println("//This is the encoder lookup table (created by calibration routine)");
   SerialUSB.println("");
-  
+
   SerialUSB.println("const float lookup[] = {");
   for (int i = 0; i < 16384; i++) {
     SerialUSB.print(lookup[i]);
@@ -532,7 +514,7 @@ void parameterQuery() {         //print current parameters in a format that can 
 
 
 void oneStep() {           /////////////////////////////////   oneStep    ///////////////////////////////
- 
+
   if (!dir) {
     stepNumber += 1;
   }
@@ -548,7 +530,7 @@ void oneStep() {           /////////////////////////////////   oneStep    //////
 int readEncoder()           //////////////////////////////////////////////////////   READENCODER   ////////////////////////////
 {
   long angleTemp;
-  
+
   CHIPSELECT_LOW(); //digitalWrite(chipSelectPin, LOW);
 
   byte b1 = SPI.transfer(0xFF);
@@ -658,22 +640,22 @@ void print_angle()                ///////////////////////////////////       PRIN
   int encoderReading = 0;
   int rawReading = 0;
   float anglefloat = 0.0;
-  
+
   disableTCInterrupts();        //can't use readEncoder while in closed loop
 
 
   for (int reading = 0; reading < avg; reading++) {  //average multple readings at each step
     encoderReading += readEncoder();
     delay(10);
-    }
+  }
 
   anglefloat = encoderReading * 0.02197265625 / avg;     //    360/16384 = 0.021972....
-  SerialUSB.print("stepNumber: ");
-  SerialUSB.print(stepNumber, DEC);
-  SerialUSB.print(" , ");
-//  SerialUSB.print(stepNumber * aps, DEC);
-//  SerialUSB.print(" , ");
-  SerialUSB.print("Angle: ");
+  //SerialUSB.print("stepNumber: ");
+  //SerialUSB.print(stepNumber, DEC);
+  //SerialUSB.print(" , ");
+  //  SerialUSB.print(stepNumber * aps, DEC);
+  //  SerialUSB.print(" , ");
+  //SerialUSB.print("Angle: ");
   SerialUSB.println(anglefloat, 2);
 }
 
@@ -816,9 +798,9 @@ void parameterEditmain() {
 }
 
 void parameterEditp() {
-  
+
   bool quit = false;
-  while(!quit){
+  while (!quit) {
     SerialUSB.println("Edit position loop gains:");
     SerialUSB.println();
     SerialUSB.print("p ----- pKp = ");
@@ -828,13 +810,13 @@ void parameterEditp() {
     SerialUSB.print("d ----- pKd = ");
     SerialUSB.println(pKd, DEC);
     SerialUSB.print("l----- LPF = ");
-    SerialUSB.println(pLPF,DEC);
+    SerialUSB.println(pLPF, DEC);
     SerialUSB.println("q ----- quit");
     SerialUSB.println();
-    
+
     while (SerialUSB.available() == 0)  {}
     char inChar3 = (char)SerialUSB.read();
-    
+
     switch (inChar3) {
       case 'p':
         {
@@ -866,20 +848,20 @@ void parameterEditp() {
           SerialUSB.println("");
         }
         break;
-       case 'l':
+      case 'l':
         {
           SerialUSB.println("pLPF = ?");
           while (SerialUSB.available() == 0)  {}
           pLPF = SerialUSB.parseFloat();
-          pLPFa = exp(pLPF*-2*3.14159/Fs);
-          pLPFb = (1.0-pLPFa);
+          pLPFa = exp(pLPF * -2 * 3.14159 / Fs);
+          pLPFb = (1.0 - pLPFa);
           SerialUSB.print("new pLPF = ");
           SerialUSB.println(pLPF, DEC);
           SerialUSB.println("");
         }
         break;
       case 'q':
-        {  
+        {
           quit = true;
           SerialUSB.println("");
           SerialUSB.println("done...");
@@ -894,7 +876,7 @@ void parameterEditp() {
 
 void parameterEditv() {
   bool quit = false;
-  while(!quit){  
+  while (!quit) {
     SerialUSB.println("Edit velocity loop gains:");
     SerialUSB.println();
     SerialUSB.print("p ----- vKp = ");
@@ -907,10 +889,10 @@ void parameterEditv() {
     SerialUSB.println(vLPF, DEC);
     SerialUSB.println("q ----- quit");
     SerialUSB.println();
-  
+
     while (SerialUSB.available() == 0)  {}
     char inChar4 = (char)SerialUSB.read();
-  
+
     switch (inChar4) {
       case 'p':
         {
@@ -939,30 +921,30 @@ void parameterEditv() {
           SerialUSB.println(vKd, DEC);
         }
         break;
-       case 'l':
+      case 'l':
         {
           SerialUSB.println("vLPF = ?");
           while (SerialUSB.available() == 0)  {}
           vLPF = SerialUSB.parseFloat();
-          vLPFa = (exp(vLPF*-2*3.14159/Fs));
-          vLPFb = (1.0-vLPFa)* Fs * 0.16666667;
+          vLPFa = (exp(vLPF * -2 * 3.14159 / Fs));
+          vLPFb = (1.0 - vLPFa) * Fs * 0.16666667;
           SerialUSB.print("new vLPF = ");
           SerialUSB.println(vLPF, DEC);
           SerialUSB.println("");
         }
         break;
       case 'q':
-        {  
+        {
           quit = true;
           SerialUSB.println("");
           SerialUSB.println("done...");
-          SerialUSB.println("");  
+          SerialUSB.println("");
         }
       default:
         {}
         break;
     }
-  }  
+  }
 }
 
 void parameterEdito() {
@@ -1041,7 +1023,7 @@ void serialMenu() {
   SerialUSB.println(" n  -  disable control loop");
   SerialUSB.println(" r  -  enter new setpoint");
   SerialUSB.println("");
-   SerialUSB.println(" j  -  step response");
+  SerialUSB.println(" j  -  step response");
   SerialUSB.println(" k  -  edit controller gains -- note, these edits are stored in volatile memory and will be reset if power is cycled");
   SerialUSB.println(" g  -  generate sine commutation table");
   SerialUSB.println(" m  -  print main menu");
@@ -1050,18 +1032,18 @@ void serialMenu() {
 }
 void sineGen() {
   int temp;
-     SerialUSB.println("");
-     SerialUSB.println("The sineGen() function in Utils.cpp generates a sinusoidal commutation table.");
-     SerialUSB.println("You can experiment with different commutation profiles by modifying this table.");
-     SerialUSB.println("The below table should be copied into sine_1 in Parameters.cpp.");   
-     SerialUSB.println("");
-     delay(3000);
-     SerialUSB.println("Printing sine look up table:...");
-     SerialUSB.println("");
+  SerialUSB.println("");
+  SerialUSB.println("The sineGen() function in Utils.cpp generates a sinusoidal commutation table.");
+  SerialUSB.println("You can experiment with different commutation profiles by modifying this table.");
+  SerialUSB.println("The below table should be copied into sine_1 in Parameters.cpp.");
+  SerialUSB.println("");
+  delay(3000);
+  SerialUSB.println("Printing sine look up table:...");
+  SerialUSB.println("");
   for (int x = 0; x <= 3600; x++) {
     temp = round(1024.0 * sin((3.14159265358979 * ((x * 0.1 / 180.0) + 0.25))));
-   SerialUSB.print(temp);
-   SerialUSB.print(", ");  
+    SerialUSB.print(temp);
+    SerialUSB.print(", ");
   }
 
 }
@@ -1110,180 +1092,180 @@ void stepResponse() {     // not done yet...
 
 
 
-void moveRel(float pos_final,int vel_max, int accel){
-  
-   //Use this function for slow relative movements in closed loop position mode
-   //
-   // This function creates a "trapezoidal speed" trajectory (constant accel, and max speed, constant decel);
-   // It works pretty well, but it may not be perfect
-   // 
-   // pos_final is the desired position in degrees
-   // vel_max is the max velocity in degrees/second
-   // accel is the max accel in degrees/second^2
-   //
-   //Note that the actual max velocity is limited by the execution speed of all the math below.
-   //Adjusting dpos (delta position, or step size) allows you to trade higher speeds for smoother motion
-   //Max speed with dpos = 0.225 degrees is about 180 deg/sec
-   //Max speed with dpos = 0.45 degrees is about 360 deg/sec 
-  
+void moveRel(float pos_final, int vel_max, int accel) {
+
+  //Use this function for slow relative movements in closed loop position mode
+  //
+  // This function creates a "trapezoidal speed" trajectory (constant accel, and max speed, constant decel);
+  // It works pretty well, but it may not be perfect
+  //
+  // pos_final is the desired position in degrees
+  // vel_max is the max velocity in degrees/second
+  // accel is the max accel in degrees/second^2
+  //
+  //Note that the actual max velocity is limited by the execution speed of all the math below.
+  //Adjusting dpos (delta position, or step size) allows you to trade higher speeds for smoother motion
+  //Max speed with dpos = 0.225 degrees is about 180 deg/sec
+  //Max speed with dpos = 0.45 degrees is about 360 deg/sec
+
   float pos = 0;
   float dpos = 0.45;  // "step size" in degrees, smaller is smoother, but will limit max speed, keep below stepper step angle
-  float vel = 0;      // 
-  float vel_1 =0;
+  float vel = 0;      //
+  float vel_1 = 0;
   int start = micros(); //for debugging
 
-  float accel_x_dpos = accel*dpos;  // pre calculate
-  float dpos_x_1000000 = dpos*1000000.0; // pre calculate
+  float accel_x_dpos = accel * dpos; // pre calculate
+  float dpos_x_1000000 = dpos * 1000000.0; // pre calculate
 
-  float pos_remaining = pos_final-pos;
-  unsigned long dt =0; 
+  float pos_remaining = pos_final - pos;
+  unsigned long dt = 0;
   unsigned long t = micros();
   unsigned long t_1 = t;
 
   float r0 = r;  //hold initial setpoint
 
   // Assume we're decelerating and calculate speed along deceleration profile
-  
-  while (abs(pos_remaining) >(dpos/2)){  //(may not actually reach exactly so leave some margin
-  
+
+  while (abs(pos_remaining) > (dpos / 2)) { //(may not actually reach exactly so leave some margin
+
     if (pos_remaining > 0)        // clockwise
-    vel = sqrt(2.0 * pos_remaining * accel);
+      vel = sqrt(2.0 * pos_remaining * accel);
     else                      // counter clockwise
-    vel = -sqrt(2.0 * -pos_remaining * accel);
+      vel = -sqrt(2.0 * -pos_remaining * accel);
 
     if (vel > vel_1)  // Check if we actually need to accelerate in  clockwise direction
-      {
+    {
 
-      if (vel_1 == 0)  
+      if (vel_1 == 0)
         vel = sqrt(2.0 * accel_x_dpos);
       else
-        vel = vel_1 + abs(accel_x_dpos/ vel_1);
+        vel = vel_1 + abs(accel_x_dpos / vel_1);
       if (vel > vel_max)
         vel = vel_max;
-      }
+    }
     else if (vel < vel_1)
     {
-    // Need to accelerate in  counter clockwise direction
-    if (vel_1 == 0)
-      vel = -sqrt(2.0 * accel_x_dpos);
-    else
-      vel = vel_1 - abs(accel_x_dpos/ vel_1);
-    if (vel < -vel_max)
-      vel = -vel_max;
+      // Need to accelerate in  counter clockwise direction
+      if (vel_1 == 0)
+        vel = -sqrt(2.0 * accel_x_dpos);
+      else
+        vel = vel_1 - abs(accel_x_dpos / vel_1);
+      if (vel < -vel_max)
+        vel = -vel_max;
     }
-  //  SerialUSB.println(vel);
-  
- 
-  dt = abs(dpos_x_1000000 / vel);
-  
-    while(t < t_1 + dt) {           //wait calculated dt 
-    t = micros();
+    //  SerialUSB.println(vel);
+
+
+    dt = abs(dpos_x_1000000 / vel);
+
+    while (t < t_1 + dt) {          //wait calculated dt
+      t = micros();
     }
-  
-  if (vel > 0)  pos += dpos;        //update setpoint
-  else if (vel < 0) pos -= dpos;
-  r= r0 + pos;
-  
-  //SerialUSB.print(micros()-start);
-  //SerialUSB.print(" , ");
-  
-  t_1 = t;  
-  vel_1 = vel;
-  pos_remaining = pos_final-pos;
-  
+
+    if (vel > 0)  pos += dpos;        //update setpoint
+    else if (vel < 0) pos -= dpos;
+    r = r0 + pos;
+
+    //SerialUSB.print(micros()-start);
+    //SerialUSB.print(" , ");
+
+    t_1 = t;
+    vel_1 = vel;
+    pos_remaining = pos_final - pos;
+
   }
-  r = r0 +pos_final;
+  r = r0 + pos_final;
   //SerialUSB.print(micros()-start);
-  
+
 }
 
 
 
 
-void moveAbs(float pos_final,int vel_max, int accel){
-  
-   //Use this function for slow absolute movements in closed loop position mode
-   //
-   // This function creates a "trapezoidal speed" trajectory (constant accel, and max speed, constant decel);
-   // It works pretty well, but it may not be perfect
-   // 
-   // pos_final is the desired position in degrees
-   // vel_max is the max velocity in degrees/second
-   // accel is the max accel in degrees/second^2
-   //
-   //Note that the actual max velocity is limited by the execution speed of all the math below.
-   //Adjusting dpos (delta position, or step size) allows you to trade higher speeds for smoother motion
-   //Max speed with dpos = 0.225 degrees is about 180 deg/sec
-   //Max speed with dpos = 0.45 degrees is about 360 deg/sec
-  
+void moveAbs(float pos_final, int vel_max, int accel) {
+
+  //Use this function for slow absolute movements in closed loop position mode
+  //
+  // This function creates a "trapezoidal speed" trajectory (constant accel, and max speed, constant decel);
+  // It works pretty well, but it may not be perfect
+  //
+  // pos_final is the desired position in degrees
+  // vel_max is the max velocity in degrees/second
+  // accel is the max accel in degrees/second^2
+  //
+  //Note that the actual max velocity is limited by the execution speed of all the math below.
+  //Adjusting dpos (delta position, or step size) allows you to trade higher speeds for smoother motion
+  //Max speed with dpos = 0.225 degrees is about 180 deg/sec
+  //Max speed with dpos = 0.45 degrees is about 360 deg/sec
+
   float pos = r;
   float dpos = 0.225;  // "step size" in degrees, smaller is smoother, but will limit max speed, keep below stepper step angle
-  float vel = 0;      // 
-  float vel_1 =0;
- // int start = micros(); //for debugging
+  float vel = 0;      //
+  float vel_1 = 0;
+  // int start = micros(); //for debugging
 
-  float accel_x_dpos = accel*dpos;  // pre calculate
-  float dpos_x_1000000 = dpos*1000000.0; // pre calculate
+  float accel_x_dpos = accel * dpos; // pre calculate
+  float dpos_x_1000000 = dpos * 1000000.0; // pre calculate
 
-  float pos_remaining = pos_final-pos;
-  unsigned long dt =0; 
+  float pos_remaining = pos_final - pos;
+  unsigned long dt = 0;
   unsigned long t = micros();
   unsigned long t_1 = t;
 
 
   // Assume we're decelerating and calculate speed along deceleration profile
-  
-  while (abs(pos_remaining) >(dpos/2)){  //(may not actually reach exactly so leave some margin
-  
+
+  while (abs(pos_remaining) > (dpos / 2)) { //(may not actually reach exactly so leave some margin
+
     if (pos_remaining > 0)        // clockwise
-    vel = sqrt(2.0 * pos_remaining * accel);
+      vel = sqrt(2.0 * pos_remaining * accel);
     else                      // counter clockwise
-    vel = -sqrt(2.0 * -pos_remaining * accel);
+      vel = -sqrt(2.0 * -pos_remaining * accel);
 
     if (vel > vel_1)  // Check if we actually need to accelerate in  clockwise direction
-      {
+    {
 
-      if (vel_1 == 0)  
+      if (vel_1 == 0)
         vel = sqrt(2.0 * accel_x_dpos);
       else
-        vel = vel_1 + abs(accel_x_dpos/ vel_1);
+        vel = vel_1 + abs(accel_x_dpos / vel_1);
       if (vel > vel_max)
         vel = vel_max;
-      }
+    }
     else if (vel < vel_1)
     {
-    // Need to accelerate in  counter clockwise direction
-    if (vel_1 == 0)
-      vel = -sqrt(2.0 * accel_x_dpos);
-    else
-      vel = vel_1 - abs(accel_x_dpos/ vel_1);
-    if (vel < -vel_max)
-      vel = -vel_max;
+      // Need to accelerate in  counter clockwise direction
+      if (vel_1 == 0)
+        vel = -sqrt(2.0 * accel_x_dpos);
+      else
+        vel = vel_1 - abs(accel_x_dpos / vel_1);
+      if (vel < -vel_max)
+        vel = -vel_max;
     }
-  //  SerialUSB.println(vel);
-  
- 
-  dt = abs(dpos_x_1000000 / vel);
-  
-    while(t < t_1 + dt) {           //wait calculated dt 
-    t = micros();
+    //  SerialUSB.println(vel);
+
+
+    dt = abs(dpos_x_1000000 / vel);
+
+    while (t < t_1 + dt) {          //wait calculated dt
+      t = micros();
     }
-  
-  if (vel > 0)  pos += dpos;        //update setpoint
-  else if (vel < 0) pos -= dpos;
-  r= pos;
-  
-  //SerialUSB.print(micros()-start);    //for debugging
-  //SerialUSB.print(" , ");
-  
-  t_1 = t;  
-  vel_1 = vel;
-  pos_remaining = pos_final-pos;
-  
+
+    if (vel > 0)  pos += dpos;        //update setpoint
+    else if (vel < 0) pos -= dpos;
+    r = pos;
+
+    //SerialUSB.print(micros()-start);    //for debugging
+    //SerialUSB.print(" , ");
+
+    t_1 = t;
+    vel_1 = vel;
+    pos_remaining = pos_final - pos;
+
   }
   r = pos_final;
   //SerialUSB.print(micros()-start);
-  
+
 }
 
 
