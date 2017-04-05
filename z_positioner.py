@@ -55,17 +55,6 @@ def z_mid_down():
   ser.write('Z')
   wait()
 
-def z_fine_up():
- ser.write('6')
- wait()
-
-def z_fine_down():
- if GPIO.input(16) == GPIO.LOW:
-  pass 
- else:
-  ser.write('9')
-  wait()
-
 def wait():
  while (ser.read() != 'o'):
   continue
