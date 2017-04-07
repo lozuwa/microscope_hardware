@@ -1,16 +1,16 @@
 import z_positioner as zz
-from nunchuck import nn 
-import autofocus as aut 
+from nnchk import nn
+import time
 
 if __name__ == '__main__':
- # Avoid control loop bug 
- zz.deactivate_control_loop()
+ # Avoid control loop bug
+ zz.init()
  zz.activate_control_loop()
  zz.deactivate_control_loop()
-
- # Start all the necessary drivers 
+ 
+ # Start wii driver
  wii = nn()
-
+ 
  # Restart drivers 
  print('---------------Reset X-----------------------')
  wii.x_reset()
@@ -26,34 +26,32 @@ if __name__ == '__main__':
  zz.deactivate_control_loop()
  print('ok')
 
- print('------------------Control Manuel-------------------------')
+ print('------------------Control Manual-------------------------')
  while(True):
-  data = wii.raw()
-  #print(data)
-  # X axis 
-  if data[0] > 215:
-   print('Mover derecha')
-   wii.x_right()
-  elif data[0] < 55:
-   print('Mover izquierda')
-   wii.x_left()
-  else:
-   pass 
+  data = wii.read()
+  #time.sleep(0.01)
+  print(data)
  
-  # Z axis (z button)
-  if (data[5] & 0x01) == False:
+  # Z axis 
+  if ((data[5] & 0x01) == 0) and ((data[5] & 0x02) != 0):
+   print('Mover arriba')
    zz.activate_control_loop()
-   if data[1] > 195:
-    print('Mover arriba')
-    zz.z_up()
-   elif data[1] < 50:
-    print('Mover abajo')
-    zz.z_down()
+   zz.z_up() 
+  elif ((data[5] & 0x02) == 0) and ((data[5] & 0x01) != 0):
+   print('Mover abajo')
+   zz.activate_control_loop()
+   zz.z_down()
+  elif ((data[5] & 0x02) != 0) and ((data[5] & 0x01) != 0):
+   # X axis 
+   if data[0] > 215:
+    print('Mover derecha')
+    wii.x_right()
+   elif data[0] < 55:
+    print('Mover izquierda')
+    wii.x_left()
    else:
     pass 
-  # Y axis 
-  elif (data[5] & 0x01) == True:
-   zz.deactivate_control_loop()
+   # Y axis 
    if data[1] > 195:
     print('Mover adelante')
     wii.y_backward()
@@ -62,18 +60,3 @@ if __name__ == '__main__':
     wii.y_forward()
    else:
     pass
-  else:
-   pass
-
-  if (data[5] & 0x02) == False:
-   #[xy.,x_right() for i in range(10)]
-   #[xy.y_forward() for i in range(4)]
-   aut.autofocus_v3_debug(0)
-   print('Tomar fotografia')
-  else:
-   pass 
- 
- # Restart drivers 
- wii.x_reset() 
- wii.y_reset()
- zz.z_reset()

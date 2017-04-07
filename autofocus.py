@@ -5,62 +5,6 @@ import numpy as np
 import time, os, sys 
 import db as DB 
 
-def refocus_v3():
- zz.activate_control_loop()
- print('Refocus')
- # Go down 
- for i in range(10):
-  zz.z_down()
- # Go up again with the analysis
- samples = [] 
- for i in range(30):
-  frame = vis.take_picture()
-  #vis.show_picture(frame)
-
-  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
-  samples.append(frame_var)
-
-  zz.z_up()
-
- m = max(samples)
- index = samples.index(m)
-
- refocus = []
- count = 0
- while(True):
-  frame = vis.take_picture()
-  #vis.show_picture(frame)
-
-  frame, frame_var = vis.laplacian(frame, debug=True, gaussian=True)
-  refocus.append(frame_var)
-
-  print(frame_var, count, (frame_var-m)**2)
-  count+=1
-  if ((20+20*1.5)-count < 0):
-   break
-
-  if (frame_var > m) or ( (frame_var-m)**2 < 10 ):
-   print('done! ', frame_var, m)
-   break
-  elif ( (frame_var-m)**2 >= 10 and (frame_var-m)**2 < 50 ):
-   print('mid focus')
-   zz.z_mid_down()
-  elif ( (frame_var-m)**2 >= 50 ) : 
-  #elif ( (frame_var-m)**2 >= 1 and (frame_var-m)**2 < 10 ):
-   print('normal focus')
-   zz.z_down()
-  else:
-   pass 
-
- zz.deactivate_control_loop()
-
- for i in range(10):
-  frame = vis.take_picture()
-  vis.show_picture(frame)
-  #vis.debug("Image in sequence max", img[index])
-
- vis.exit()
-
 def autofocus_v3_debug(c):
  zz.activate_control_loop()
 

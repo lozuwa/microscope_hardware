@@ -60,7 +60,7 @@ def y_backward():
 
 def y_reset():
  while(GPIO.input(23) != GPIO.LOW):
-  print(GPIO.input(23))
+  #print(GPIO.input(23))
   y_backward()
  for i in range(3):
   y_forward()

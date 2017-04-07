@@ -17,13 +17,14 @@ except:
   try:
    ser = serial.Serial('/dev/ttyACM2', 115200, timeout=5)
   except:
-   try:
-    ser = serial.Serial('/dev/ttyACM3', 115200, timeout=5)
-   except:
-    print('Failed connection with device: ', ser)
-    sys.exit()
+   print('Failed connection with device: ', ser)
+   sys.exit()
 
 GPIO.setup(16, GPIO.IN, GPIO.PUD_UP) # z positioner 
+
+def init():
+ ser.write('x')
+ time.sleep(0.01)
 
 def deactivate_control_loop():
  ser.write('n')
@@ -39,7 +40,7 @@ def z_up():
 
 def z_down():
  if GPIO.input(16) == GPIO.LOW:
-  pass 
+  pass
  else:
   ser.write('z')
   wait()
