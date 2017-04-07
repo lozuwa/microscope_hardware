@@ -45,12 +45,18 @@ class nn:
   if gpio.input(24) == gpio.LOW:
    pass
   else:
-   self.bus.write_byte(self.arduino_address, 0x07)
-   self.wait()
+   try:
+    self.bus.write_byte(self.arduino_address, 0x07)
+    self.wait()
+   except:
+    pass
 
  def x_left(self):
-  self.bus.write_byte(self.arduino_address, 0x04)
-  self.wait()
+  try:
+   self.bus.write_byte(self.arduino_address, 0x04)
+   self.wait()
+  except: 
+   pass 
 
  def x_reset(self):
   while(gpio.input(24) != gpio.LOW):
@@ -61,15 +67,21 @@ class nn:
    self.x_right()
 
  def y_forward(self):
-  self.bus.write_byte(self.arduino_address, 0x08)
-  self.wait()
+  try:
+   self.bus.write_byte(self.arduino_address, 0x08)
+   self.wait()
+  except:
+   pass
 
  def y_backward(self):
   if gpio.input(23) == gpio.LOW:
    pass
-  else:
-   self.bus.write_byte(self.arduino_address, 0x05)
-   self.wait()
+  else: 
+   try:
+    self.bus.write_byte(self.arduino_address, 0x05)
+    self.wait()
+   except:
+    pass 
 
  def y_reset(self):
   while(gpio.input(23) != gpio.LOW):
@@ -80,11 +92,17 @@ class nn:
    self.y_backward()
 
  def read(self):
-  self.bus.write_byte_data(0x52,0x40,0x00)
-  time.sleep(self.delay)
-  self.bus.write_byte(0x52,0x00)
-  time.sleep(self.delay)
-  temp = [(0x17 + (0x17 ^ self.bus.read_byte(0x52))) for i in range(6)]
+  temp = []
+  try:
+   self.bus.write_byte_data(0x52,0x40,0x00)
+   time.sleep(self.delay)
+   self.bus.write_byte(0x52,0x00)
+   time.sleep(self.delay)
+   temp = [(0x17 + (0x17 ^ self.bus.read_byte(0x52))) for i in range(6)]
+   temp.append(gpio.input(23))
+   temp.append(gpio.input(24))
+  except:
+   pass
   return temp
 
  def raw(self):
@@ -95,20 +113,5 @@ class nn:
   data = self.read()
   return data[2],data[3],data[4]
 
- def accelerometer_x(self):
-  data = self.read()
-  return data[2]
-
- def accelerometer_y(self):
-  data = self.read()
-  return data[3]
-
- def accelerometer_z(self):
-  data = self.read()
-  return data[4]
-    
  def setdelay(self,delay):
   self.delay = delay
-
- def scale(self,value,_min,_max,_omin,_omax):
-  return (value - _min) * (_omax - _omin) // (_max - _min) + _omin
