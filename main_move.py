@@ -76,7 +76,7 @@ if __name__ == '__main__':
      wii.x_right()
     elif data[0] < 55:
      print('Mover izquierda')
-     contx(True) if cont_x_left < 3 else nothing()
+     contx(True) if cont_x_left < 30 else nothing()
      wii.x_left() if cont_x_left < 30 else nothing()
      #wii.x_left()
     else:
