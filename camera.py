@@ -1,3 +1,4 @@
+
 import cv2
 import numpy as np
 import os, sys
@@ -26,10 +27,10 @@ def vision():
  c = 0
  while(1):
   ret, frame = cap.read()
-  cv2.imshow('_', frame)
   if gpio.input(26) == 0:
-   cv2.imwrite( str(c) + '.png', frame )
+   cv2.imwrite( 'images/' + str(c) + '.png', frame )
    c += 1
+  cv2.imshow('_', frame) #cv2.pyrUp(frame, dstsize=(frame.shape[1]*1, frame.shape[0]*1)))
   cv2.waitKey(10)
 
 def exit():
@@ -37,3 +38,4 @@ def exit():
  cv2.destroyAllWindows()
  sys.exit()
 
+vision()
