@@ -62,11 +62,17 @@ if __name__ == '__main__':
    if ((data[5] & 0x01) == 0) and ((data[5] & 0x02) != 0):
     print('Mover abajo')
     zz.activate_control_loop()
-    zz.z_down() 
+    try:
+     zz.z_down()
+    except:
+     print('Failed z down') 
    elif ((data[5] & 0x02) == 0) and ((data[5] & 0x01) != 0):
     print('Mover arriba')
     zz.activate_control_loop()
-    zz.z_up()
+    try:
+     zz.z_up()
+    except:
+     print('Failed z up')
    elif ((data[5] & 0x02) != 0) and ((data[5] & 0x01) != 0):
     zz.deactivate_control_loop()
     # X axis 

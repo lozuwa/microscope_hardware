@@ -9,13 +9,13 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 try:
- ser = serial.Serial('/dev/ttyACM0', 115200, timeout=5)
+ ser = serial.Serial('/dev/ttyACM0', 115200, timeout=2)
 except:
  try:
-  ser = serial.Serial('/dev/ttyACM1', 115200, timeout=5)
+  ser = serial.Serial('/dev/ttyACM1', 115200, timeout=2)
  except:
   try:
-   ser = serial.Serial('/dev/ttyACM2', 115200, timeout=5)
+   ser = serial.Serial('/dev/ttyACM2', 115200, timeout=2)
   except:
    print('Failed connection with device: ', ser)
    sys.exit()
@@ -57,7 +57,12 @@ def z_mid_down():
   wait()
 
 def wait():
+ counter = 0
  while (ser.read() != 'o'):
+  counter += 1
+  if counter == 100:
+   print('broken point')
+   break
   continue
 
 def z_reset():

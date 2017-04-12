@@ -58,6 +58,18 @@ class nn:
   except: 
    pass 
 
+ def x_move_center(self):
+  try:
+   [self.bus.write_byte(self.arduino_address, 0x04) for i in range(10)]
+  except:
+   pass 
+
+ def y_move_ceter(self):
+  try:
+   [self.bus.write_byte(self.arduino_address, 0x05) for i in range(10)]
+  except:
+   pass 
+
  def x_reset(self):
   while(gpio.input(24) != gpio.LOW):
    self.x_right()
