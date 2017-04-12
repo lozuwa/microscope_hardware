@@ -1,13 +1,33 @@
 import z_positioner as zz
 from nnchk import nn
 import time
+import cv2
+import numpy as np
 
 # Variables 
 cont_x_left = 0
 cont_y_back = 0
 
+cv2.namedWindow('animation')
+xsize = 300
+ysize = 150
+img = np.zeros([ysize, xsize], np.uint8)
+
+xis = 1
+yis = 1
+xes = 299
+yes = 149
+
+xir = 200
+yir = 100
+xer = 220
+yer = 120
+
 def nothing():
- pass 
+ return None 
+
+def nothinga():
+ return 0
 
 def contx(op):
  global cont_x_left
@@ -38,11 +58,17 @@ if __name__ == '__main__':
  # Restart drivers 
  print('---------------Reset X-----------------------')
  wii.x_reset()
- [wii.x_left() for i in range(10)]
+ for i in range(10):
+  xir-=10 if xir < (xsize-50) else nothinga()
+  xer-=10 if xer < (xsize-30) else nothinga()
+ [[wii.x_left(), contx(True)] for i in range(10)]
  print('ok')
  print('---------------Reset Y-----------------------')
+ for i in range(8):
+  yir += 5 if yir < (ysize-40) else nothinga()
+  yer += 5 if yer < (ysize-20) else nothinga()
  wii.y_reset()
- [wii.y_forward() for i in range(8)]
+ [[wii.y_forward(), conty(False)] for i in range(8)]
  print('ok')
  print('---------------Reset Z-----------------------')
  zz.activate_control_loop()
@@ -52,6 +78,18 @@ if __name__ == '__main__':
 
  print('------------------Control Manual-------------------------')
  while(True):
+  ####-------------------------animation---------------------
+  img = np.zeros([ysize, xsize], np.uint8)
+  # Slide animation 
+  cv2.rectangle(img, (xis,yis), (xes,yes), (255,0,0), 4)
+  cv2.line(img, (80, 1), (80, 149), (255,0,0), 3)
+  # ROI animation 
+  cv2.rectangle(img, (xir,yir), (xer,yer), (255,0,0), 2)
+  # Show image
+  cv2.imshow('animation', img)
+  cv2.waitKey(1)
+  
+  ####-------------------------wii---------------------
   data = wii.read()
   if len(data) != 0:
    #print(data)
@@ -80,22 +118,30 @@ if __name__ == '__main__':
      print('Mover derecha')
      contx(False) if data[7] == 1 else nothing()
      wii.x_right()
+     xir -= 10 if xir > 200 else nothinga()
+     xer -= 10 if xer > 220 else nothinga()
     elif data[0] < 55:
      print('Mover izquierda')
      contx(True) if cont_x_left < 30 else nothing()
      wii.x_left() if cont_x_left < 30 else nothing()
+     xir += 10 if xir < (xsize-50) else nothinga()
+     xer += 10 if xer < (xsize-30) else nothinga()
      #wii.x_left()
     else:
      pass 
-    # Y axis 
+    # Y axis
     if data[1] > 195:
      print('Mover adelante')
      conty(False) if data[6] == 1 else nothing()
      wii.y_backward()
+     yir += 10 if yir < (ysize-40) else nothinga()
+     yer += 10 if yer < (ysize-20) else nothinga()
     elif data[1] < 50:
      print('Mover atras')
      conty(True) if cont_y_back < 12 else nothing()
      wii.y_forward() if cont_y_back < 12 else nothing()
+     yir -= 10 if yir > 40 else nothinga()
+     yer -= 10 if yer > 60 else nothinga()
      #wii.y_forward()
     else:
      pass
