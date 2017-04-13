@@ -68,7 +68,7 @@ def wait():
 def z_reset():
  while(GPIO.input(16) != GPIO.LOW):
   z_down()
- for i in range(25):
+ for i in range(30):
   z_up()
  #while(GPIO.input(18) != GPIO.LOW):
  # z_down()
