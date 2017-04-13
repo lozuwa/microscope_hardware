@@ -19,7 +19,18 @@ This README would normally document whatever steps are necessary to get your app
  *C++:
   ** stdio.h
   ** wire.h
-* Upload the c++ code to the arduino and the mechaduino respectively. Then, run the python code in the raspberry pi. 
+ *Dependencies
+  ** libblas-dev
+  ** liblapack-dev
+  ** python-dev
+  ** libatlas-base-dev
+  ** gfortran
+  ** python-setuptools
+  ** scipy
+  ** python-matplotlib
+
+* Upload the c++ code to the arduino and the mechaduino respectively. 
+* Then, run the python code in the raspberry pi.
 
 ### Contribution guidelines ###
 

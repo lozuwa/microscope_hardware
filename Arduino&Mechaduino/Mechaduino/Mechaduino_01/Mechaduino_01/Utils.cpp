@@ -410,7 +410,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       /////--------------------------------------------------------------
       case 'z':
         for (int i = 0; i < 1; i++) {
-          r -= 2;
+          r -= 1;
           delayMicroseconds(SPEED);
         }
         SerialUSB.println('o');
@@ -418,7 +418,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
 
       case 'b':
         for (int i = 0; i < 1; i++) {
-          r += 2;
+          r += 1;
           delayMicroseconds(SPEED);
         }
         SerialUSB.println('o');
@@ -426,7 +426,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
 
       case 'Z':
         for (int i = 0; i < 1; i++) {
-          r -= 1;
+          r -= 0.5;
           delayMicroseconds(SPEED);
         }
         SerialUSB.println('o');
@@ -434,7 +434,7 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
 
       case 'B':
         for (int i = 0; i < 1; i++) {
-          r += 1;
+          r += 0.5;
           delayMicroseconds(SPEED);
         }
         SerialUSB.println('o');

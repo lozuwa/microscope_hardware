@@ -77,7 +77,7 @@ void m_x(int n) {
     digitalWrite(dirx, LOW);
   else
     digitalWrite(dirx, HIGH);
-  for (int i = 0; i <= 5 * 16; i++) {
+  for (int i = 0; i <= 8; i++) {
     digitalWrite(stepsx , LOW);
     digitalWrite(stepsx , HIGH);
     delayMicroseconds(SPEED);
@@ -97,10 +97,11 @@ void m_y(int n) {
     digitalWrite(diry, HIGH);
   else
     digitalWrite(diry, LOW);
-  for (int i = 0; i <= 5 * 16; i++) {
+  for (int i = 0; i <= 8; i++) {
     digitalWrite(stepsy , HIGH);
     digitalWrite(stepsy , LOW);
-    delayMicroseconds(SPEED);
+
+  delayMicroseconds(SPEED);
   }
   digitalWrite(eny, 1);
 }
