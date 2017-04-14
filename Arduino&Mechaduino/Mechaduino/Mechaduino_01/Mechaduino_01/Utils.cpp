@@ -315,7 +315,7 @@ void calibrate() {   /// this is the calibration routine
 
 void serialCheck() {        //Monitors serial for commands.  Must be called in routinely in loop for serial interface to work.
 
-  if (SerialUSB.available()) {
+  if (SerialUSB.available() > 0) {
 
     char inChar = (char)SerialUSB.read();
 
@@ -410,34 +410,49 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
       /////--------------------------------------------------------------
       case 'z':
         for (int i = 0; i < 1; i++) {
-          r -= 2;
+          r -= 3.6;
           delayMicroseconds(SPEED);
         }
-        SerialUSB.println('o');
+        for (int j = 0; j < 2; j++){
+          SerialUSB.println('o');
+        }
+        delay(1);
+        for (int j = 0; j < 2; j++){
+          SerialUSB.println('o');
+        }
         break;
 
       case 'b':
         for (int i = 0; i < 1; i++) {
-          r += 2;
+          r += 3.6;
           delayMicroseconds(SPEED);
         }
-        SerialUSB.println('o');
+        delay(1);
+        for (int j = 0; j < 2; j++){
+          SerialUSB.println('o');
+        }
         break;
 
       case 'Z':
         for (int i = 0; i < 1; i++) {
-          r -= 1;
+          r -= 1.8;
           delayMicroseconds(SPEED);
         }
-        SerialUSB.println('o');
+        delay(1);
+        for (int j = 0; j < 10; j++){
+          SerialUSB.println('o');
+        }
         break;
 
       case 'B':
         for (int i = 0; i < 1; i++) {
-          r += 1;
+          r += 1.8;
           delayMicroseconds(SPEED);
         }
-        SerialUSB.println('o');
+        delay(1);
+        for (int j = 0; j < 10; j++){
+          SerialUSB.println('o');
+        }
         break;
 
       /////------------------0--------------------------------------------

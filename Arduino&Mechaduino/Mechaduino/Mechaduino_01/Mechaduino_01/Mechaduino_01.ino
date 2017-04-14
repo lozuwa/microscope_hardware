@@ -1,4 +1,3 @@
-
 /*
   -------------------------------------------------------------
   Mechaduino 0.1 Firmware  v0.1.3
@@ -51,8 +50,8 @@
 //////////////////////////////////////
 
 
-void setup(){
-          
+void setup(){                         
+   
   digitalWrite(ledPin,HIGH);        // turn LED on 
   setupPins();                      // configure pins
   setupTCInterrupts();              // configure controller interrupt
@@ -69,23 +68,16 @@ void setup(){
   
   //    configureStepDir();           // Configures setpoint to be controlled by step/dir interface
   //    configureEnablePin();         // Active low, for use wath RAMPS 1.4 or similar
-  //     enableTCInterrupts();         // uncomment this line to start in closed loop 
-  mode = 'x';                   // start in position mode
+  enableTCInterrupts();         // uncomment this line to start in closed loop 
+  mode = 'n';                   // start in position mode
 
 }
-  
-
 
 //////////////////////////////////////
 /////////////////LOOP/////////////////
 //////////////////////////////////////
 
 
-void loop()                 // main loop
-{
-
+void loop(){
   serialCheck();              //must have this execute in loop for serial commands to function
-
-  //r=0.1125*step_count;      //Don't use this anymore. Step interrupts enabled above by "configureStepDir()", adjust step size in parameters.cpp
-
 }
