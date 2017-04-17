@@ -115,7 +115,7 @@ if __name__ == '__main__':
      #wii.x_left() if cont_x_left < 38 else nothing()
      xir += 11 if xir < 310 else nothinga()
      xer += 11 if xer < 330 else nothinga()
-     if xir < 310 and xer < 330:
+     if True:#xir < 310 and xer < 330:
       wii.x_left()
     elif data[0] < 55:
      print('Mover izquierda')
@@ -123,7 +123,7 @@ if __name__ == '__main__':
      #wii.x_right()
      xir -= 11 if xir > 100 else nothinga()
      xer -= 11 if xer > 120 else nothinga()
-     if xir > 100 and xer > 120:
+     if True:#xir > 100 and xer > 120:
       wii.x_right()
     else:
      pass 
@@ -134,7 +134,7 @@ if __name__ == '__main__':
      #wii.y_forward() if cont_y_back < 12 else nothing()
      yir -= 10 if yir > 20 else nothinga()
      yer -= 10 if yer > 40 else nothinga()
-     if yir > 20 and yer > 40:
+     if True: #yir > 20 and yer > 40:
       wii.y_forward()
     elif data[1] < 50:
      print('Mover adelante')
@@ -142,7 +142,7 @@ if __name__ == '__main__':
      #wii.y_backward()
      yir += 10 if yir < 105 else nothinga()
      yer += 10 if yer < 125 else nothinga()
-     if yir < 105 and yer < 125 :
+     if True: #yir < 105 and yer < 125 :
       wii.y_backward()
     else:
      pass

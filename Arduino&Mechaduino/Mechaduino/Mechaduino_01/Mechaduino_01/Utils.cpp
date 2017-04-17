@@ -315,7 +315,7 @@ void calibrate() {   /// this is the calibration routine
 
 void serialCheck() {        //Monitors serial for commands.  Must be called in routinely in loop for serial interface to work.
 
-  if (SerialUSB.available()) {
+  if (SerialUSB.available() > 0) {
 
     char inChar = (char)SerialUSB.read();
 
