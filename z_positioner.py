@@ -17,7 +17,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(16, GPIO.IN, GPIO.PUD_UP) # z positioner
 
-class z_controller():
+class z_controller:
   def __init__(self):
     ser.write('x')
     time.sleep(0.01)
