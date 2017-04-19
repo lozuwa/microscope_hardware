@@ -122,4 +122,4 @@ if __name__ == "__main__":
     while key != ord('q') and key != 27: # 27 = escape key
         #the OpenCV window won't display until you call cv2.waitKey()
         key = cv2.waitKey(5) #User can press 'q' or ESC to exit.
-    cv2.destroyAllWindows()    
+    cv2.destroyAllWindows()
