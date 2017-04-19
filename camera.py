@@ -21,6 +21,7 @@ class Camera:
     self.cropping = False
     # Image windows 
     cv2.namedWindow( "_" )
+    cv2.createTrackbar( 'thrs', '_', 300, 800, callback )
     cv2.setMouseCallback( "_", self.click_and_crop )
 
   def click_and_crop(self, event, x, y, flags, param):
@@ -51,10 +52,10 @@ class Camera:
   def resize(self, f_):
     p_ = [cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA, cv2.INTER_CUBIC]
     row, col, d = f_.shape
-    if (row < 50) and (col < 50):
-      return cv2.resize( f_, (f_.shape[1]*3, f_.shape[0]*3), p_[2] )
+    if (row < 100) and (col < 100):
+      return cv2.resize( f_, (f_.shape[1]*5, f_.shape[0]*5), p_[2] )
     else:
-      return cv2.resize( f_, (320, 280), p_[2] )
+      return cv2.resize( f_, (640, 480), p_[2] )
 
   def frames(self):
     c = 0
@@ -65,7 +66,6 @@ class Camera:
       if False: #gpio.input(26) == 0:
         cv2.imwrite( 'images/'+str(c)+'.png',self.frame )
         cv2.putText( self.frame, 'Foto tomada', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, 255, 2 )
-        cv2.imshow( '_', cv2.resize(self.frame, (720,640)) )
         cv2.waitKey( 200 )
         c += 1
       cv2.imshow( '_', self.frame )
