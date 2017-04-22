@@ -1,7 +1,6 @@
 from z_positioner as z_controller
 from nnchk import nn
-import numpy as np
-import cv2, time 
+import time 
 
 def restart():
   # Restart drivers 
@@ -19,7 +18,7 @@ def restart():
   zz.deactivate_control_loop()
   print('ok')
 
-if __name__ == '__main__':
+def start():
   # Start wii driver
   wii = nn()
   zz = z_controller()

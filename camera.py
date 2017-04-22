@@ -14,7 +14,7 @@ class Camera:
     except:
       print('Failed GPIO initialization')'''
     # Init camera
-    self.vs = WebcamVideoStream(0).start()
+    self.vs = WebcamVideoStream(2).start()
     # Variables 
     self.frame = []
     self.refPt = []
@@ -79,28 +79,15 @@ class Camera:
 
   def frames(self):
     c = 0
-    if sys.argv[1] == 1:
-      self.frame = cv2.imread('giardia.jpg')
-      self.frame = self.frame[1000:3000, 1000:3000]
-      while(1):
-        #self.frame = self.vs.read()
-        if False: #gpio.input(26) == 0:
-          cv2.imwrite( 'images/'+str(c)+'.png',self.frame )
-          cv2.putText( self.frame, 'Foto tomada', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, 255, 2 )
-          cv2.waitKey( 200 )
-          c += 1
-        cv2.imshow( '_', self.frame )
-        cv2.waitKey( 1 )
-    elif sys.argv[1] == 0:
-      while(1):
-        self.frame = self.vs.read()
-        if False: #gpio.input(26) == 0:
-          cv2.imwrite( 'images/'+str(c)+'.png',self.frame )
-          cv2.putText( self.frame, 'Foto tomada', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, 255, 2 )
-          cv2.waitKey( 200 )
-          c += 1
-        cv2.imshow( '_', self.frame )
-        cv2.waitKey( 1 )
+    while( 1 ):
+      self.frame = self.vs.read()
+      if False: #gpio.input(26) == 0:
+        cv2.imwrite( 'images/'+str(c)+'.png',self.frame )
+        cv2.putText( self.frame, 'Foto tomada', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, 255, 2 )
+        cv2.waitKey( 200 )
+        c += 1
+      cv2.imshow( '_', self.frame )
+      cv2.waitKey( 1 )
 
   def exit(self):
     self.vs.stop()

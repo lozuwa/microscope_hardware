@@ -7,8 +7,8 @@ class WebcamVideoStream:
     # Initialize the video camera stream and read the first frame from the stream 
     try:
       self.stream = cv2.VideoCapture(src)
-      self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-      self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
+      self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1280) #1280)
+      self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 720) #1024)
     except:
       print('Bad camera driver')
       sys.exit()
@@ -18,7 +18,7 @@ class WebcamVideoStream:
 
   def start(self):
     Thread(target=self.update, args=()).start()
-    return self   
+    return self
 
   def update(self):
     while True:
@@ -27,7 +27,7 @@ class WebcamVideoStream:
       (self.grabbed, self.frame) = self.stream.read()
 
   def read(self):
-    return self.frame 
+    return self.frame
 
   def stop(self):
     self.stopped = True   
