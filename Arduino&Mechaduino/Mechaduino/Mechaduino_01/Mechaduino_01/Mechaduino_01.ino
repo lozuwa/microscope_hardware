@@ -1,4 +1,3 @@
-
 /*
   -------------------------------------------------------------
   Mechaduino 0.1 Firmware  v0.1.3
@@ -73,19 +72,13 @@ void setup(){
   mode = 'x';                   // start in position mode
 
 }
-  
-
 
 //////////////////////////////////////
 /////////////////LOOP/////////////////
 //////////////////////////////////////
 
+void loop(){
 
-void loop()                 // main loop
-{
-
-  serialCheck();              //must have this execute in loop for serial commands to function
-
-  //r=0.1125*step_count;      //Don't use this anymore. Step interrupts enabled above by "configureStepDir()", adjust step size in parameters.cpp
+  serialCheck();
 
 }
