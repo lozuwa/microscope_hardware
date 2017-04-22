@@ -14,7 +14,7 @@ class Camera:
     except:
       print('Failed GPIO initialization')'''
     # Init camera
-    self.vs = WebcamVideoStream(2).start()
+    self.vs = WebcamVideoStream(0).start()
     # Variables 
     self.frame = []
     self.refPt = []
