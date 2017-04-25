@@ -2,8 +2,8 @@
 //Implimentation of a paper;
 //Farsiu, S.,Robinson, D., Elad, M., Milanfar, P."Fast and robust multiframe super resolution," IEEETrans.ImageProcessing 13 (2004)1327?1344.
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -40,13 +40,13 @@ void superresolutionSparseMat32f(Mat src[], Mat& dest, SparseMat DHF[], const in
 
 int main(int argc, char** argv)
 {
-	Mat image = imread("lenna.png");//input image
+	Mat image = imread("/home/pi/Documents/CLICK/Super_Resolution/larvae.jpg") //"lenna.png");//input image
 	if(image.empty())
 	{
 		cout<<"invalid image name"<<endl;
 			return -1;
 	}
-	Mat dest = Mat(image.size(),CV_8UC3);
+	/*Mat dest = Mat(image.size(),CV_8UC3);
 
 	const int image_count = 16;//number of input images for super resolution
 	const int rfactor = 4;//magnification factor
@@ -55,10 +55,10 @@ int main(int argc, char** argv)
 	SparseMat A[image_count];//degrading matrices
 	Mat degimage[image_count];//degraded images
 
-	RNG rnd;//random number generator of image shift/movement
+	RNG rnd;//random number generator of image shift/movement*/
 
 	//(1) generate degraded images and degrading matrices for super resolution
-	for(int i=0;i<image_count;i++)
+	/*for(int i=0;i<image_count;i++)
 	{	
 		cout<<i<<endl;
 		move[i].x=rnd.uniform(0.0,(double)rfactor);//randam shift for x
@@ -80,21 +80,21 @@ int main(int argc, char** argv)
 		sprintf(name,"input%03d.png",i);
 		imwrite(name,degimage[i]);
 		waitKey(30);
-	}
+	}*/
 
 	//(2) super resolution
 	//beta: asymptotic value of steepest descent method
 	//lambda: weight parameter to balance data term and smoothness term
 	////alpha: parameter of spacial distribution in btv
 	//btv kernel size: kernel size of btv filter
-	superresolutionSparseMat32f(degimage,dest,A,image_count,
+	/*superresolutionSparseMat32f(degimage,dest,A,image_count,
 		180,//number of iteration
 		1.3f,//beta
 		0.03f,//lambda
 		0.7f,//alpha
 		Size(7,7),//btv kernel size
 		SR_DATA_L1,//L1 norm minimization for data term
-		image);//ideal image for evaluation	
+		image);//ideal image for evaluation	*/
 	return 0;
 }
 
