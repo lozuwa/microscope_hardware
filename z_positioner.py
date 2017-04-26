@@ -5,9 +5,8 @@ Description: Script dedicated to build a serial communication
 with a mechaduino. 
 '''
 import serial as ses 
-import math, time 
+import sys, os, time 
 import RPi.gpio as gpio 
-import os, sys 
 
 # ----------------------------General configurations----------------------------- #
 gpio.setmode(gpio.BCM)
@@ -29,6 +28,15 @@ class z_controller:
     ser.write('x')
     time.sleep(self.delay)
 
+  def wait(self):
+    counter = 0
+    while (ser.read() != 'o'):
+      counter += 1
+      if counter > 100:
+        print('broken point')
+        break
+      continue
+
   def activate_control_loop(self):
     ser.write('y')
     time.sleep(self.delay)
@@ -48,14 +56,11 @@ class z_controller:
       ser.write('B')
       self.wait()
 
-  def wait(self):
-    counter = 0
-    while (ser.read() != 'o'):
-      counter += 1
-      if counter == 100:
-        print('broken point')
-        break
-      continue
+  def z_reset(self):
+    while( gpio.input(16) != gpio.LOW ):
+      self.z_down()
+    for i in range(50):
+      self.z_up()
 
   def exit(self):
     ser.close()

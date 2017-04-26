@@ -9,7 +9,7 @@ Description: Multi-purpose script
 '''
 from smbus import SMBus
 import RPi.GPIO as gpio
-import time
+import time, os, sys 
 
 # ----------------------------General configurations----------------------------- #
 gpio.setmode(gpio.BCM)
@@ -112,3 +112,6 @@ class nnchk:
     ''' Accelerometer data values extracted from reading stream '''
     data = self.read()
     return data[2],data[3],data[4]
+
+  def exit(self):
+    sys.exit()

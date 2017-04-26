@@ -1,17 +1,23 @@
+'''
+Author: Rodrigo Loza 
+Project: click_hardware
+Description: Script to move the 
+x,y,z axis of the device.
+'''
 from z_positioner as z_controller
-from nnchk import nn
-import time 
+from nnchk import nnchk 
+import time, os, sys 
 
-def restart():
+def reset():
   # Restart drivers 
   print('---------------Reset X-----------------------')
   wii.x_reset()
-  [wii.x_left() for i in range(10)]
+  [wii.x_left() for i in range(50)]
   print('ok')
   print('---------------Reset Y-----------------------')
   wii.y_reset()
-  [wii.y_forward() for i in range(8)]
-  print('ok')
+  [wii.y_forward() for i in range(50)]
+  print('ok') 
   print('---------------Reset Z-----------------------')
   zz.activate_control_loop()
   zz.z_reset()
@@ -19,15 +25,17 @@ def restart():
   print('ok')
 
 def start():
-  # Start wii driver
-  wii = nn()
+  print('Starting program ...')
+  # Start objects 
+  print('Objects initialization')
+  wii = nnchk()
   zz = z_controller()
   # Avoid control loop bug z axis
-  zz.init()
+  print('Starting device\'s axis')
   zz.activate_control_loop()
+  time.sleep(0.1)
   zz.deactivate_control_loop()
-
-  k = cv2.waitKey(1)
+  time.sleep(0.1)
   
   print('------------------Control Manual-------------------------')
   while(True):
@@ -64,3 +72,7 @@ def start():
         elif data[1] < 50:
           print('Mover adelante')
           wii.y_backward()
+
+if __name__ == '__main__':
+  #reset()
+  start()
