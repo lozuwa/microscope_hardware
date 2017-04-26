@@ -6,7 +6,7 @@ with a mechaduino.
 '''
 import serial as ses 
 import sys, os, time 
-import RPi.gpio as gpio 
+import RPi.GPIO as gpio 
 
 # ----------------------------General configurations----------------------------- #
 gpio.setmode(gpio.BCM)

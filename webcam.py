@@ -1,6 +1,5 @@
 from threading import Thread 
-import os, sys
-import cv2
+import os, sys, cv2
 
 class WebcamVideoStream:
   def __init__(self, src=0):

@@ -1,21 +1,54 @@
 import numpy as np
 import os, sys, cv2
-from webcam import WebcamVideoStream
-#import RPi.GPIO as gpio 
+from threading import Thread
+#from webcam import WebcamVideoStream
 
-#gpio.setmode(gpio.BCM)
-#gpio.setwarnings(False)
+class WebcamVideoStream:
+  def __init__(self, src=0):
+    # Initialize the video camera stream and read the first frame from the stream 
+    try:
+      self.stream = cv2.VideoCapture(src)
+      self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1280) #1280)
+      self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 720) #1024)
+    except:
+      print('Bad camera driver')
+      sys.exit()
+    (self.grabbed, self.frame) = self.stream.read()
+    # Initialize the variable used to indicate if the thread should be stopped
+    self.stopped = False
+
+  def start(self):
+    Thread(target=self.update, args=()).start()
+    return self
+
+  def update(self):
+    while True:
+      if self.stopped:
+        return
+      (self.grabbed, self.frame) = self.stream.read()
+
+  def read(self):
+    return self.frame
+
+  def stop(self):
+    self.stopped = True   
+    self.stream.release()
 
 class Camera:
-  def __init__(self):
+  def __init__(self, use_button=False):
     # Initialize GPIO 
-    '''try:
-      gpio.setup(26, gpio.IN, gpio.PUD_UP) # y positionr 
-    except:
-      print('Failed GPIO initialization')'''
+    if use_button:
+      import RPi.GPIO as gpio 
+      gpio.setmode(gpio.BCM)
+      gpio.setwarnings(False)
+      try:
+        gpio.setup(26, gpio.IN, gpio.PUD_UP) # y positionr 
+      except:
+        print('Failed GPIO initialization')
     # Init camera
     self.vs = WebcamVideoStream(0).start()
-    # Variables 
+    # Variables
+    self.pt = 1 
     self.frame = []
     self.refPt = []
     self.cropping = False
@@ -24,16 +57,16 @@ class Camera:
     # Image windows 
     cv2.namedWindow( "_" )
     cv2.namedWindow( "_t" )
-    cv2.createTrackbar( 'x', '_t', 1, 10, self.nothing )
+    cv2.createTrackbar( 'x', '_t', 1, 10, self.callback )
     cv2.setMouseCallback( "_", self.click_and_crop )
 
-  def nothing(self, *arg):
-    print(self.ROI.shape)
-    tp = cv2.getTrackbarPos('x', '_t') 
-    if tp > 0:
+  def callback(self, *arg):
+    #print(self.ROI.shape)
+    self.tp = cv2.getTrackbarPos('x', '_t')
+    '''if tp > 0:
       cv2.destroyWindow('__')
       cv2.imshow( "__", self.resize(self.ROI, tp) )
-      cv2.waitKey( 1 )
+      cv2.waitKey( 1 )'''
 
   def click_and_crop(self, event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -43,6 +76,7 @@ class Camera:
     elif event == cv2.EVENT_LBUTTONUP:
       self.refPt.append( (x, y) )
       self.cropping = False
+      # Update zoom screen
       self.update_roi = True
       self.update_zoom()
 
@@ -51,7 +85,7 @@ class Camera:
       if ( (self.refPt[0][0] - self.refPt[1][0])**2  < 50) and ( (self.refPt[0][1] - self.refPt[1][1])**2 < 50 ):
         pass
       else:
-        tp = cv2.getTrackbarPos('x', '_t')
+        #tp = cv2.getTrackbarPos('x', '_t')
         self.ROI = self.frame.copy()[self.refPt[0][1]:self.refPt[1][1], self.refPt[0][0]:self.refPt[1][0]]
         cv2.rectangle( self.frame, self.refPt[0], self.refPt[1], (0, 255, 255), 2 )
         cv2.destroyWindow('__')
@@ -64,20 +98,15 @@ class Camera:
         cv2.waitKey( 200 )
         self.update_roi = False
     
-  def pyrup(self, f_):
-    return cv2.pyrUp( f_, 2 )
-
   def resize(self, f_, tp):
     p_ = [cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA, cv2.INTER_CUBIC]
     row, col, d = f_.shape
     if (row < 10) and (col < 10):
       pass
-    elif (row > 10) and (col > 10) and (row < 100) and (col < 100):
-      return cv2.resize( f_, (f_.shape[1]*tp, f_.shape[0]*tp), p_[0] )
     else:
       return cv2.resize( f_, (f_.shape[1]*tp, f_.shape[0]*tp), p_[0] )
 
-  def frames(self):
+  def stream(self):
     c = 0
     while( 1 ):
       self.frame = self.vs.read()
