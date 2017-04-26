@@ -409,34 +409,37 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
 
       /////--------------------------------------------------------------
       case 'z':
-        for (int i = 0; i < 1; i++) {
-          r -= 1;
+        for (int i = 0; i < 1; i++){
+          r -= 0.5;
           delayMicroseconds(SPEED);
         }
+        delay(1);
         SerialUSB.println('o');
         break;
 
       case 'b':
-        for (int i = 0; i < 1; i++) {
-          r += 1;
+        for (int i = 0; i < 1; i++){
+          r += 0.5;
           delayMicroseconds(SPEED);
         }
         SerialUSB.println('o');
         break;
 
       case 'Z':
-        for (int i = 0; i < 1; i++) {
-          r -= 0.5;
+        for (int i = 0; i < 1; i++){
+          r -= 0.25;
           delayMicroseconds(SPEED);
         }
+        delayMicroseconds(SPEED);
         SerialUSB.println('o');
         break;
 
       case 'B':
-        for (int i = 0; i < 1; i++) {
-          r += 0.5;
+        for (int i = 0; i < 1; i++){
+          r += 0.25;
           delayMicroseconds(SPEED);
         }
+        delayMicroseconds(SPEED);
         SerialUSB.println('o');
         break;
 
@@ -447,7 +450,6 @@ void serialCheck() {        //Monitors serial for commands.  Must be called in r
   }
 
 }
-
 
 void parameterQuery() {         //print current parameters in a format that can be copied directly in to Parameters.cpp
   SerialUSB.println(' ');

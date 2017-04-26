@@ -18,14 +18,14 @@ class z_controller:
     self.delay = delay
     # Init serial port 
     try:
-      ser = serial.Serial('/dev/ttyACM0', 115200, timeout=2)
+      self.ser = ses.Serial('/dev/ttyACM0', 115200, timeout=1)
     except:
       print('Failed connection with device: ', ser)
       sys.exit()
     # Init GPIO 
     gpio.setup(16, gpio.IN, gpio.PUD_UP) 
     # Start mechaduino in control-loop
-    ser.write('x')
+    self.ser.write('x')
     time.sleep(self.delay)
 
   def wait(self):
@@ -34,26 +34,32 @@ class z_controller:
       counter += 1
       if counter > 100:
         print('broken point')
-        break
+        #break
+        self.recover_serial_port()
       continue
 
+  def recover_serial_port(self):
+    print('Trying to restart serial port')
+    self.ser.port = '/dev/ttyACM1' 
+    time.sleep(1)
+    
   def activate_control_loop(self):
-    ser.write('y')
+    self.ser.write('y')
     time.sleep(self.delay)
 
   def deactivate_control_loop(self):
-    ser.write('n')
+    self.ser.write('n')
     time.sleep(self.delay)
 
   def z_up(self):
-    ser.write('B')
+    self.ser.write('Z')
     self.wait()
 
   def z_down(self):
     if gpio.input(16) == gpio.LOW:
       pass
     else:
-      ser.write('B')
+      self.ser.write('B')
       self.wait()
 
   def z_reset(self):
@@ -63,5 +69,5 @@ class z_controller:
       self.z_up()
 
   def exit(self):
-    ser.close()
+    self.ser.close()
     sys.exit()
