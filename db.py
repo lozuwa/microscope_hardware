@@ -1,3 +1,8 @@
+''' 
+Author: Rodrigo Loza
+Project: click_hardware
+Description: Database support.
+'''
 from pymongo import *
 import numpy as np
 import gridfs

@@ -1,3 +1,8 @@
+''' 
+Author: Rodrigo Loza
+Project: click_hardware
+Description: Experiments for autofocus algorithms.
+'''
 import z_positioner as zz
 import vision as vis 
 import algorithms as alg

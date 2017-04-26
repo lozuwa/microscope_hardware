@@ -1,3 +1,8 @@
+''' 
+Author: Rodrigo Loza
+Project: click_hardware
+Description: Image processing algorithms.
+'''
 import cv2
 import numpy as np
 import sys, os 
