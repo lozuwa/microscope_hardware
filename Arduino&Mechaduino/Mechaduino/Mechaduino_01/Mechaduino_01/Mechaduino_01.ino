@@ -77,7 +77,8 @@ void setup(){
 /////////////////LOOP/////////////////
 //////////////////////////////////////
 
-
 void loop(){
-  serialCheck();              //must have this execute in loop for serial commands to function
+
+  serialCheck();
+
 }
