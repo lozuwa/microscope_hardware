@@ -1,56 +1,52 @@
-import serial 
-import numpy as np
+''' 
+Author: Rodrigo Loza 
+Project: click_hardware
+Description: Script dedicated to build a serial communication 
+with a mechaduino. 
+'''
+import serial as ses 
 import math, time 
-import RPi.GPIO as GPIO 
+import RPi.gpio as gpio 
 import os, sys 
 
-try:
-  ser = serial.Serial('/dev/ttyACM0', 115200, timeout=2)
-except:
-  try:
-    ser = serial.Serial('/dev/ttyACM1', 115200, timeout=2)
-  except:
-    print('Failed connection with device: ', ser)
-    sys.exit()
+# ----------------------------General configurations----------------------------- #
+gpio.setmode(gpio.BCM)
+gpio.setwarnings(False)
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-GPIO.setup(16, GPIO.IN, GPIO.PUD_UP) # z positioner
-
-class z_controller:
-  def __init__(self):
+class z_controller: 
+  def __init__(self, delay=0.01):
+    # Init variables 
+    self.delay = delay
+    # Init serial port 
+    try:
+      ser = serial.Serial('/dev/ttyACM0', 115200, timeout=2)
+    except:
+      print('Failed connection with device: ', ser)
+      sys.exit()
+    # Init GPIO 
+    gpio.setup(16, gpio.IN, gpio.PUD_UP) 
+    # Start mechaduino in control-loop
     ser.write('x')
-    time.sleep(0.01)
-
-  def deactivate_control_loop(self):
-    ser.write('n')
-    time.sleep(0.01)
+    time.sleep(self.delay)
 
   def activate_control_loop(self):
     ser.write('y')
-    time.sleep(0.01)
+    time.sleep(self.delay)
+
+  def deactivate_control_loop(self):
+    ser.write('n')
+    time.sleep(self.delay)
 
   def z_up(self):
-    ser.write('b')
-    wait()
+    ser.write('B')
+    self.wait()
 
   def z_down(self):
-    if GPIO.input(16) == GPIO.LOW:
+    if gpio.input(16) == gpio.LOW:
       pass
     else:
-      ser.write('z')
-      wait()
-
-  def z_mid_up(self):
-    ser.write('B')
-    wait()
-
-  def z_mid_down(self):
-    if GPIO.input(16) == GPIO.LOW:
-      pass 
-    else:
-      ser.write('Z')
-      wait()
+      ser.write('B')
+      self.wait()
 
   def wait(self):
     counter = 0
