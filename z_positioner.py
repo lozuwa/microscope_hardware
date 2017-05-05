@@ -40,9 +40,9 @@ class z_controller:
 
   def recover_serial_port(self):
     print('Trying to restart serial port')
-    self.ser.port = '/dev/ttyACM1' 
+    self.ser.port = '/dev/ttyACM1'
     time.sleep(1)
-    
+
   def activate_control_loop(self):
     self.ser.write('y')
     time.sleep(self.delay)
