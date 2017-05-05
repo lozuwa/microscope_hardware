@@ -49,7 +49,7 @@ class Streamer:
     self.vs = WebcamVideoStream(0).start()
     # Variables
     method = [cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_AREA, cv2.INTER_CUBIC]
-    self.pt = 1 
+    self.tp = 1 
     self.frame = []
     self.refPt = []
     self.cropping = False
@@ -84,14 +84,14 @@ class Streamer:
       cv2.destroyWindow('__')
       cv2.waitKey(1)
       #print(ROI.shape)
-      r_ = self.resize( self.ROI, tp )
+      r_ = self.resize( self.ROI )
       cv2.imshow( "_", self.frame )
       cv2.imshow( "__", r_ )
       #print(r_.shape)
       cv2.waitKey( 200 )
     
-  def resize(self, f_, tp):
-    return cv2.resize( f_, (f_.shape[1]*tp, f_.shape[0]*tp), self.method[0] )
+  def resize(self, f_):
+    return cv2.resize( f_, (f_.shape[1]*self.tp, f_.shape[0]*self.tp), self.method[0] )
 
   def stream(self):
     c = 0
