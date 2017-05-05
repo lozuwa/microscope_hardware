@@ -67,7 +67,7 @@ void receiveEvent(int howMany) {
 
 //--------------- Move x --------------------
 
-void m_x(int n) {
+void m_x(int n){
   /*
     n = 0 -> left
     n = 1 -> right
@@ -77,11 +77,7 @@ void m_x(int n) {
     digitalWrite(dirx, LOW);
   else
     digitalWrite(dirx, HIGH);
-<<<<<<< HEAD
-  for (int i = 0; i <= 2; i++) {
-=======
-  for (int i = 0; i <= 16; i++) {
->>>>>>> cad57703688389b2b5dd53b90ad34066f12ac84f
+  for (int i = 0; i <= 1; i++){
     digitalWrite(stepsx , LOW);
     digitalWrite(stepsx , HIGH);
     delayMicroseconds(SPEED);
@@ -91,7 +87,7 @@ void m_x(int n) {
 
 //--------------- Move y --------------------
 
-void m_y(int n) {
+void m_y(int n){
   /*
     n = 0 -> forward
     n = 1 -> back
@@ -101,15 +97,10 @@ void m_y(int n) {
     digitalWrite(diry, HIGH);
   else
     digitalWrite(diry, LOW);
-<<<<<<< HEAD
-  for (int i = 0; i <= 2; i++) {
-=======
-  for (int i = 0; i <= 16; i++) {
->>>>>>> cad57703688389b2b5dd53b90ad34066f12ac84f
-    digitalWrite(stepsy , HIGH);
-    digitalWrite(stepsy , LOW);
-
-  delayMicroseconds(SPEED);
+  for (int i = 0; i <= 1; i++){
+    digitalWrite(stepsy, HIGH);
+    digitalWrite(stepsy, LOW);
+    delayMicroseconds(SPEED);
   }
   digitalWrite(eny, 1);
 }
