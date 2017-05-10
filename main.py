@@ -5,8 +5,12 @@ Description: Script to move the
 x,y,z axis of the device.
 '''
 from z_positioner as z_controller
-from nnchk import nnchk 
-import time, os, sys 
+from nnchk import nnchk
+import time, os, sys
+import paho.mqtt.client as mqtt
+
+TOPIC_ = '/'
+CLIENT_ = 'test.mosquitto.org'
 
 def reset():
   # Restart drivers 
@@ -25,12 +29,15 @@ def reset():
   print('ok')
 
 def start():
-  print('Starting program ...')
+  print('-----------------------------------------')
+  print('Starting controllers')
   # Start objects 
+  print('-----------------------------------------')
   print('Objects initialization')
   wii = nnchk()
   zz = z_controller()
   # Avoid control loop bug z axis
+  print('-----------------------------------------')
   print('Starting device\'s axis')
   zz.activate_control_loop()
   time.sleep(0.1)
@@ -39,6 +46,10 @@ def start():
   
   print('------------------Control Manual-------------------------')
   while(True):
+    '''----------------------------Take picture----------------------------'''
+    if False:
+      (rc, mid) = client.publish(TOPIC_, '1', qos=2)
+    '''-----------------------------Controller---------------------------'''
     data = wii.read()
     if len(data) != 0:
       # Z axis 
@@ -73,6 +84,24 @@ def start():
           print('Mover adelante')
           wii.y_backward()
 
+def on_publish(client, userdata, mid):
+    print("mid: " + str(mid))
+
+def exit():
+  client.loop_stop()
+  sys.exit()
+
 if __name__ == '__main__':
-  #reset()
+  global client
+  # Define mqtt client and start background thread  
+  print('-----------------------------------------')
+  print('Connecting to the client {}'.format(client_))
+  client = mqtt.Client()
+  client.on_publish = on_publish
+  client.connect(CLIENT_, 1883)
+  print('-----------------------------------------')
+  print('Starting thread ...')
+  client.loop_start()
+  # Continue with hardware controllers 
+  reset()
   start()
