@@ -2,6 +2,7 @@ package me.yogeshwardan.mqttsubscriber;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
@@ -50,10 +51,13 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
     /**********************************MQTT***************************************************/
 
     private static final String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 
         //MQTTConnect options : setting version to MQTT 3.1.1
         //MqttConnectOptions options = new MqttConnectOptions();
@@ -66,8 +70,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
         //Todo : Check why it wasn't connecting to test.mosquitto.org. Isn't that a public broker.
         //Todo : .check why client.subscribe was throwing NullPointerException  even on doing subToken.waitForCompletion()  for Async                  connection estabishment. and why it worked on subscribing from within client.connect’s onSuccess(). SO
         String clientId = MqttClient.generateClientId();
-        final MqttAndroidClient client =
-                new MqttAndroidClient(this.getApplicationContext(), "tcp://test.mosquitto.org", clientId);
+        final MqttAndroidClient client = new MqttAndroidClient(this.getApplicationContext(), "tcp://10.42.0.1", clientId);
         //tcp://test.mosquitto.org:1883
 
         try {
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                     Toast.makeText(MainActivity.this, "Connection successful", Toast.LENGTH_SHORT).show();
                     //Subscribing to a topic door/status on broker.hivemq.com
                     client.setCallback(MainActivity.this);
-                    final String topic = "/zu";
+                    final String topic = "/test";
                     int qos = 1;
                     try {
                         IMqttToken subToken = client.subscribe(topic, qos);
@@ -132,9 +135,17 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
         zup.setBackgroundColor(Color.GREEN);
         zdown.setBackgroundColor(Color.GREEN);
 
+        connection.setChecked(true);
+
         connection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    yforward.setEnabled(true);
+                    ybackward.setEnabled(true);
+                    xleft.setEnabled(true);
+                    xright.setEnabled(true);
+                    zup.setEnabled(true);
+                    zdown.setEnabled(true);
                     String topic = "/connect";
                     String payload = "1";
                     byte[] encodedPayload = new byte[0];
@@ -147,8 +158,14 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                         e.printStackTrace();
                     }
                 } else {
+                    yforward.setEnabled(false);
+                    ybackward.setEnabled(false);
+                    xleft.setEnabled(false);
+                    xright.setEnabled(false);
+                    zup.setEnabled(false);
+                    zdown.setEnabled(false);
                     String topic = "/connect";
-                    String payload = "0";
+                    String payload = "2";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -181,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     yforward.setBackgroundColor(Color.GREEN);
                     String topic = "/yf";
-                    String payload = "0";
+                    String payload = "2";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -216,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     ybackward.setBackgroundColor(Color.GREEN);
                     String topic = "/yb";
-                    String payload = "0";
+                    String payload = "2";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -250,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     xleft.setBackgroundColor(Color.GREEN);
                     String topic = "/xl";
-                    String payload = "0";
+                    String payload = "2";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -284,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     xright.setBackgroundColor(Color.GREEN);
                     String topic = "/xr";
-                    String payload = "0";
+                    String payload = "2";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -318,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     zup.setBackgroundColor(Color.GREEN);
                     String topic = "/zu";
-                    String payload = "0";
+                    String payload = "2";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");
@@ -352,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements MqttCallback{
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     zdown.setBackgroundColor(Color.GREEN);
                     String topic = "/zd";
-                    String payload = "0";
+                    String payload = "2";
                     byte[] encodedPayload = new byte[0];
                     try {
                         encodedPayload = payload.getBytes("UTF-8");

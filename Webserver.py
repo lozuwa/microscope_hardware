@@ -122,6 +122,6 @@ def get_cam_state():
 		return jsonify({'result': '1'})
 
 if __name__ == '__main__':
-	app.run(host="192.168.3.215",
+	app.run(host="192.168.3.213",
 			port=int("5000"),
 			debug=True)

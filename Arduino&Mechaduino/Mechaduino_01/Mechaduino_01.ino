@@ -56,12 +56,11 @@ void setup(){
   setupPins();                      // configure pins
   setupTCInterrupts();              // configure controller interrupt
 
-  SerialUSB.begin(115200);          
+  SerialUSB.begin(115200);
   delay(3000);                      // This delay seems to make it easier to establish a connection when the Mechaduino is configured to start in closed loop mode.  
   serialMenu();                     // Prints menu to serial monitor
   setupSPI();                       // Sets up SPI for communicating with encoder
   digitalWrite(ledPin,LOW);         // turn LED off 
-  
 
   // Uncomment the below lines as needed for your application.
   // Leave commented for initial calibration and tuning.
