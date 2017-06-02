@@ -22,7 +22,7 @@ class z_controller:
     except:
       print('Failed connection with device: ', ser)
       sys.exit()
-    # Init GPIO 
+    # Init GPIO
     gpio.setup(16, gpio.IN, gpio.PUD_UP) 
     # Start mechaduino in control-loop
     self.ser.write('x')
@@ -40,7 +40,7 @@ class z_controller:
 
   def recover_serial_port(self):
     print('Trying to restart serial port')
-    self.ser.port = '/dev/ttyACM1'
+    self.ser.port = '/dev/ttyACM0'
     time.sleep(1)
 
   def activate_control_loop(self):

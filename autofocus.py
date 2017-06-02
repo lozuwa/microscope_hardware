@@ -26,7 +26,6 @@ def autofocus_v3_debug(c):
   img.append(frame)
   frame, frame_var = vis.laplacian(frame, debug=True, gaussian=False)
   samples.append(frame_var)
-
   zz.z_up()
   print(frame_var, i)
 

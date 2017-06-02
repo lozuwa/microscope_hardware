@@ -12,7 +12,7 @@ import RPi.GPIO as gpio
 import time, os, sys 
 
 # ----------------------------General configurations----------------------------- #
-gpio.setmode(gpio.BCM)
+gpio.se tmode(gpio.BCM)
 gpio.setwarnings(False)
 
 class nnchk:
