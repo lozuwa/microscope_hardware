@@ -1,6 +1,6 @@
 import serial
 import time
-s=serial.Serial('/COM3',115200)
+s=serial.Serial('/dev/ttyACM0',115200)
 
 def x_f(pasos,dir):
 	s.write('x,'+str(pasos)+','+str(dir)+','+str(250))
