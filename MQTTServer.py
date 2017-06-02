@@ -2,38 +2,42 @@ import paho.mqtt.client as mqtt
 import numpy as np
 import os, time 
 from multiprocessing import Process
+from interface_mic import *
 
 enable = False
 
 def z_up(steps):
     while(1):
         print('z', os.getpid())
-        #ser.write('1')
-
+        z_s(100, 1)
+        
 def z_down(steps):
     while(1):
         print('z', os.getpid())
-        #ser.write('1') 
-
+        z_s(100, 0)
+    
 def x_left(steps):
     while(1):
         print('x', os.getpid())
-        #ser.write('1')
-
+        x_s(30, 1)
+    
 def x_right(steps):
     while(1):
         print('x', os.getpid())
-        #ser.write('1')
-
+        x_s(30, 0)
+        
 def y_forward(steps):
     while(1):
         print('y', os.getpid())
-        #ser.write('1')
-
+        y_s(30, 1)
+        
 def y_backward(steps):
     while(1):
         print('y', os.getpid())
-        #ser.write('1')
+        y_s(30, 0)
+
+def set_brightness(b):
+    brigthness(b)
 
 # Subscribe topics
 def on_connect(client, userdata, rc):
@@ -45,6 +49,7 @@ def on_connect(client, userdata, rc):
     client.subscribe("/yf")
     client.subscribe("/xl")
     client.subscribe("/xr")
+    client.subscribe('/brightness')
 
 # Reply messages
 def on_message(client, userdata, msg):
@@ -61,7 +66,10 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == "/zu":
+        if msg.topic == "/brightness":
+            print(msg.topic, msg.payload)
+            set_brigthness(msg.payload)
+        elif msg.topic == "/zu":
             if int(msg.payload) == 0:
                 print(msg.topic, int(msg.payload))
             elif int(msg.payload) == 1:
