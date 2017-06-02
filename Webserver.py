@@ -50,7 +50,7 @@ html_post_message = '''
       <div>
 
       <form action="post_message" method="post">
-        <input type="text" name="sent_message"><br /><br />
+        <input type="text" name="body"><br /><br />
         <input type="submit" value="Send">
       </form>
       </div>
@@ -64,7 +64,7 @@ app = Flask(__name__)
 CORS(app)
 
 # This is the path to the upload directory
-app.config['UPLOAD_FOLDER'] = 'C:/Users/HP/Documents/Research/CLICK/Hardware/images/'
+app.config['UPLOAD_FOLDER'] = 'C:/Users/HP/Dropbox/CLICK_Medical/CLICK/Hardware/images/'
 # These are the extension that we are accepting to be uploaded
 app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -77,22 +77,13 @@ def allowed_file(filename):
 def index():
 	return '''<b> Welcome to the home page </b>'''
 
-# This route will show a form to perform an AJAX request jQuery is loaded to execute the request and update the vars(object)lue of the operation
-@app.route('/post_image', methods=['GET'])
-def image():
-	if request.method == 'GET':
-		#return render_template('index.html')
-		return html_post_file
-	else:
-		return ''' Not supported method '''
-
 # Route that will post a message
 @app.route('/post_message', methods=['POST', 'GET'])
-def post():
+def post_message():
 	if request.method == 'GET':
 		return html_post_message
 	elif request.method == 'POST':
-		requested = request.form['sent_message']
+		requested = request.form['body']
 		print( str(requested) )
 		return jsonify({'result': 'success'})
 	else:
@@ -100,8 +91,11 @@ def post():
 
 # Route that will process the file upload
 @app.route('/post_image', methods=['POST', 'GET'])
-def upload():
-	if request.method == 'POST':
+def post_image():
+	if request.method == 'GET':
+		#return render_template('index.html')
+		return html_post_file
+	elif request.method == 'POST':
 		# Get the name of the uploaded file
 		file = request.files['file']
 		print(file)
@@ -125,13 +119,13 @@ def get_cam_state():
 def listen():
 	global state
 	while True:
-		state = int(np.random.rand()*10)
-		print(state)
+		state = 10#int(np.random.rand()*10)
+		#print(state)
 		eventlet.sleep(0.5)
 
 eventlet.spawn(listen)
 
 if __name__ == '__main__':
-	app.run(host="192.168.3.213",
+	app.run(host="192.168.3.214",
 			port=int("5000"),
 			debug=True)
