@@ -25,7 +25,7 @@ def x_right(steps):
     while(1):
         print('x', os.getpid())
         x_f(5, 0)
-        
+
 def y_forward(steps):
     while(1):
         print('y', os.getpid())
@@ -35,7 +35,7 @@ def y_backward(steps):
     while(1):
         print('y', os.getpid())
         y_s(5, 0)
-
+    
 # Subscribe topics
 def on_connect(client, userdata, rc):
     print("Connected with result code " + str(rc))
@@ -57,7 +57,8 @@ def on_message(client, userdata, msg):
     global proc_y_back
     global proc_x_left
     global proc_x_right
-    #print(msg.topic, int(msg.payload))
+
+    #print(msg.topic, msg.payload)
     if msg.topic == "/connect":
         enable = True if int(msg.payload) == 1 else False
         if int(msg.payload) == 1:
@@ -66,16 +67,20 @@ def on_message(client, userdata, msg):
         if msg.topic == "/led":
             print(msg.topic, msg.payload, type(int(msg.payload)))
             brigthness(int(msg.payload))
+            print(msg.topic, msg.payload)
         elif msg.topic == "/zu":
             if int(msg.payload) == 0:
                 print(msg.topic, int(msg.payload))
             elif int(msg.payload) == 1:
                 proc_z_up.start()
-                print(msg.topic, int(msg.payload))                
-            elif int(msg.payload) == 2:
-                proc_z_up.terminate()
-                proc_z_up = Process(target=z_up, args=(5,))
                 print(msg.topic, int(msg.payload))
+            elif int(msg.payload) == 2:
+                try:
+                    proc_z_up.terminate()
+                    proc_z_up = Process(target=z_up, args=(5,))
+                    print(msg.topic, int(msg.payload))
+                except:
+                    print('There was a problem')
             else:
                 pass 
         elif msg.topic == "/zd":
@@ -85,9 +90,12 @@ def on_message(client, userdata, msg):
                 print(msg.topic, int(msg.payload))
                 proc_z_down.start()
             elif int(msg.payload) == 2:
-                print(msg.topic, int(msg.payload))
-                proc_z_down.terminate()
-                proc_z_down = Process(target=z_down, args=(5,))
+                try:
+                    print(msg.topic, int(msg.payload))
+                    proc_z_down.terminate()
+                    proc_z_down = Process(target=z_down, args=(5,))
+                except:
+                    print('There was a problem')
             else:
                 pass 
         elif msg.topic == "/xl":
@@ -97,9 +105,12 @@ def on_message(client, userdata, msg):
                 proc_x_left.start()
                 print(msg.topic, int(msg.payload))
             elif int(msg.payload) == 2:
-                proc_x_left.terminate()
-                proc_x_left = Process(target=x_left, args=(5,))
-                print(msg.topic, int(msg.payload))
+                try:
+                    proc_x_left.terminate()
+                    proc_x_left = Process(target=x_left, args=(5,))
+                    print(msg.topic, int(msg.payload))
+                except:
+                    print('There was a problem')
             else:
                 pass    
         elif msg.topic == "/xr":
@@ -109,9 +120,12 @@ def on_message(client, userdata, msg):
                 proc_x_right.start()
                 print(msg.topic, int(msg.payload))
             elif int(msg.payload) == 2:
-                proc_x_right.terminate()
-                proc_x_right = Process(target=x_right, args=(5,))
-                print(msg.topic, int(msg.payload))
+                try:
+                    proc_x_right.terminate()
+                    proc_x_right = Process(target=x_right, args=(5,))
+                    print(msg.topic, int(msg.payload))
+                except:
+                    print('There was a problem')
             else:
                 pass
         elif msg.topic == "/yf":
@@ -121,9 +135,12 @@ def on_message(client, userdata, msg):
                 proc_y_forw.start()
                 print(msg.topic, int(msg.payload))
             elif int(msg.payload) == 2:
-                proc_y_forw.terminate()
-                proc_y_forw = Process(target=y_forward, args=(5,))
-                print(msg.topic, int(msg.payload))
+                try:
+                    proc_y_forw.terminate()
+                    proc_y_forw = Process(target=y_forward, args=(5,))
+                    print(msg.topic, int(msg.payload))
+                except:
+                    print('There was a problem')
             else:
                 pass 
         elif msg.topic == "/yb":
@@ -133,9 +150,12 @@ def on_message(client, userdata, msg):
                 proc_y_back.start()
                 print(msg.topic, int(msg.payload))
             elif int(msg.payload) == 2:
-                proc_y_back.terminate()
-                proc_y_back = Process(target=y_backward, args=(5,))
-                print(msg.topic, int(msg.payload))
+                try:
+                    proc_y_back.terminate()
+                    proc_y_back = Process(target=y_backward, args=(5,))
+                    print(msg.topic, int(msg.payload))
+                except:
+                    print('There was a problem')
             else:
                 pass 
         else:
@@ -150,6 +170,7 @@ if __name__ == '__main__':
     proc_y_back = Process(target=y_backward, args=(5,))
     proc_x_left = Process(target=x_left, args=(5,))
     proc_x_right = Process(target=x_right, args=(5,))
+
     client = mqtt.Client()
     client.connect('test.mosquitto.org', 1883, 60)
     #client.connect('10.42.0.1', 1883, 60)
