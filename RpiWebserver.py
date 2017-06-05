@@ -1,3 +1,15 @@
+''' 
+up: 82
+down: 84
+right: 83 
+left: 81
+1: 49
+2: 50
+3: 51
+4: 52
+5: 53
+'''
+
 import os
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, Response, jsonify
 from werkzeug import secure_filename
