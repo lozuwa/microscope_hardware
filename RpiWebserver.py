@@ -131,7 +131,7 @@ def get_cam_state():
 def listen():
 	global state
 	while True:
-		state = 10 #int(np.random.rand()*10)
+		state = 10 ##int(np.random.rand()*10)
 		#print(state)
 		eventlet.sleep(0.5)
 
