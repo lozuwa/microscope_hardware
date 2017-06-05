@@ -1,41 +1,44 @@
 import paho.mqtt.client as mqtt
 import numpy as np
-import os, time 
+import os, time
 from multiprocessing import Process
 from Interface_mic import *
 
 enable = False
+stepsz = 5
+stepsxy = 5
+time_ = 500
 
-def z_up(steps):
+def z_up(s):
     while(1):
         print('z', os.getpid())
-        z_s(5, 1)
-        
-def z_down(steps):
+        z_s(stepsz, 1, time_)
+
+def z_down(s):
     while(1):
         print('z', os.getpid())
-        z_s(5, 0)
-    
-def x_left(steps):
-    while(1):
-        print('x', os.getpid())
-        x_f(5, 1)
-    
-def x_right(steps):
-    while(1):
-        print('x', os.getpid())
-        x_f(5, 0)
+        z_s(stepsz, 0, time_)
 
-def y_forward(steps):
+def x_left(s):
+    while(1):
+        print('x', os.getpid())
+        x_f(stepsxy, 1, time_)
+
+def x_right(s):
+    while(1):
+        print('x', os.getpid())
+        x_f(stepsxy, 0, time_)
+
+def y_forward(s):
     while(1):
         print('y', os.getpid())
-        y_s(5, 1)
-        
-def y_backward(steps):
+        y_s(stepsxy, 1, time_)
+
+def y_backward(s):
     while(1):
         print('y', os.getpid())
-        y_s(5, 0)
-    
+        y_s(stepsxy, 0, time_)
+
 # Subscribe topics
 def on_connect(client, userdata, rc):
     print("Connected with result code " + str(rc))
@@ -47,10 +50,15 @@ def on_connect(client, userdata, rc):
     client.subscribe("/xl")
     client.subscribe("/xr")
     client.subscribe('/led')
+    client.subscribe('/stepsmicro')
+    client.subscribe('/timemicro')
 
 # Reply messages
 def on_message(client, userdata, msg):
     global enable
+    global stepsxy
+    global stepsz
+    global time_
     global proc_z_up
     global proc_z_down
     global proc_y_forw
@@ -64,7 +72,15 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == "/led":
+	if msg.topic == "/stepsmicro":
+            t = int((float(msg.payload) / 100) * 20)
+	    print(msg.topic, t)
+            stepsz = t
+        elif msg.topic == "/timemicro":
+            tt = int((float(msg.payload) / 100) * 1000)
+            print(msg.topic, tt)
+            time_ = tt
+        elif msg.topic == "/led":
             print(msg.topic, msg.payload, type(int(msg.payload)))
             brigthness(int(msg.payload))
             print(msg.topic, msg.payload)
