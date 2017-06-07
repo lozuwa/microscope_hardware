@@ -16,6 +16,8 @@ This README would normally document whatever steps are necessary to get your app
   ** python-opencv
   ** smbus
   ** RPi.GPIO
+  ** click
+  ** scipy 
  *C++:
   ** stdio.h
   ** wire.h
@@ -26,7 +28,6 @@ This README would normally document whatever steps are necessary to get your app
   ** libatlas-base-dev
   ** gfortran
   ** python-setuptools
-  ** scipy
   ** python-matplotlib
 
 * Upload the c++ code to the arduino and the mechaduino respectively. 

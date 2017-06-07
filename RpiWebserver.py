@@ -10,7 +10,8 @@ left: 81
 5: 53
 '''
 
-import os
+import os, sys 
+import click 
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, Response, jsonify
 from werkzeug import secure_filename
 import numpy as np 
@@ -131,9 +132,35 @@ def get_cam_state():
 def listen():
 	global state
 	while True:
-		state = 10 ##int(np.random.rand()*10)
-		#print(state)
-		eventlet.sleep(0.5)
+    state = 10 
+
+    # Move events 
+    key = click.getchar()
+
+    # Arrow event 
+    if key == b'\xe0':
+      # Wait for second stream  
+      key = bytes.decode( click.getchar() )
+      if key == 'H': # Up arrow 
+        pass 
+      elif key == 'K': # Left arrow 
+        pass 
+      elif key == 'M': # Right arrow 
+        pass
+      elif key == 'P': # Down arrow 
+        pass
+      else:
+        pass 
+    # Other events 
+    else:
+      key = bytes.decode( key )
+      if key == '1': # E.coli 
+        pass
+      elif key == '2': # Giardia 
+        pass 
+      else:
+        pass
+		eventlet.sleep(0.01)
 
 eventlet.spawn(listen)
 

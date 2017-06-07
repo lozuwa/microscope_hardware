@@ -4,7 +4,7 @@ Project: click_hardware
 Description: Script to move the 
 x,y,z axis of the device.
 '''
-from z_positioner as z_controller
+from z_positioner import z_controller
 from nnchk import nnchk
 import time, os, sys
 import paho.mqtt.client as mqtt

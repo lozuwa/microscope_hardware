@@ -72,12 +72,12 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-	if msg.topic == "/stepsmicro":
-            t = int((float(msg.payload) / 100) * 20)
-	    print(msg.topic, t)
+        if msg.topic == "/stepsmicro":
+            t = float(msg.payload) #int((float(msg.payload) / 100) * 20)
+            print(msg.topic, t)
             stepsz = t
         elif msg.topic == "/timemicro":
-            tt = int((float(msg.payload) / 100) * 1000)
+            tt = float(msg.payload) #int((float(msg.payload) / 100) * 1000)
             print(msg.topic, tt)
             time_ = tt
         elif msg.topic == "/led":
