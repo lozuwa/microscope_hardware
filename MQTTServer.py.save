@@ -22,12 +22,12 @@ def z_down(s):
 def x_left(s):
     while(1):
         print('x', os.getpid())
-        x_s(stepsxy, 1, time_)
+        x_f(stepsxy, 1, time_)
 
 def x_right(s):
     while(1):
         print('x', os.getpid())
-        x_s(stepsxy, 0, time_)
+        x_f(stepsxy, 0, time_)
 
 def y_forward(s):
     while(1):
@@ -72,30 +72,17 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == "/stepsmicro":
-            t = float(msg.payload) #int((float(msg.payload) / 100) * 20)
-            print(msg.topic, t)
+	if msg.topic == "/stepsmicro":
+            t = int((float(msg.payload) / 100) * 20)
+	    print(msg.topic, t)
             stepsz = t
         elif msg.topic == "/timemicro":
-            tt = float(msg.payload) #int((float(msg.payload) / 100) * 1000)
+            tt = int((float(msg.payload) / 100) * 1000)
             print(msg.topic, tt)
             time_ = tt
         elif msg.topic == "/led":
             print(msg.topic, msg.payload, type(int(msg.payload)))
-            b = int(msg.payload)
-            if b == 0:
-	        b = 0
-            elif b > 0 and b <= 5:
-                b = b + 10
-            elif b > 5 and b <= 25:
-                b = b + 25
-            elif b > 25 and b <= 55:
-                b = b + 45
-            elif b > 55 and b <= 85:
-                b = b + 60
-	    else:
-                b = 255
-            brigthness(b)
+            brigthness(int(msg.payload))
             print(msg.topic, msg.payload)
         elif msg.topic == "/zu":
             if int(msg.payload) == 0:
@@ -111,7 +98,7 @@ def on_message(client, userdata, msg):
                 except:
                     print('There was a problem')
             else:
-                pass
+                pass 
         elif msg.topic == "/zd":
             if int(msg.payload) == 0:
                 print(msg.topic, int(msg.payload))
@@ -126,7 +113,7 @@ def on_message(client, userdata, msg):
                 except:
                     print('There was a problem')
             else:
-                pass
+                pass 
         elif msg.topic == "/xl":
             if int(msg.payload) == 0:
                 print(msg.topic, int(msg.payload))
@@ -141,7 +128,7 @@ def on_message(client, userdata, msg):
                 except:
                     print('There was a problem')
             else:
-                pass
+                pass    
         elif msg.topic == "/xr":
             if int(msg.payload) == 0:
                 print(msg.topic, int(msg.payload))
@@ -171,7 +158,7 @@ def on_message(client, userdata, msg):
                 except:
                     print('There was a problem')
             else:
-                pass
+                pass 
         elif msg.topic == "/yb":
             if int(msg.payload) == 0:
                 print(msg.topic, int(msg.payload))
@@ -186,7 +173,7 @@ def on_message(client, userdata, msg):
                 except:
                     print('There was a problem')
             else:
-                pass
+                pass 
         else:
             pass
     else:
@@ -201,7 +188,8 @@ if __name__ == '__main__':
     proc_x_right = Process(target=x_right, args=(5,))
 
     client = mqtt.Client()
-    #client.connect('test.mosquitto.org', 1883, 60)
+    
+3client.connect('test.mosquitto.org', 1883, 60)
     client.connect('10.42.0.1', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
