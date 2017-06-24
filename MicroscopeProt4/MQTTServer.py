@@ -4,7 +4,6 @@ import os, time
 from multiprocessing import Process
 from Interface_mic import * 
 
-enable = False
 stepsz = 5
 stepsxy = 5
 time_ = 500
@@ -50,15 +49,12 @@ def on_connect(client, userdata, rc):
     client.subscribe("/xl")
     client.subscribe("/xr")
     client.subscribe('/led')
-    client.subscribe('/stepsmicro')
     client.subscribe('/timemicro')
     client.subscribe('/microscope')
 
 # Reply messages
 def on_message(client, userdata, msg):
     global enable
-    global stepsxy
-    global stepsz
     global time_
     global proc_z_up
     global proc_z_down
@@ -73,15 +69,9 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-
-        if msg.topic == "/stepsmicro":
-            t = float(msg.payload) #int((float(msg.payload) / 100) * 20)
-            print(msg.topic, t)
-            stepsz = 5 #t
-        elif msg.topic == "/timemicro":
-            tt = float(msg.payload) #int((float(msg.payload) / 100) * 1000)
-            print(msg.topic, tt)
-            time_ = tt
+        if msg.topic == "/timemicro":
+            time_ = float(msg.payload)*100
+	    print(msg.topic, time_)
         elif msg.topic == "/led":
             print(msg.topic, msg.payload, type(int(msg.payload)))
             b = int(msg.payload)
@@ -195,6 +185,11 @@ def on_message(client, userdata, msg):
         print('server not enabled')
 
 if __name__ == '__main__':
+    # Initialize enable variable 
+    global enable 
+    enable = False
+
+    # Background processes 
     proc_z_up = Process(target=z_up, args=(5,))
     proc_z_down = Process(target=z_down, args=(5,))
     proc_y_forw = Process(target=y_forward, args=(5,))
@@ -202,6 +197,7 @@ if __name__ == '__main__':
     proc_x_left = Process(target=x_left, args=(5,))
     proc_x_right = Process(target=x_right, args=(5,))
 
+    # Initialize mqtt client 
     client = mqtt.Client()
     client.connect('test.mosquitto.org', 1883, 60)
     #client.connect('10.42.0.1', 1883, 60)
