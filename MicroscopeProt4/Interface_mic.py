@@ -25,3 +25,26 @@ def auto(time_):
 		y_s(2000,1,time_)
 		time.sleep(1.5)
 		x_s(30,1,time_)
+def proc_H_x():
+    while(1):
+        s.write('x,'+str(20)+','+str(1)+','+str(500))
+		time.sleep(0.01)
+def proc_H_y():
+    while(1):
+        s.write('y,'+str(20)+','+str(1)+','+str(500))
+		time.sleep(0.01)
+
+H_x_ = Process(target=proc_H_x)
+H_y_ = Process(target=proc_H_y)
+
+def home():
+	H_x_.start()
+	while 1:
+		if (s.readline()[0]=='x'):
+			break
+	H_x_.terminate()
+	H_y_.start()
+	while 1:
+		if (s.readline()[0]=='y'):
+			break
+	H_y_.terminate()
