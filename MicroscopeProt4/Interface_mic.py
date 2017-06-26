@@ -25,3 +25,4 @@ def auto(time_):
 		y_s(2000,1,time_)
 		time.sleep(1.5)
 		x_s(30,1,time_)
+		

@@ -50,7 +50,6 @@ def on_connect(client, userdata, rc):
     client.subscribe("/xl")
     client.subscribe("/xr")
     client.subscribe('/led')
-    client.subscribe('/stepsmicro')
     client.subscribe('/timemicro')
     client.subscribe('/microscope')
 
@@ -73,20 +72,15 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-
-        if msg.topic == "/stepsmicro":
-            t = float(msg.payload) #int((float(msg.payload) / 100) * 20)
-            print(msg.topic, t)
-            stepsz = 5 #t
-        elif msg.topic == "/timemicro":
+        if msg.topic == "/timemicro":
             tt = float(msg.payload) #int((float(msg.payload) / 100) * 1000)
             print(msg.topic, tt)
-            time_ = tt
+            time_ = tt*100
         elif msg.topic == "/led":
             print(msg.topic, msg.payload, type(int(msg.payload)))
             b = int(msg.payload)
             if b == 0:
-	        b = 0
+                b = 0
             elif b > 0 and b <= 5:
                 b = b + 10
             elif b > 5 and b <= 25:
@@ -95,7 +89,7 @@ def on_message(client, userdata, msg):
                 b = b + 45
             elif b > 55 and b <= 85:
                 b = b + 60
-	    else:
+            else:
                 b = 255
             brigthness(b)
             print(msg.topic, msg.payload)
@@ -203,8 +197,8 @@ if __name__ == '__main__':
     proc_x_right = Process(target=x_right, args=(5,))
 
     client = mqtt.Client()
-    client.connect('test.mosquitto.org', 1883, 60)
-    #client.connect('10.42.0.1', 1883, 60)
+    #client.connect('test.mosquitto.org', 1883, 60)
+    client.connect('192.168.3.174', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
