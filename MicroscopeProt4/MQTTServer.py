@@ -1,47 +1,49 @@
+#ip 192.168.3.174
+
 import paho.mqtt.client as mqtt
 import numpy as np
 import os, time
 from multiprocessing import Process
 from Interface_mic import *
 
-enable = False
 stepsz = 5
 stepsxy = 5
 time_ = 500
 
 def z_up(s):
     while(1):
-        print('z', os.getpid())
+        #print('z', os.getpid())
         z_s(stepsz, 1, time_)
 
 def z_down(s):
     while(1):
-        print('z', os.getpid())
+        #print('z', os.getpid())
         z_s(stepsz, 0, time_)
 
 def x_left(s):
     while(1):
-        print('x', os.getpid())
+        #print('x', os.getpid())
         x_s(stepsxy, 1, time_)
 
 def x_right(s):
     while(1):
-        print('x', os.getpid())
+        #print('x', os.getpid())
         x_s(stepsxy, 0, time_)
 
 def y_forward(s):
     while(1):
-        print('y', os.getpid())
+        #print('y', os.getpid())
         y_s(stepsxy, 1, time_)
 
 def y_backward(s):
     while(1):
-        print('y', os.getpid())
+        #print('y', os.getpid())
         y_s(stepsxy, 0, time_)
 
 # Subscribe topics
-def on_connect(client, userdata, rc):
+def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
+    # Microscope hardware
     client.subscribe("/connect")
     client.subscribe("/zu")
     client.subscribe("/zd")
@@ -51,13 +53,14 @@ def on_connect(client, userdata, rc):
     client.subscribe("/xr")
     client.subscribe('/led')
     client.subscribe('/timemicro')
+    client.subscribe('/home')
+    client.subscribe('/automatic')
+    # Camera app 
     client.subscribe('/microscope')
 
 # Reply messages
 def on_message(client, userdata, msg):
     global enable
-    global stepsxy
-    global stepsz
     global time_
     global proc_z_up
     global proc_z_down
@@ -72,10 +75,14 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == "/timemicro":
-            tt = float(msg.payload) #int((float(msg.payload) / 100) * 1000)
-            print(msg.topic, tt)
-            time_ = tt*100
+        if msg.topic == "/automatic":
+            if int(msg.payload) == 0:
+                auto(6000)
+        elif msg.topic == "/home":
+            home()
+        elif msg.topic == "/timemicro":
+            time_ = float(msg.payload)*100
+            print(msg.topic, time_)
         elif msg.topic == "/led":
             print(msg.topic, msg.payload, type(int(msg.payload)))
             b = int(msg.payload)
@@ -189,6 +196,11 @@ def on_message(client, userdata, msg):
         print('server not enabled')
 
 if __name__ == '__main__':
+    # Initialize enable variable 
+    global enable 
+    enable = False
+
+    # Background processes 
     proc_z_up = Process(target=z_up, args=(5,))
     proc_z_down = Process(target=z_down, args=(5,))
     proc_y_forw = Process(target=y_forward, args=(5,))
@@ -196,8 +208,10 @@ if __name__ == '__main__':
     proc_x_left = Process(target=x_left, args=(5,))
     proc_x_right = Process(target=x_right, args=(5,))
 
+    # Initialize mqtt client 
     client = mqtt.Client()
     #client.connect('test.mosquitto.org', 1883, 60)
+    #client.connect('10.42.0.1', 1883, 60)
     client.connect('192.168.3.174', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
