@@ -1,8 +1,10 @@
+#ip 192.168.3.174
+
 import paho.mqtt.client as mqtt
 import numpy as np
 import os, time
 from multiprocessing import Process
-from Interface_mic import * 
+from Interface_mic import *
 
 stepsz = 5
 stepsxy = 5
@@ -74,9 +76,10 @@ def on_message(client, userdata, msg):
             print('server enabled')
     if enable == True:
         if msg.topic == "/automatic":
-            pass
+            if int(msg.payload) == 0:
+		auto(6000)
         elif msg.topic == "/home":
-            pass
+            home()
         elif msg.topic == "/timemicro":
             time_ = float(msg.payload)*100
 	    print(msg.topic, time_)
@@ -207,8 +210,9 @@ if __name__ == '__main__':
 
     # Initialize mqtt client 
     client = mqtt.Client()
-    client.connect('test.mosquitto.org', 1883, 60)
+    #client.connect('test.mosquitto.org', 1883, 60)
     #client.connect('10.42.0.1', 1883, 60)
+    client.connect('192.168.3.174', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
