@@ -10,37 +10,38 @@ time_ = 500
 
 def z_up(s):
     while(1):
-        print('z', os.getpid())
+        #print('z', os.getpid())
         z_s(stepsz, 1, time_)
 
 def z_down(s):
     while(1):
-        print('z', os.getpid())
+        #print('z', os.getpid())
         z_s(stepsz, 0, time_)
 
 def x_left(s):
     while(1):
-        print('x', os.getpid())
+        #print('x', os.getpid())
         x_s(stepsxy, 1, time_)
 
 def x_right(s):
     while(1):
-        print('x', os.getpid())
+        #print('x', os.getpid())
         x_s(stepsxy, 0, time_)
 
 def y_forward(s):
     while(1):
-        print('y', os.getpid())
+        #print('y', os.getpid())
         y_s(stepsxy, 1, time_)
 
 def y_backward(s):
     while(1):
-        print('y', os.getpid())
+        #print('y', os.getpid())
         y_s(stepsxy, 0, time_)
 
 # Subscribe topics
 def on_connect(client, userdata, rc):
     print("Connected with result code " + str(rc))
+    # Microscope hardware
     client.subscribe("/connect")
     client.subscribe("/zu")
     client.subscribe("/zd")
@@ -50,6 +51,9 @@ def on_connect(client, userdata, rc):
     client.subscribe("/xr")
     client.subscribe('/led')
     client.subscribe('/timemicro')
+    client.subscribe('/home')
+    client.subscribe('/automatic')
+    # Camera app 
     client.subscribe('/microscope')
 
 # Reply messages
@@ -69,7 +73,11 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == "/timemicro":
+        if msg.topic == "/automatic":
+            pass
+        elif msg.topic == "/home":
+            pass
+        elif msg.topic == "/timemicro":
             time_ = float(msg.payload)*100
 	    print(msg.topic, time_)
         elif msg.topic == "/led":
