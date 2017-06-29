@@ -1,8 +1,10 @@
+#ip 192.168.3.174
+
 import paho.mqtt.client as mqtt
 import numpy as np
 import os, time
 from multiprocessing import Process
-from Interface_mic import * 
+from Interface_mic import *
 
 stepsz = 5
 stepsxy = 5
@@ -10,37 +12,38 @@ time_ = 500
 
 def z_up(s):
     while(1):
-        print('z', os.getpid())
+        #print('z', os.getpid())
         z_s(stepsz, 1, time_)
 
 def z_down(s):
     while(1):
-        print('z', os.getpid())
+        #print('z', os.getpid())
         z_s(stepsz, 0, time_)
 
 def x_left(s):
     while(1):
-        print('x', os.getpid())
+        #print('x', os.getpid())
         x_s(stepsxy, 1, time_)
 
 def x_right(s):
     while(1):
-        print('x', os.getpid())
+        #print('x', os.getpid())
         x_s(stepsxy, 0, time_)
 
 def y_forward(s):
     while(1):
-        print('y', os.getpid())
+        #print('y', os.getpid())
         y_s(stepsxy, 1, time_)
 
 def y_backward(s):
     while(1):
-        print('y', os.getpid())
+        #print('y', os.getpid())
         y_s(stepsxy, 0, time_)
 
 # Subscribe topics
-def on_connect(client, userdata, rc):
+def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
+    # Microscope hardware
     client.subscribe("/connect")
     client.subscribe("/zu")
     client.subscribe("/zd")
@@ -50,6 +53,9 @@ def on_connect(client, userdata, rc):
     client.subscribe("/xr")
     client.subscribe('/led')
     client.subscribe('/timemicro')
+    client.subscribe('/home')
+    client.subscribe('/automatic')
+    # Camera app 
     client.subscribe('/microscope')
 
 # Reply messages
@@ -69,14 +75,19 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == "/timemicro":
+        if msg.topic == "/automatic":
+            if int(msg.payload) == 0:
+                auto(6000)
+        elif msg.topic == "/home":
+            home()
+        elif msg.topic == "/timemicro":
             time_ = float(msg.payload)*100
-	    print(msg.topic, time_)
+            print(msg.topic, time_)
         elif msg.topic == "/led":
             print(msg.topic, msg.payload, type(int(msg.payload)))
             b = int(msg.payload)
             if b == 0:
-	        b = 0
+                b = 0
             elif b > 0 and b <= 5:
                 b = b + 10
             elif b > 5 and b <= 25:
@@ -85,7 +96,7 @@ def on_message(client, userdata, msg):
                 b = b + 45
             elif b > 55 and b <= 85:
                 b = b + 60
-	    else:
+            else:
                 b = 255
             brigthness(b)
             print(msg.topic, msg.payload)
@@ -199,8 +210,9 @@ if __name__ == '__main__':
 
     # Initialize mqtt client 
     client = mqtt.Client()
-    client.connect('test.mosquitto.org', 1883, 60)
+    #client.connect('test.mosquitto.org', 1883, 60)
     #client.connect('10.42.0.1', 1883, 60)
+    client.connect('192.168.3.174', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
