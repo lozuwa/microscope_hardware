@@ -3,6 +3,7 @@ import time
 from multiprocessing import Process
 
 s=serial.Serial('/dev/ttyACM0',115200)
+c=0
 
 def x_s(pasos,dir,time_):
 	s.write(('x,'+str(pasos)+','+str(dir)+','+str(time_)).encode()) # time=500
@@ -47,7 +48,8 @@ H_x_ = Process(target=proc_H_x)
 def home():
 	global H_y_
 	global H_x_
-
+	z_s(5000,0,200)
+	time.sleep(3.5)
 	H_y_.start()
 	print('aqui')
 	if (s.readline()[0]==121):
@@ -62,4 +64,20 @@ def home():
 	time.sleep(0.5)
 	x_s(3000,0,500)
 	time.sleep(1.5)
-	y_s(300,1,500)
+	y_s(1700,1,500)
+	time.sleep(4)
+	z_s(5000,1,200)
+	time.sleep(5)
+
+def cambio():
+	global c
+	c=c+1
+	if c<15:
+		y_s(40,1,5000)
+	elif c==15:
+		x_s(60,1,5000)
+	elif c>15 and c<30:
+		y_s(40,0,5000)
+	elif c==30:
+		x_s(60,1,5000)
+		c=0

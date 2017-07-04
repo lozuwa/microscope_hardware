@@ -55,6 +55,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('/timemicro')
     client.subscribe('/home')
     client.subscribe('/automatic')
+
+    client.subscribe('/movefield')
     # Camera app 
     client.subscribe('/microscope')
 
@@ -77,6 +79,11 @@ def on_message(client, userdata, msg):
     if enable == True:
         if msg.topic == '/microscope':
             print(msg.topic, msg.payload)
+            time.sleep(1)
+            cambio()
+        elif msg.topic == '/movefield':
+            if int(msg.payload)==1:
+                cambio()
         elif msg.topic == "/automatic":
             if int(msg.payload) == 0:
                 auto(6000)
