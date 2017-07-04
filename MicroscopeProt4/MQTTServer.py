@@ -75,7 +75,9 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == "/automatic":
+        if msg.topic == '/microscope':
+            print(msg.topic, msg.payload)
+        elif msg.topic == "/automatic":
             if int(msg.payload) == 0:
                 auto(6000)
         elif msg.topic == "/home":
