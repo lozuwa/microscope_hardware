@@ -1,14 +1,25 @@
 #ip 192.168.3.174
 
+# MQTT
 import paho.mqtt.client as mqtt
-import numpy as np
-import os, time
-from multiprocessing import Process
+# Supporting libraries
+import os, time, numpy as np
 from Interface_mic import *
+# Thread
+from multiprocessing import Process
+import eventlet
+eventlet.monkey_patch()
 
+# Initialize mqtt client
+client = mqtt.Client()
+
+
+# Global variables
 stepsz = 5
 stepsxy = 5
 time_ = 500
+KEEP_ALIVE_TIME = 5
+
 
 def z_up(s):
     while(1):
@@ -55,9 +66,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('/timemicro')
     client.subscribe('/home')
     client.subscribe('/automatic')
-
     client.subscribe('/movefield')
-    # Camera app 
+    # Camera app
     client.subscribe('/microscope')
 
 # Reply messages
@@ -80,10 +90,11 @@ def on_message(client, userdata, msg):
         if msg.topic == '/microscope':
             print(msg.topic, msg.payload)
             time.sleep(1)
-            cambio()
         elif msg.topic == '/movefield':
             if int(msg.payload)==1:
-                cambio()
+                change(1)
+            if int(msg.payload)==0:
+                change(0)
         elif msg.topic == "/automatic":
             if int(msg.payload) == 0:
                 auto(6000)
@@ -204,12 +215,20 @@ def on_message(client, userdata, msg):
     else:
         print('server not enabled')
 
+def keep_smartphone_alive():
+    #while(1):
+    client.publish('/microscope', 'keep alive', 2)
+    time.sleep(KEEP_ALIVE_TIME)
+
+# Initialize thread
+eventlet.spawn(keep_smartphone_alive)
+
 if __name__ == '__main__':
-    # Initialize enable variable 
-    global enable 
+    # Initialize enable variable
+    global enable
     enable = False
 
-    # Background processes 
+    # Background processes
     proc_z_up = Process(target=z_up, args=(5,))
     proc_z_down = Process(target=z_down, args=(5,))
     proc_y_forw = Process(target=y_forward, args=(5,))
@@ -217,8 +236,6 @@ if __name__ == '__main__':
     proc_x_left = Process(target=x_left, args=(5,))
     proc_x_right = Process(target=x_right, args=(5,))
 
-    # Initialize mqtt client 
-    client = mqtt.Client()
     #client.connect('test.mosquitto.org', 1883, 60)
     #client.connect('10.42.0.1', 1883, 60)
     client.connect('192.168.3.174', 1883, 60)
