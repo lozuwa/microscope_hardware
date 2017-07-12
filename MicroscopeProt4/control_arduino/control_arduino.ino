@@ -7,8 +7,9 @@
 #define enable 8
 #define luz 12
 #define endX 11
-#define endY 10 
+#define endY 10
 //#define endZ 9
+#define enablez A0
 
 String eje, pasos, direccion, timpo, brillo;
 byte brillo_actual=0;

@@ -18,8 +18,7 @@ client = mqtt.Client()
 stepsz = 5
 stepsxy = 5
 time_ = 500
-KEEP_ALIVE_TIME = 5
-
+KEEP_ALIVE_TIME = 10
 
 def z_up(s):
     while(1):
@@ -216,12 +215,11 @@ def on_message(client, userdata, msg):
         print('server not enabled')
 
 def keep_smartphone_alive():
-    #while(1):
     client.publish('/microscope', 'keep alive', 2)
     time.sleep(KEEP_ALIVE_TIME)
 
 # Initialize thread
-eventlet.spawn(keep_smartphone_alive)
+#eventlet.spawn(keep_smartphone_alive)
 
 if __name__ == '__main__':
     # Initialize enable variable
@@ -241,4 +239,7 @@ if __name__ == '__main__':
     client.connect('192.168.3.174', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
-    client.loop_forever()
+    client.loop_start()
+
+    while True:
+        keep_smartphone_alive()
