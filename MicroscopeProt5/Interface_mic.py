@@ -64,12 +64,12 @@ def home():
 	time.sleep(3.5)
 	H_y_.start()
 	print('zs ...')
-	if (s.readline()[0]==121):
+	if (s.readline()[0] == 121):
 		H_y_.terminate()
 	H_y_ = Process(target=proc_H_y)
 	time.sleep(0.05)
 	H_x_.start()
-	if (s.readline()[0]==120):
+	if (s.readline()[0] == 120):
 		time.sleep(0.05)
 		H_x_.terminate()
 	H_x_ = Process(target=proc_H_x)

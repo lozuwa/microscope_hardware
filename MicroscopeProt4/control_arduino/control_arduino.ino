@@ -31,6 +31,7 @@ void setup() {
   pinMode(endX, INPUT_PULLUP);
   pinMode(endY, INPUT_PULLUP);
 
+  digitalWrite(enablez, 1);
   digitalWrite(enable , 1);
   digitalWrite(direccionZ, 0);
 

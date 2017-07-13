@@ -13,44 +13,58 @@ eventlet.monkey_patch()
 # Initialize mqtt client
 client = mqtt.Client()
 
-
 # Global variables
 stepsz = 5
 stepsxy = 5
 time_ = 500
 KEEP_ALIVE_TIME = 10
 
+state = False
+
 def z_up(s):
-    while(1):
-        #print('z', os.getpid())
+    global stepsz
+    if state == True:
         z_s(stepsz, 1, time_)
-        #wait()
+        time.sleep(0.01)
+    else:
+        while(1):
+            #print('z', os.getpid())
+            z_s(stepsz, 1, time_)
+            time.sleep(0.01)
 
 def z_down(s):
-    while(1):
-        #print('z', os.getpid())
-        z_s(stepsz, 0, time_) 
-        #wait()
+    if state == True:
+        z_s(stepsz, 0, time_)
+        time.sleep(0.01)
+    else:
+        while(1):
+            #print('z', os.getpid())
+            z_s(stepsz, 0, time_)
+            time.sleep(0.01)
 
 def x_left(s):
     while(1):
         #print('x', os.getpid())
         x_s(stepsxy, 1, time_)
+        time.sleep(0.01)
 
 def x_right(s):
     while(1):
         #print('x', os.getpid())
         x_s(stepsxy, 0, time_)
+        time.sleep(0.01)
 
 def y_forward(s):
     while(1):
         #print('y', os.getpid())
         y_s(stepsxy, 1, time_)
+        time.sleep(0.01)
 
 def y_backward(s):
     while(1):
         #print('y', os.getpid())
         y_s(stepsxy, 0, time_)
+        time.sleep(0.01)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -81,6 +95,7 @@ def on_message(client, userdata, msg):
     global proc_y_back
     global proc_x_left
     global proc_x_right
+    global stepsz
 
     #print(msg.topic, msg.payload)
     if msg.topic == "/connect":
@@ -89,8 +104,9 @@ def on_message(client, userdata, msg):
             print('server enabled')
     if enable == True:
         if msg.topic == '/microscope':
-            print(msg.topic, msg.payload)
-            time.sleep(1)
+            pass
+            #print(msg.topic, msg.payload)
+            #time.sleep(1)
         elif msg.topic == '/movefield':
             if int(msg.payload)==1:
                 change(1)
@@ -102,22 +118,13 @@ def on_message(client, userdata, msg):
         elif msg.topic == "/home":
             home()
         elif msg.topic == "/timemicro":
-            time_ = float(msg.payload)*100
-            print(msg.topic, time_)
+            stepsz = float(msg.payload)*50
+            print(msg.topic, stepsz)
         elif msg.topic == "/led":
-            print(msg.topic, msg.payload, type(int(msg.payload)))
             b = int(msg.payload)
-            if b == 0:
+            if b >= 0 and b < 50:
                 b = 0
-            elif b > 0 and b <= 5:
-                b = b + 10
-            elif b > 5 and b <= 25:
-                b = b + 25
-            elif b > 25 and b <= 55:
-                b = b + 45
-            elif b > 55 and b <= 85:
-                b = b + 60
-            else:
+            elif b >= 50 and b <= 100:
                 b = 255
             brigthness(b)
             print(msg.topic, msg.payload)

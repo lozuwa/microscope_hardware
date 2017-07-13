@@ -1,6 +1,6 @@
 # Author: Khalil Nallar
-# Company: pfm medical 
-# Description: Supporting functions for microscope movement 
+# Company: pfm medical
+# Description: Supporting functions for microscope movement
 
 import serial
 import os, sys, time
@@ -12,19 +12,16 @@ c = 0
 TIME_HOME = 200
 
 def x_s(pasos,dir,time_):
-	s.write(('x,'+str(pasos)+','+str(dir)+','+str(time_)).encode()) # time=500
-	time.sleep(0.01)
-def y_s(pasos,dir,time_):
-	s.write(('y,'+str(pasos)+','+str(dir)+','+str(time_)).encode()) # time=500
-	time.sleep(0.01)
-def z_s(pasos,dir,time_):
-	s.write(('z,'+str(pasos)+','+str(dir)+','+str(time_)).encode()) # time=500
+	s.write(('x,'+str(pasos)+','+str(dir)+','+str(time_)).encode())
 	time.sleep(0.01)
 
-def wait():
-	time.sleep(0.05)
-	while(s.read() != "o"):
-		continue
+def y_s(pasos,dir,time_):
+	s.write(('y,'+str(pasos)+','+str(dir)+','+str(time_)).encode())
+	time.sleep(0.01)
+
+def z_s(pasos,dir,time_):
+	s.write(('z,'+str(pasos)+','+str(dir)+','+str(time_)).encode())
+	time.sleep(0.01)
 
 def brigthness(b):
 	s.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(b)).encode())
@@ -42,6 +39,7 @@ def auto(time_):
 		y_s(2000,1,time_)
 		time.sleep(5)
 		x_s(30,1,time_)
+
 def exit():
 	s.close()
 
@@ -49,13 +47,11 @@ def proc_H_y():
     while(1):
         s.write(('y,'+str(20)+','+str(0)+','+str(500)).encode())
         time.sleep(0.01)
-        #print 'home y'
 
 def proc_H_x():
     while(1):
         s.write(('x,'+str(20)+','+str(1)+','+str(500)).encode())
         time.sleep(0.01)
-        #print 'home x'
 
 H_y_ = Process(target=proc_H_y)
 H_x_ = Process(target=proc_H_x)
