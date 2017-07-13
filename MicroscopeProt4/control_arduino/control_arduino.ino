@@ -34,7 +34,7 @@ void setup() {
   digitalWrite(direccionZ, 0);
 
   Serial.begin(115200);
-  Serial.setTimeout(5);
+  Serial.setTimeout(10);
 }
 
 void loop() {
@@ -95,6 +95,7 @@ void z(int pasos, int direccion, int timpo) {
     delayMicroseconds(timpo);
   }
   digitalWrite(enable , 1);
+  Serial.write("o");
 }
 void y(int pasos, int direccion, int timpo) {
   digitalWrite(enable, 0);

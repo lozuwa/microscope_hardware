@@ -21,6 +21,11 @@ def z_s(pasos,dir,time_):
 	s.write(('z,'+str(pasos)+','+str(dir)+','+str(time_)).encode()) # time=500
 	time.sleep(0.01)
 
+def wait():
+	time.sleep(0.05)
+	while(s.read() != "o"):
+		continue
+
 def brigthness(b):
 	s.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(b)).encode())
 	time.sleep(0.01)
