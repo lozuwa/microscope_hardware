@@ -115,7 +115,7 @@ void x(int pasos, int direccion, int timpo) {
   digitalWrite(direccionX, direccion);
   for (int i = 0; i < pasos; i++) {
     digitalWrite(stepsX, 1);
-    delayMicroseconds(timpo);
+    delayMicroseconds(tdimpo);
     digitalWrite(stepsX, 0);
     delayMicroseconds(timpo);
   }
