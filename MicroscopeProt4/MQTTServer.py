@@ -24,13 +24,13 @@ def z_up(s):
     while(1):
         #print('z', os.getpid())
         z_s(stepsz, 1, time_)
-	wait()
+        #wait()
 
 def z_down(s):
     while(1):
         #print('z', os.getpid())
-        z_s(stepsz, 0, time_)
-	wait()
+        z_s(stepsz, 0, time_) 
+        #wait()
 
 def x_left(s):
     while(1):

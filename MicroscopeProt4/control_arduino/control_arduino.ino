@@ -24,6 +24,7 @@ void setup() {
   pinMode(direccionZ, OUTPUT);
 
   pinMode(enable, OUTPUT);
+  pinMode(enablez, OUTPUT);
 
   pinMode(luz, OUTPUT);
 
@@ -87,14 +88,14 @@ void brillo_(int brillo){
 }
 void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
-  digitalWrite(enable, 0);
+  digitalWrite(enablez, 0);
   for (int i = 0; i < pasos; i++) {
     digitalWrite(stepsZ, 1);
     delayMicroseconds(timpo);
     digitalWrite(stepsZ, 0);
     delayMicroseconds(timpo);
   }
-  digitalWrite(enable , 1);
+  digitalWrite(enablez, 1);
   Serial.write("o");
 }
 void y(int pasos, int direccion, int timpo) {
