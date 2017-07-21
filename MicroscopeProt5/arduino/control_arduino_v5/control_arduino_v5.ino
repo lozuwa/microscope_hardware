@@ -6,15 +6,18 @@
 #define direccionY 7
 #define enable 8
 #define luz 12
-#define endX 11
+#define endX 9
 #define endY 10
-//#define endZ 9
+#define endZ 11
 #define enablez A0
 
 String eje, pasos, direccion, timpo, brillo;
-byte brillo_actual=0;
-byte B_endStopX=0;
-byte B_endStopY=0;
+byte brillo_actual = 0;
+
+byte B_homeX = 1;
+byte B_homeY = 1;
+byte B_homeZ = 1;
+
 void setup() {
   pinMode(stepsX, OUTPUT);
   pinMode(direccionX, OUTPUT);
@@ -30,6 +33,7 @@ void setup() {
 
   pinMode(endX, INPUT_PULLUP);
   pinMode(endY, INPUT_PULLUP);
+  pinMode(endZ, INPUT_PULLUP);
 
   digitalWrite(enablez, 1);
   digitalWrite(enable , 1);
@@ -45,8 +49,7 @@ void loop() {
   digitalWrite(direccionZ , 0);
   digitalWrite(direccionY , 0);
   digitalWrite(direccionX , 0);
-  endStop();
-  
+
   if (Serial.available() > 0) {
     String tx = Serial.readString();
     //Serial.println(tx);
@@ -61,10 +64,6 @@ void loop() {
     tx = tx.substring(timpo.length() + 1);
     brillo = tx.substring(0, tx.indexOf(","));
 
-    //Serial.println(eje);
-    //Serial.println(pasos);
-    //Serial.println(direccion);
-    //Serial.println(brillo);
     if (eje == "x") {
       //Serial.println("moviendo eje x, " + pasos +" pasos, en direccion " + direccion + ",en " + timpo +" milisegundos por paso");
       x(pasos.toInt(), direccion.toInt(), timpo.toInt());
@@ -77,15 +76,24 @@ void loop() {
       //Serial.print("moviendo eje z, " + pasos +" pasos, en direccion " + direccion + ",en " + timpo +" milisegundos por paso");
       z(pasos.toInt(), direccion.toInt(), timpo.toInt());
     }
-    else if(brillo.toInt()!=brillo_actual){
+    else if (eje == "homeX") {
+      homeX();
+    }
+    else if (eje == "homeY") {
+      homeY();
+    }
+    else if (eje == "homeZ") {
+      homeZ();
+    }
+    else if (brillo.toInt() != brillo_actual) {
       brillo_(brillo.toInt());
-      brillo_actual=brillo.toInt();
+      brillo_actual = brillo.toInt();
       //Serial.println("ok");
     }
   }
 }
-void brillo_(int brillo){
-  analogWrite(luz,brillo);
+void brillo_(bool brillo) {
+  digitalWrite(luz, brillo);
 }
 void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
@@ -97,7 +105,7 @@ void z(int pasos, int direccion, int timpo) {
     delayMicroseconds(timpo);
   }
   digitalWrite(enablez, 1);
-  Serial.write("o");
+  B_homeZ = 1;
 }
 void y(int pasos, int direccion, int timpo) {
   digitalWrite(enable, 0);
@@ -109,6 +117,7 @@ void y(int pasos, int direccion, int timpo) {
     delayMicroseconds(timpo);
   }
   digitalWrite(enable , 1);
+  B_homeY = 1;
 }
 void x(int pasos, int direccion, int timpo) {
   digitalWrite(enable, 0);
@@ -120,25 +129,50 @@ void x(int pasos, int direccion, int timpo) {
     delayMicroseconds(timpo);
   }
   digitalWrite(enable , 1);
+  B_homeX = 1;
 }
-void endStop(){
-  if(digitalRead(endX)==0 and B_endStopX==0){
-    B_endStopX=1;
-    Serial.println("x");
-    delay(10);
+void homeX() {
+  if (B_homeX == 1) {
+    digitalWrite(enable, 0);
+    digitalWrite(direccionX, 0);
+    while (digitalRead(endX) == 1) {
+      digitalWrite(stepsX, 1);
+      delayMicroseconds(200);
+      digitalWrite(stepsX, 0);
+      delayMicroseconds(200);
+    }
+    B_homeX = 0;
+    digitalWrite(enable, 1);
   }
-  else if(digitalRead(endX)==1 and B_endStopX==1){
-    B_endStopX=0;
-    delay(10);
-  }
-  if(digitalRead(endY)==0 and B_endStopY==0){
-    B_endStopY=1;
-    Serial.println("y");
-    delay(1);
-  }
-  else if(digitalRead(endY)==1 and B_endStopY==1){
-    B_endStopY=0;
-    delay(1);
-  }
+  Serial.println("ok");
 }
-
+void homeY() {
+  if (B_homeY == 1) {
+    digitalWrite(enable, 0);
+    digitalWrite(direccionY, 0);
+    while (digitalRead(endY) == 1) {
+      digitalWrite(stepsY, 1);
+      delayMicroseconds(100);
+      digitalWrite(stepsY, 0);
+      delayMicroseconds(100);
+    }
+    B_homeY = 0;
+    digitalWrite(enable, 1);
+  }
+  Serial.println("ok");
+}
+void homeZ() {
+  if (B_homeZ == 1) {
+    digitalWrite(enablez, 0);
+    digitalWrite(direccionZ, 0);
+    while (digitalRead(endZ) == 1) {
+      digitalWrite(stepsZ, 1);
+      delayMicroseconds(200);
+      digitalWrite(stepsZ, 0);
+      delayMicroseconds(200);
+    }
+    B_homeZ = 0;
+    digitalWrite(enablez, 1);
+  }
+  Serial.println("ok");
+}

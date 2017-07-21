@@ -4,7 +4,7 @@
 import paho.mqtt.client as mqtt
 # Supporting libraries
 import os, time, numpy as np
-from Interface_mic import *
+from Interface import *
 # Thread
 from multiprocessing import Process
 import eventlet
@@ -17,7 +17,7 @@ client = mqtt.Client()
 stepsz = 5
 stepsxy = 5
 time_ = 500
-KEEP_ALIVE_TIME = 10
+KEEP_ALIVE_TIME = 120
 
 state = False
 
