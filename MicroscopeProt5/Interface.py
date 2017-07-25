@@ -6,11 +6,11 @@ import serial
 import os, sys, time
 from multiprocessing import Process
 
-# Global variables
-s = serial.Serial('/dev/ttyACM0',115200)
+### Global variables ###
+s = serial.Serial('/dev/ttyACM1',115200)
 c = 0
-TIME_HOME = 200
 
+### Move ### 
 def x(pasos,dir,time_):
 	s.write(('x,'+str(pasos)+','+str(dir)+','+str(time_)).encode())
 	time.sleep(0.01)
@@ -30,57 +30,68 @@ def brigthness(b):
 def exit():
 	s.close()
 
-
 def homeZ():
 	s.write('homeZ'.encode())
+
 def homeX():
 	s.write('homeX'.encode())
+
 def homeY():
 	s.write('homeY'.encode())
+
 def home():
+	s.flushInput()
 	global c
+	k=0
 	brigthness(255)
 	time.sleep(0.2)
+
 	homeZ()
-	time.sleep(3)
-	print ('z')
+	wait('z')
+
 	homeX()
-	time.sleep(2)
-	print ('x')
+	wait('x')
+
 	homeY()
-	time.sleep(2)
-	print ('y')
+	wait('y')
+
 	y(3000,1,150)
 	time.sleep(2)
 	print ('2')
 	x(1300,1,300)
 	time.sleep(1)
 	print ('2')
-	z(4600,1,300)
+	z(15000,1,300)
 	print ('ok')
 	c=0
+
 def change(dir):
         global c
         campos = 30
         if dir == 0:
             c -= 1
-            if c < campos:
+            if c < campos-1:
                 x(40,0,5000)
-            elif c == campos:
+            elif c == campos-1:
                 y(80,1,5000)
-            elif c > campos and c < campos*2:
+            elif c > campos-1 and c < (campos*2)-1:
                 x(40,1,5000)
-            elif c == campos*2:
-                y(120,1,5000)
+            elif c == (campos*2)-1:
+                y(90,1,5000)
                 c = 0
         elif dir:
             c += 1
             if c < campos:
                 x(40,1,5000)
             elif c == campos:
-                y(80,0,5000)
+                y(50,0,4000)
             elif c > campos and c < campos*2:
                 x(40,0,5000)
             elif c == campos*2:
-                y(120,0,5000)
+                y(60,0,4000)
                 c = 0
+
+def wait(axis):
+	while(chr(s.read()[0])!=axis):
+		continue
+	time.sleep(0.1)
