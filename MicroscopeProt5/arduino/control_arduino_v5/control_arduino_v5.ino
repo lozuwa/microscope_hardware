@@ -11,6 +11,9 @@
 #define endZ 11
 #define enablez A0
 
+//y,1000,1,500
+//x,1000,1,500
+
 String eje, pasos, direccion, timpo, brillo;
 byte brillo_actual = 0;
 
