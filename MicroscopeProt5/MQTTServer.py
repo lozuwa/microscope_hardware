@@ -15,7 +15,7 @@ client = mqtt.Client()
 
 # Global variables
 stepsz = 5
-stepsxy = 5
+stepsxy = 1
 time_ = 500
 KEEP_ALIVE_TIME = 120
 

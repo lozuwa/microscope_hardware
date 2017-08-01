@@ -7,10 +7,10 @@ import os, sys, time
 from multiprocessing import Process
 
 ### Global variables ###
-s = serial.Serial('/dev/ttyACM1',115200)
+s = serial.Serial('/dev/ttyACM0',115200)
 c = 0
 
-### Move ### 
+### Move ###
 def x(pasos,dir,time_):
 	s.write(('x,'+str(pasos)+','+str(dir)+','+str(time_)).encode())
 	time.sleep(0.01)
@@ -55,9 +55,9 @@ def home():
 	homeY()
 	wait('y')
 
-	y(3000,1,150)
+	y(1400,1,150)
 	time.sleep(2)
-	print ('2')
+	print ('1')
 	x(1300,1,300)
 	time.sleep(1)
 	print ('2')
@@ -67,16 +67,16 @@ def home():
 
 def change(dir):
         global c
-        campos = 30
+        campos = 40
         if dir == 0:
             c -= 1
-            if c < campos-1:
+            if c < campos-1 and c!=-1:
                 x(40,0,5000)
             elif c == campos-1:
                 y(80,1,5000)
             elif c > campos-1 and c < (campos*2)-1:
                 x(40,1,5000)
-            elif c == (campos*2)-1:
+            elif c == -1:
                 y(90,1,5000)
                 c = 0
         elif dir:
@@ -84,7 +84,7 @@ def change(dir):
             if c < campos:
                 x(40,1,5000)
             elif c == campos:
-                y(50,0,4000)
+                y(30,0,4000)
             elif c > campos and c < campos*2:
                 x(40,0,5000)
             elif c == campos*2:
