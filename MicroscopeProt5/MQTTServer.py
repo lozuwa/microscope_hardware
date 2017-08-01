@@ -19,7 +19,6 @@ stepsxy = 1
 time_ = 500
 KEEP_ALIVE_TIME = 120
 
-
 def z_up():
     global stepsz
     while(1):
