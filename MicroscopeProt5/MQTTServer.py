@@ -107,7 +107,7 @@ def on_message(client, userdata, msg):
         elif msg.topic == "/home":
             home()
         elif msg.topic == "/timemicro":
-            stepsz = float(msg.payload)*50
+            stepsz = float(msg.payload)*10
             print(msg.topic, stepsz)
         elif msg.topic == "/led":
             if int(msg.payload) == 0 :

@@ -9,6 +9,7 @@
 #define endX 9
 #define endY 10
 #define endZ 11
+#define endZtop A1
 #define enablez A0
 
 //y,1000,1,500
@@ -37,6 +38,7 @@ void setup() {
   pinMode(endX, INPUT_PULLUP);
   pinMode(endY, INPUT_PULLUP);
   pinMode(endZ, INPUT_PULLUP);
+  pinMode(endZtop, INPUT_PULLUP);
 
   digitalWrite(enablez, 1);
   digitalWrite(enable , 1);
@@ -102,10 +104,12 @@ void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
   digitalWrite(enablez, 0);
   for (int i = 0; i < pasos; i++) {
-    digitalWrite(stepsZ, 1);
-    delayMicroseconds(timpo);
-    digitalWrite(stepsZ, 0);
-    delayMicroseconds(timpo);
+    //Serial.println(digitalRead(endZtop));
+    if(direccion == 1 and digitalRead(endZtop)==0){
+      Serial.write("ok");
+      break;
+    }
+    move_(stepsZ,timpo);
   }
   digitalWrite(enablez, 1);
   B_homeZ = 1;
@@ -114,10 +118,7 @@ void y(int pasos, int direccion, int timpo) {
   digitalWrite(enable, 0);
   digitalWrite(direccionY, direccion);
   for (int i = 0; i < pasos; i++) {
-    digitalWrite(stepsY, 1);
-    delayMicroseconds(timpo);
-    digitalWrite(stepsY, 0);
-    delayMicroseconds(timpo);
+    move_(stepsY,timpo);
   }
   digitalWrite(enable , 1);
   B_homeY = 1;
@@ -126,10 +127,7 @@ void x(int pasos, int direccion, int timpo) {
   digitalWrite(enable, 0);
   digitalWrite(direccionX, direccion);
   for (int i = 0; i < pasos; i++) {
-    digitalWrite(stepsX, 1);
-    delayMicroseconds(timpo);
-    digitalWrite(stepsX, 0);
-    delayMicroseconds(timpo);
+    move_(stepsX,timpo);
   }
   digitalWrite(enable , 1);
   B_homeX = 1;
@@ -139,43 +137,40 @@ void homeX() {
     digitalWrite(enable, 0);
     digitalWrite(direccionX, 0);
     while (digitalRead(endX) == 1) {
-      digitalWrite(stepsX, 1);
-      delayMicroseconds(200);
-      digitalWrite(stepsX, 0);
-      delayMicroseconds(200);
+      move_(stepsX,200);
     }
     B_homeX = 0;
     digitalWrite(enable, 1);
   }
-  Serial.println("ok");
+  Serial.println("x");
 }
 void homeY() {
   if (B_homeY == 1) {
     digitalWrite(enable, 0);
     digitalWrite(direccionY, 0);
     while (digitalRead(endY) == 1) {
-      digitalWrite(stepsY, 1);
-      delayMicroseconds(100);
-      digitalWrite(stepsY, 0);
-      delayMicroseconds(100);
+      move_(stepsY,200);
     }
     B_homeY = 0;
     digitalWrite(enable, 1);
   }
-  Serial.println("ok");
+  Serial.println("y");
 }
 void homeZ() {
   if (B_homeZ == 1) {
     digitalWrite(enablez, 0);
     digitalWrite(direccionZ, 0);
     while (digitalRead(endZ) == 1) {
-      digitalWrite(stepsZ, 1);
-      delayMicroseconds(200);
-      digitalWrite(stepsZ, 0);
-      delayMicroseconds(200);
+      move_(stepsZ,200);
     }
     B_homeZ = 0;
     digitalWrite(enablez, 1);
   }
-  Serial.println("ok");
+  Serial.println("z");
+}
+void move_(int motor_, int timpo_) {
+  digitalWrite(motor_, 1);
+  delayMicroseconds(timpo_);
+  digitalWrite(motor_, 0);
+  delayMicroseconds(timpo_);
 }
