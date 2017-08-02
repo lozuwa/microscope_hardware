@@ -1,5 +1,3 @@
-#ip 192.168.3.174
-
 # MQTT
 import paho.mqtt.client as mqtt
 # Supporting libraries
@@ -7,30 +5,9 @@ import os, time, numpy as np
 from Interface import *
 # Thread
 from multiprocessing import Process
-import eventlet
-eventlet.monkey_patch()
 
 # Initialize mqtt client
 client = mqtt.Client()
-
-# Global variables
-stepsz = 250
-stepsxy = 1
-time_ = 500
-KEEP_ALIVE_TIME = 120
-
-def z_up():
-    global stepsz
-    #while(1):
-    #    z(stepsz, 1, time_)
-    #    time.sleep(0.01)
-
-def z_down():
-    global stepsz
-    #while(1):
-    #    #print('z', os.getpid())
-    #    z(stepsz, 0, time_)
-    #    time.sleep(0.01)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -40,88 +17,75 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("/zu")
     client.subscribe("/zd")
     client.subscribe('/led')
-    client.subscribe('/timemicro')
+    client.subscribe('/steps')
     client.subscribe('/home')
     client.subscribe('/movefield')
+    # Autofocus
+    client.subscribe('/autofocus')
+    client.subscribe('/variance')
 
 # Reply messages
 def on_message(client, userdata, msg):
     global enable
     global time_
-    global proc_z_up
-    global proc_z_down
     global stepsz
 
-    #print(msg.topic, msg.payload)
     if msg.topic == "/connect":
-        enable = True if int(msg.payload) == 1 else False
         if int(msg.payload) == 1:
+            enable = True
             print('server enabled')
+
     if enable == True:
         if msg.topic == '/movefield':
             if int(msg.payload)==1:
                 change(1)
             if int(msg.payload)==0:
                 change(0)
+
         elif msg.topic == "/home":
             home()
-        elif msg.topic == "/timemicro":
+
+        elif msg.topic == "/steps":
             stepsz = float(msg.payload)*50
             print(msg.topic, stepsz)
+
         elif msg.topic == "/led":
             if int(msg.payload) == 0 :
                 brigthness(0)
             elif int(msg.payload) == 1:
                 brigthness(1)
             print(msg.topic, msg.payload)
+
+        elif msg.topic == "/autofocus":
+            print(msg.topic, msg.payload)
+            start_autofocus = True
+
+        elif msg.topic == "/variance":
+            print(msg.topic, msg.payload)
+
         elif msg.topic == "/zu":
             z(stepsz, 1, 500)
-            '''if int(msg.payload) == 1:
-                proc_z_up.start()
-                print(msg.topic, int(msg.payload))
-            elif int(msg.payload) == 2:
-                try:
-                    proc_z_up.terminate()
-                    proc_z_up = Process(target=z_up)
-                    print(msg.topic, int(msg.payload))
-                except:
-                    print('There was a problem')'''
+	    
         elif msg.topic == "/zd":
             z(stepsz, 0, 500)
-            '''if int(msg.payload) == 1:
-                print(msg.topic, int(msg.payload))
-                proc_z_down.start()
-            elif int(msg.payload) == 2:
-                try:
-                    print(msg.topic, int(msg.payload))
-                    proc_z_down.terminate()
-                    proc_z_down = Process(target=z_down)
-                except:
-                    print('There was a problem')'''
+            
     else:
         print('server not enabled')
 
-def keep_smartphone_alive():
-    client.publish('/microscope', 'keep alive', 2)
-    time.sleep(KEEP_ALIVE_TIME)
-
-# Initialize thread
-#eventlet.spawn(keep_smartphone_alive)
+def publish_message(topic, message):
+    client.publish(topic, str(message), 2)
 
 if __name__ == '__main__':
-    # Initialize enable variable
-    global enable
+    # Global variables
+    global stepsz, time_, enable 
+    global start_autofocus
+    stepsz = 250
+    time_ = 500
     enable = False
-
-    # Background processes
-    proc_z_up = Process(target=z_up)
-    proc_z_down = Process(target=z_down)
+    start_autofocus = False
     
     #client.connect('test.mosquitto.org', 1883, 60)
     client.connect('test.mosquitto.org', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
-    client.loop_start()
-
-    while True:
-        keep_smartphone_alive()
+    client.loop_forever()
