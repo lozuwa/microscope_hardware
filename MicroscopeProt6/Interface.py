@@ -101,10 +101,6 @@ def wait():
 			break
 		k = s.read().decode("utf-8")
 		time.sleep(0.01)
-	#print('Leaving ...')
-	#while(chr(s.read()[0])!=axis):
-	#	print(s.read()[0])
-	#time.sleep(0.1)
-
+	
 def exit():
 	s.close()
