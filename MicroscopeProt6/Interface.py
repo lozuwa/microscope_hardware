@@ -22,13 +22,11 @@ def y(pasos,dir,time_):
 def z(pasos,dir,time_):
 	s.write(('z,'+str(pasos)+','+str(dir)+','+str(time_)).encode())
 	time.sleep(0.01)
+	wait()
 
 def brigthness(b):
 	s.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(b)).encode())
 	time.sleep(0.01)
-
-def exit():
-	s.close()
 
 def homeZ():
 	s.write('homeZ'.encode())
@@ -47,13 +45,13 @@ def home():
 	time.sleep(0.2)
 
 	homeZ()
-	wait('z')
+	wait()
 
 	homeX()
-	wait('x')
+	wait()
 
 	homeY()
-	wait('y')
+	wait()
 
 	y(1400,1,150)
 	time.sleep(2)
@@ -91,7 +89,17 @@ def change(dir):
                 y(60,0,4000)
                 c = 0
 
-def wait(axis):
-	while(chr(s.read()[0])!=axis):
-		continue
-	time.sleep(0.1)
+def wait():
+	time.sleep(0.01)
+	k = s.read().decode("utf-8")
+	while (k != "o"):
+		print(k)
+		k = s.read().decode("utf-8")
+		time.sleep(0.01)
+	print('Leaving ...')
+	#while(chr(s.read()[0])!=axis):
+	#	print(s.read()[0])
+	#time.sleep(0.1)
+
+def exit():
+	s.close()

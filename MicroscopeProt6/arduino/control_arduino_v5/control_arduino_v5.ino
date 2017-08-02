@@ -95,9 +95,11 @@ void loop() {
     }
   }
 }
+
 void brillo_(bool brillo) {
   digitalWrite(luz, brillo);
 }
+
 void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
   digitalWrite(enablez, 0);
@@ -109,7 +111,9 @@ void z(int pasos, int direccion, int timpo) {
   }
   digitalWrite(enablez, 1);
   B_homeZ = 1;
+  Serial.write("o\n");
 }
+
 void y(int pasos, int direccion, int timpo) {
   digitalWrite(enable, 0);
   digitalWrite(direccionY, direccion);
@@ -122,6 +126,7 @@ void y(int pasos, int direccion, int timpo) {
   digitalWrite(enable , 1);
   B_homeY = 1;
 }
+
 void x(int pasos, int direccion, int timpo) {
   digitalWrite(enable, 0);
   digitalWrite(direccionX, direccion);
@@ -147,7 +152,7 @@ void homeX() {
     B_homeX = 0;
     digitalWrite(enable, 1);
   }
-  Serial.println("ok");
+  Serial.write("o\n");
 }
 void homeY() {
   if (B_homeY == 1) {
@@ -162,7 +167,7 @@ void homeY() {
     B_homeY = 0;
     digitalWrite(enable, 1);
   }
-  Serial.println("ok");
+  Serial.write("o\n");
 }
 void homeZ() {
   if (B_homeZ == 1) {
@@ -177,5 +182,5 @@ void homeZ() {
     B_homeZ = 0;
     digitalWrite(enablez, 1);
   }
-  Serial.println("ok");
+  Serial.write("o\n");
 }

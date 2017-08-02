@@ -14,23 +14,23 @@ eventlet.monkey_patch()
 client = mqtt.Client()
 
 # Global variables
-stepsz = 50
+stepsz = 250
 stepsxy = 1
 time_ = 500
 KEEP_ALIVE_TIME = 120
 
 def z_up():
     global stepsz
-    while(1):
-        z(stepsz, 1, time_)
-        time.sleep(0.01)
+    #while(1):
+    #    z(stepsz, 1, time_)
+    #    time.sleep(0.01)
 
 def z_down():
     global stepsz
-    while(1):
-        #print('z', os.getpid())
-        z(stepsz, 0, time_)
-        time.sleep(0.01)
+    #while(1):
+    #    #print('z', os.getpid())
+    #    z(stepsz, 0, time_)
+    #    time.sleep(0.01)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -75,7 +75,8 @@ def on_message(client, userdata, msg):
                 brigthness(1)
             print(msg.topic, msg.payload)
         elif msg.topic == "/zu":
-            if int(msg.payload) == 1:
+            z(stepsz, 1, 500)
+            '''if int(msg.payload) == 1:
                 proc_z_up.start()
                 print(msg.topic, int(msg.payload))
             elif int(msg.payload) == 2:
@@ -84,9 +85,10 @@ def on_message(client, userdata, msg):
                     proc_z_up = Process(target=z_up)
                     print(msg.topic, int(msg.payload))
                 except:
-                    print('There was a problem')
+                    print('There was a problem')'''
         elif msg.topic == "/zd":
-            if int(msg.payload) == 1:
+            z(stepsz, 0, 500)
+            '''if int(msg.payload) == 1:
                 print(msg.topic, int(msg.payload))
                 proc_z_down.start()
             elif int(msg.payload) == 2:
@@ -95,9 +97,7 @@ def on_message(client, userdata, msg):
                     proc_z_down.terminate()
                     proc_z_down = Process(target=z_down)
                 except:
-                    print('There was a problem')
-        else:
-            pass
+                    print('There was a problem')'''
     else:
         print('server not enabled')
 
