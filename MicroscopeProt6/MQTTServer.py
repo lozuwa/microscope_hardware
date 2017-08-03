@@ -58,34 +58,34 @@ def on_message(client, userdata, msg):
 
         elif msg.topic == "/autofocus":
             if msg.payload == "start":
-	        # Start sequence
-		start_autofocus = True
-		publish_message("/autofocus", "get")
-	    print(msg.topic, msg.payload)
+                # Start sequence
+                start_autofocus = True
+                publish_message("/autofocus", "get")
+                print(msg.topic, msg.payload)
 
         elif msg.topic == "/variance":
-	    if start_autofocus == True:
-	        # Save position and focus coefficient
-	        list_autofocus.append((0, msg.payload))
-		# Move the microscope and get another value 
-		z(stepsz, 1, 500)
+            if start_autofocus == True:
+                # Save position and focus coefficient
+                list_autofocus.append((0, msg.payload))
+                # Move the microscope and get another value 
+                z(stepsz, 1, 500)
                 pulish_message("/autofocus", "get")
-		# Count the amount of positions plus values 
-		count_autofocus += 1
-		# Ten positions are enough
-		if count_autofocus == 10:
-		    start_autofocus = False
-		    count_autofocus = 0
+                # Count the amount of positions plus values 
+                count_autofocus += 1
+                # Ten positions are enough
+                if count_autofocus == 10:
+                    start_autofocus = False
+                    count_autofocus = 0
                     print(list_autofocus)
                     # Focus the microscope
-		    aut = autofocus(list_autofocus)
-		    aut.focus()
+                    aut = autofocus(list_autofocus)
+                    aut.focus()
         
 	elif msg.topic == "/zu":
             z(stepsz, 1, 500)
-	    
-        elif msg.topic == "/zd":
-            z(stepsz, 0, 500)
+    
+    elif msg.topic == "/zd":
+        z(stepsz, 0, 500)
             
     else:
         print('server not enabled')
