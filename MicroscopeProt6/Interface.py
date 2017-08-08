@@ -90,16 +90,17 @@ def change(dir):
                 c = 0
 
 def wait():
+	counter = 0
 	time.sleep(0.01)
 	k = s.read().decode("utf-8")
 	while (k != "o"):
-		print(k)
+		#print(k)
+		counter += 1
+		if counter == 10000:
+			print("Counter exceeded")
+			break
 		k = s.read().decode("utf-8")
 		time.sleep(0.01)
-	print('Leaving ...')
-	#while(chr(s.read()[0])!=axis):
-	#	print(s.read()[0])
-	#time.sleep(0.1)
-
+	
 def exit():
 	s.close()
