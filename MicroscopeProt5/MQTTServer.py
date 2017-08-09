@@ -67,12 +67,14 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("/xl")
     client.subscribe("/xr")
     client.subscribe('/led')
-    client.subscribe('/timemicro')
+    client.subscribe('/steps')
     client.subscribe('/home')
     client.subscribe('/automatic')
     client.subscribe('/movefield')
     # Camera app
     client.subscribe('/microscope')
+    # Autofocus
+    client.subscribe('/variance')
 
 # Reply messages
 def on_message(client, userdata, msg):
@@ -92,7 +94,9 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             print('server enabled')
     if enable == True:
-        if msg.topic == '/microscope':
+        if msg.topic == '/variance':
+            print(msg.topic, float(msg.payload))
+        elif msg.topic == '/microscope':
             pass
             #print(msg.topic, msg.payload)
             #time.sleep(1)
@@ -106,7 +110,7 @@ def on_message(client, userdata, msg):
                 auto(6000)
         elif msg.topic == "/home":
             home()
-        elif msg.topic == "/timemicro":
+        elif msg.topic == "/steps":
             stepsz = float(msg.payload)*10
             print(msg.topic, stepsz)
         elif msg.topic == "/led":
@@ -211,7 +215,7 @@ def on_message(client, userdata, msg):
         print('server not enabled')
 
 def keep_smartphone_alive():
-    client.publish('/microscope', 'keep alive', 2)
+    client.publish('/microscope', 'keep alive', qos = 2, retain = False)
     time.sleep(KEEP_ALIVE_TIME)
 
 # Initialize thread

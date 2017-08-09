@@ -168,6 +168,7 @@ void homeZ() {
   }
   Serial.println("z");
 }
+
 void move_(int motor_, int timpo_) {
   digitalWrite(motor_, 1);
   delayMicroseconds(timpo_);
