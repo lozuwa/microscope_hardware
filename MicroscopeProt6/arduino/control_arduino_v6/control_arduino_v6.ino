@@ -50,10 +50,10 @@ void setup() {
 
 void loop() {
   Serial.flush();
-  digitalWrite(enable , 1);
-  digitalWrite(direccionZ , 0);
-  digitalWrite(direccionY , 0);
-  digitalWrite(direccionX , 0);
+  /*digitalWrite(enable, 1);
+  digitalWrite(direccionZ, 0);
+  digitalWrite(direccionY, 0);
+  digitalWrite(direccionX, 0);*/
 
   if (Serial.available() > 0) {
     String tx = Serial.readString();
@@ -129,11 +129,11 @@ void z_r(int pasos, int direccion, int timpo) {
   digitalWrite(enablez, 0);
   for (int i = 0; i < pasos; i++) {
     if(direccion == 1 and digitalRead(endZtop)==0){
-      Serial.write("ok");
+      Serial.write("u\n");
       break;
     }
     if(direccion == 0 and digitalRead(endZ)==0){
-      Serial.write("ok");
+      Serial.write("d\n");
       break;
     }
     move_(stepsZ, timpo);

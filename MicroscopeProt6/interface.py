@@ -139,17 +139,19 @@ class axisMovement:
 		self.homeX()
 		self.homeY()
 		# Move axis to intial position
-		self.y_response(1400,1,150)
-		self.x_response(1300,1,300)
-		self.z_response(15000,1,300)
+		self.y(1400,1,150)
+		time.sleep(2)
+		self.x(1300,1,300)
+		time.sleep(2)
+		self.zResponse(3500,1,300)
 
 		### Support functions ###
-	def wait(self):
+	def wait(self, code = "o"):
 		counter = 0
 		time.sleep(0.01)
 		k = self.serPort.read().decode("utf-8")
 		#print(k)
-		while (k != "o"):
+		while (k != code):
 			#print(k)
 			counter += 1
 			if counter == 600: # 6 seconds timeout

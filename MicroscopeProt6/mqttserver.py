@@ -8,10 +8,15 @@ from autofocus import *
 # Thread
 from multiprocessing import Process
 
-# Constant variables 
+# Constant variables
 AUTOFOCUS_TOPIC = "/autofocus"
 VARIANCE_TOPIC = "/variance"
 LED_TOPIC = "/led"
+MOVEFIELD_TOPIC = "/movefield"
+STEPS_TOPIC = "/steps"
+HOME_TOPIC = "/home"
+ZDOWN_TOPIC = "/zd"
+ZUP_TOPIC = "/zu"
 
 # Initialize mqtt client
 client = mqtt.Client()
@@ -63,26 +68,22 @@ def on_message(client, userdata, msg):
         if int(msg.payload) == 1:
             enable = True
             print('server enabled')
-        elif int(msg.payload) == 0:
+        elif int(msg.payload) == 2:
             enable = False
             print('server disabled')
-
     if enable == True:
-        if msg.topic == '/movefield':
+        if msg.topic == MOVEFIELD_TOPIC:
             if int(msg.payload)==1:
                 axMov.moveField(1)
             if int(msg.payload)==0:
                 axMov.moveField(0)
-
-        elif msg.topic == "/home":
+        elif msg.topic == HOME_TOPIC:
             axMov.home()
-
-        elif msg.topic == "/steps":
-            stepsz = float(msg.payload)
+        elif msg.topic == STEPS_TOPIC:
+            stepsz = float(msg.payload)*3
             if stepsz <= 30:
                 stepsz = 30
             print(msg.topic, stepsz)
-
         elif msg.topic == LED_TOPIC:
             if int(msg.payload) == 0 :
                 axMov.led.set_state(0)
@@ -93,32 +94,29 @@ def on_message(client, userdata, msg):
                 ledState = axMov.led.get_state()
                 axMov.writeLed(ledState)
             print(msg.topic, msg.payload)
-
         elif msg.topic == AUTOFOCUS_TOPIC:
             print(msg.topic, msg.payload)
-            if msg.payload.decode('utf-8') == "start":
+            if msg.payload.decode("utf-8") == "start":
+                axMov.homeZ()
                 startAutofocus = True
                 countAutofocus = 0
                 countFrames = 0
-
         elif msg.topic == VARIANCE_TOPIC:
-            print(msg.topic, msg.payload)
-            # Start autofocus    
             if startAutofocus:
-                if countAutofocus < 5:
-                    if countFrames < 5:
-                        listAutofocus.append((countAutofocus, float(msg.payload)))
+                if countAutofocus < 10:
+                    if countFrames < 3:
+                        listAutofocus.append(float(msg.payload))
                         countFrames += 1
                     else:
-                        axMov.zResponse(100, 1, 500)
+                        print("\n: {} {} {}".format(countAutofocus, len(listAutofocus), sum(listAutofocus)))
+                        axMov.zResponse(400, 1, 250)
                         countFrames = 0
                         countAutofocus += 1
                 else:
                     startAutofocus = False
+                    print("\npublishing stop ...")
                     publishMessage(AUTOFOCUS_TOPIC, "stop")
-                    print(listAutofocus)
-
-        elif msg.topic == "/zu":
+        elif msg.topic == ZUP_TOPIC:
             if int(msg.payload) == 1:
                 print(msg.topic, int(msg.payload))
                 procZUp.start()
@@ -129,8 +127,7 @@ def on_message(client, userdata, msg):
                     procZUp = Process(target=zUp)
                 except:
                     print('There was a problem with zu process')
-
-        elif msg.topic == "/zd":
+        elif msg.topic == ZDOWN_TOPIC:
             if int(msg.payload) == 1:
                 print(msg.topic, int(msg.payload))
                 procZDown.start()
@@ -152,8 +149,8 @@ if __name__ == '__main__':
     global stepsz, time_, enable
     global startAutofocus, countAutofocus, countFrames
     global procZUp, procZDown
-    stepsz = 250
-    time_ = 500
+    stepsz = 200
+    time_ = 250
     enable = False
     startAutofocus = False
     countAutofocus = 0
@@ -167,4 +164,3 @@ if __name__ == '__main__':
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
-
