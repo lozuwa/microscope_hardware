@@ -10,6 +10,8 @@ from multiprocessing import Process
 
 # Constant variables 
 AUTOFOCUS_TOPIC = "/autofocus"
+VARIANCE_TOPIC = "/variance"
+LED_TOPIC = "/led"
 
 # Initialize mqtt client
 client = mqtt.Client()
@@ -81,7 +83,7 @@ def on_message(client, userdata, msg):
                 stepsz = 30
             print(msg.topic, stepsz)
 
-        elif msg.topic == "/led":
+        elif msg.topic == LED_TOPIC:
             if int(msg.payload) == 0 :
                 axMov.led.set_state(0)
                 ledState = axMov.led.get_state()
@@ -92,14 +94,14 @@ def on_message(client, userdata, msg):
                 axMov.writeLed(ledState)
             print(msg.topic, msg.payload)
 
-        elif msg.topic == "/autofocus":
+        elif msg.topic == AUTOFOCUS_TOPIC:
             print(msg.topic, msg.payload)
             if msg.payload.decode('utf-8') == "start":
                 startAutofocus = True
                 countAutofocus = 0
                 countFrames = 0
 
-        elif msg.topic == "/variance":
+        elif msg.topic == VARIANCE_TOPIC:
             print(msg.topic, msg.payload)
             # Start autofocus    
             if startAutofocus:

@@ -52,7 +52,8 @@ class Led:
 class axisMovement:
 	def __init__(self):
 		# Other classes inst
-		self.serPort = serialPort(portNumber = 0, baudrate = 115200).port
+		self.serPortClass = serialPort(portNumber = 0, baudrate = 115200)
+		self.serPort = self.serPortClass.port
 		self.led = Led(state = 0)
 		# Variables
 		self.fieldCounter = 0
@@ -111,12 +112,15 @@ class axisMovement:
 
 	def homeZ(self):
 		self.serPort.write('homeZ'.encode())
+		self.wait()
 
 	def homeX(self):
 		self.serPort.write('homeX'.encode())
+		self.wait()
 
 	def homeY(self):
 		self.serPort.write('homeY'.encode())
+		self.wait()
 
 	### HOME ###
 	def home(self):
@@ -132,11 +136,8 @@ class axisMovement:
 		time.sleep(0.2)
 		# Restart the axis
 		self.homeZ()
-		self.wait()
 		self.homeX()
-		self.wait()
 		self.homeY()
-		self.wait()
 		# Move axis to intial position
 		self.y_response(1400,1,150)
 		self.x_response(1300,1,300)
