@@ -8,25 +8,31 @@ from autofocus import *
 # Thread
 from multiprocessing import Process
 
+# Constant variables 
+AUTOFOCUS_TOPIC = "/autofocus"
+
 # Initialize mqtt client
 client = mqtt.Client()
 
+# Instantiate classes
+axMov = axisMovement()
+
 # Support functions
-def z_up():
+def zUp():
     global stepsz
     while(1):
         print('zup ', os.getpid())
-        z(stepsz, 1, time_)
+        axMov.z(stepsz, 1, time_)
         time.sleep(0.01)
 
-def z_down():
+def zDown():
     global stepsz
     while(1):
         print('zdown ', os.getpid())
-        z(stepsz, 0, time_)
+        axMov.z(stepsz, 0, time_)
         time.sleep(0.01)
 
-def timestamp():
+def timeStamp():
     now = datetime.datetime
     return str(now.microsecond)
 
@@ -48,8 +54,8 @@ def on_connect(client, userdata, flags, rc):
 # Reply messages
 def on_message(client, userdata, msg):
     global enable, stepsz, time_
-    global start_autofocus, count_autofocus
-    global proc_z_up, proc_z_down
+    global startAutofocus, countAutofocus, countFrames
+    global procZUp, procZDown
 
     if msg.topic == "/connect":
         if int(msg.payload) == 1:
@@ -62,12 +68,12 @@ def on_message(client, userdata, msg):
     if enable == True:
         if msg.topic == '/movefield':
             if int(msg.payload)==1:
-                change(1)
+                axMov.moveField(1)
             if int(msg.payload)==0:
-                change(0)
+                axMov.moveField(0)
 
         elif msg.topic == "/home":
-            home()
+            axMov.home()
 
         elif msg.topic == "/steps":
             stepsz = float(msg.payload)
@@ -77,80 +83,82 @@ def on_message(client, userdata, msg):
 
         elif msg.topic == "/led":
             if int(msg.payload) == 0 :
-                brigthness(0)
+                axMov.led.set_state(0)
+                ledState = axMov.led.get_state()
+                axMov.writeLed(ledState)
             elif int(msg.payload) == 1:
-                brigthness(1)
+                axMov.led.set_state(1)
+                ledState = axMov.led.get_state()
+                axMov.writeLed(ledState)
             print(msg.topic, msg.payload)
 
         elif msg.topic == "/autofocus":
             print(msg.topic, msg.payload)
             if msg.payload.decode('utf-8') == "start":
-                # Start sequence
-                start_autofocus = True
-                publish_message("/autofocus", "get")
+                startAutofocus = True
+                countAutofocus = 0
+                countFrames = 0
 
         elif msg.topic == "/variance":
             print(msg.topic, msg.payload)
-            if start_autofocus == True:
-                # Save position and focus coefficient
-                list_autofocus.append((count_autofocus, float(msg.payload)))
-                # Move the microscope and get another value
-                z(100,1,300)
-                time.sleep(0.01)
-                publish_message("/autofocus", "get")
-                # Count the amount of positions plus values
-                count_autofocus += 1
-                # Ten positions are enough
-                if count_autofocus == 10:
-                    start_autofocus = False
-                    count_autofocus = 0
-                    print(list_autofocus)
-                    # Focus the microscope
-                    #aut = autofocus(list_autofocus)
-                    #aut.focus()
+            # Start autofocus    
+            if startAutofocus:
+                if countAutofocus < 5:
+                    if countFrames < 5:
+                        listAutofocus.append((countAutofocus, float(msg.payload)))
+                        countFrames += 1
+                    else:
+                        axMov.zResponse(100, 1, 500)
+                        countFrames = 0
+                        countAutofocus += 1
+                else:
+                    startAutofocus = False
+                    publishMessage(AUTOFOCUS_TOPIC, "stop")
+                    print(listAutofocus)
 
         elif msg.topic == "/zu":
             if int(msg.payload) == 1:
                 print(msg.topic, int(msg.payload))
-                proc_z_up.start()
+                procZUp.start()
             elif int(msg.payload) == 2:
                 try:
                     print(msg.topic, int(msg.payload))
-                    proc_z_up.terminate()
-                    proc_z_up = Process(target=z_up)
+                    procZUp.terminate()
+                    procZUp = Process(target=zUp)
                 except:
                     print('There was a problem with zu process')
 
         elif msg.topic == "/zd":
             if int(msg.payload) == 1:
                 print(msg.topic, int(msg.payload))
-                proc_z_down.start()
+                procZDown.start()
             elif int(msg.payload) == 2:
                 try:
                     print(msg.topic, int(msg.payload))
-                    proc_z_down.terminate()
-                    proc_z_down = Process(target=z_down)
+                    procZDown.terminate()
+                    procZDown = Process(target=zDown)
                 except:
                     print('There was a problem with zd process')
     else:
         print('server not enabled')
 
-def publish_message(topic, message):
+def publishMessage(topic, message):
     client.publish(topic, str(message), 2)
 
 if __name__ == '__main__':
     # Global variables
     global stepsz, time_, enable
-    global start_autofocus, count_autofocus
-    global proc_z_up, proc_z_down
+    global startAutofocus, countAutofocus, countFrames
+    global procZUp, procZDown
     stepsz = 250
     time_ = 500
     enable = False
-    start_autofocus = False
-    count_autofocus = 0
-    list_autofocus = []
-    proc_z_up = Process(target=z_up)
-    proc_z_down = Process(target=z_down)
+    startAutofocus = False
+    countAutofocus = 0
+    countFrames = 0
+    listAutofocus = []
+    procZUp = Process(target=zUp)
+    procZDown = Process(target=zDown)
 
     #client.connect('test.mosquitto.org', 1883, 60)
     client.connect('192.168.3.174', 1883, 60)

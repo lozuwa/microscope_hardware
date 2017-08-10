@@ -6,15 +6,12 @@ import serial
 import os, sys, time
 from multiprocessing import Process
 
-### Global variables ###
-#s = serial.Serial('/dev/ttyACM0',115200)
-#c = 0
-
+### Serial Port ###
 class serialPort:
-	def __init__(self, portNumber = 0, baudrate = 115200):
+	def __init__(self, portNumber, baudrate):
 		self.portNumber = '/dev/ttyACM' + str(portNumber)
 		self.baudrate = int(baudrate)
-		startPort()
+		self.startPort()
 
 	def startPort(self):
 		try:
@@ -40,78 +37,116 @@ class serialPort:
 	def get_baudrate(self, baudrate):
 		return self.baudrate	
 
+### Led ###
+class Led:
+	def __init__(self, state):
+		self.state = int(state)
+
+	def set_state(self, state):
+		self.state = int(state)
+
+	def get_state(self):
+		return self.state
+
 ### Individual axis move ###
 class axisMovement:
 	def __init__(self):
-		self.s = serialPort(portNumber = 0, baudrate = 115200)
-		self.c = 0
+		# Other classes inst
+		self.serPort = serialPort(portNumber = 0, baudrate = 115200).port
+		self.led = Led(state = 0)
+		# Variables
+		self.fieldCounter = 0
 		
 	def x(self, steps, dir, time_):
-		self.s.write(('x,'+str(steps)+','+str(dir)+','+str(time_)).encode())
+		self.serPort.write(('x,'+str(steps)+','+str(dir)+','+str(time_)).encode())
 		time.sleep(0.01)
 
-	def x_response(self, steps, dir, time_):
-		self.s.write(('x,'+str(steps)+','+str(dir)+','+str(time_)).encode())
-		time.sleep(0.01)
-		wait()
-
-	def y(self, steps, dir, time_):
-		self.s.write(('y,'+str(steps*2)+','+str(dir)+','+str(time_)).encode())
-		time.sleep(0.01)
-
-	def y_response(self, steps, dir, time_):
-		self.s.write(('y,'+str(steps*2)+','+str(dir)+','+str(time_)).encode())
-		time.sleep(0.01)
-		wait()
-
-	def z(self, steps, dir, time_):
-		self.s.write(('z,'+str(steps)+','+str(dir)+','+str(time_)).encode())
-		time.sleep(0.01)
-
-	def z_response(self, steps, dir, time_):
-		self.s.write(('z,'+str(steps)+','+str(dir)+','+str(time_)).encode())
+	def xResponse(self, steps, dir, time_):
+		self.serPort.write(('x,'+str(steps)+','+str(dir)+','+str(time_)).encode())
 		time.sleep(0.01)
 		self.wait()
 
-	def change(self, dir):
+	def y(self, steps, dir, time_):
+		self.serPort.write(('y,'+str(steps*2)+','+str(dir)+','+str(time_)).encode())
+		time.sleep(0.01)
+
+	def yResponse(self, steps, dir, time_):
+		self.serPort.write(('y,'+str(steps*2)+','+str(dir)+','+str(time_)).encode())
+		time.sleep(0.01)
+		self.wait()
+
+	def z(self, steps, dir, time_):
+		self.serPort.write(('z,'+str(steps)+','+str(dir)+','+str(time_)).encode())
+		time.sleep(0.01)
+
+	def zResponse(self, steps, dir, time_):
+		self.serPort.write(('z_r,'+str(steps)+','+str(dir)+','+str(time_)).encode())
+		time.sleep(0.01)
+		self.wait()
+
+	def moveField(self, dir):
 		campos = 40
 		if dir == 0:
-			self.c -= 1
-			if self.c < campos-1 and self.c != -1:
+			self.fieldCounter -= 1
+			if self.fieldCounter < campos-1 and self.fieldCounter != -1:
 				self.x(40,0,5000)
-			elif self.c == campos-1:
+			elif self.fieldCounter == campos-1:
 				self.y(80,1,5000)
-			elif self.c > campos-1 and self.c < (campos*2)-1:
+			elif self.fieldCounter > campos-1 and self.fieldCounter < (campos*2)-1:
 				self.x(40,1,5000)
-			elif self.c == -1:
+			elif self.fieldCounter == -1:
 				self.y(90,1,5000)
-				self.c = 0
-			elif dir:
-				self.c += 1
-				if self.c < campos:
-					self.x(40,1,5000)
-				elif self.c == campos:
-					self.y(30,0,4000)
-				elif self.c > campos and self.c < campos*2:
-					self.x(40,0,5000)
-				elif self.c == campos*2:
-					self.y(60,0,4000)
-					self.c = 0
+				self.fieldCounter = 0
+		elif dir:
+			self.fieldCounter += 1
+			if self.fieldCounter < campos:
+				self.x(40,1,5000)
+			elif self.fieldCounter == campos:
+				self.y(30,0,4000)
+			elif self.fieldCounter > campos and self.fieldCounter < campos*2:
+				self.x(40,0,5000)
+			elif self.fieldCounter == campos*2:
+				self.y(60,0,4000)
+				self.fieldCounter = 0
 
 	def homeZ(self):
-		s.write('homeZ'.encode())
+		self.serPort.write('homeZ'.encode())
 
 	def homeX(self):
-		s.write('homeX'.encode())
+		self.serPort.write('homeX'.encode())
 
 	def homeY(self):
-		s.write('homeY'.encode())
+		self.serPort.write('homeY'.encode())
 
-	### Support functions ###
+	### HOME ###
+	def home(self):
+		# Reset input buffer
+		self.serPort.flushInput()
+		# Reset movefield counter
+		k = 0
+		self.fieldCounter = 0
+		# Turn on led
+		self.led.set_state(1)
+		ledState = self.led.get_state()
+		self.writeLed(ledState)
+		time.sleep(0.2)
+		# Restart the axis
+		self.homeZ()
+		self.wait()
+		self.homeX()
+		self.wait()
+		self.homeY()
+		self.wait()
+		# Move axis to intial position
+		self.y_response(1400,1,150)
+		self.x_response(1300,1,300)
+		self.z_response(15000,1,300)
+
+		### Support functions ###
 	def wait(self):
 		counter = 0
 		time.sleep(0.01)
-		k = self.s.read().decode("utf-8")
+		k = self.serPort.read().decode("utf-8")
 		#print(k)
 		while (k != "o"):
 			#print(k)
@@ -119,43 +154,9 @@ class axisMovement:
 			if counter == 600: # 6 seconds timeout
 				print("Counter exceeded")
 				break
-			k = self.s.read().decode("utf-8")
+			k = self.serPort.read().decode("utf-8")
 			time.sleep(0.01)
 		print(k)
 
-### HOME ###
-def home():
-	global c
-
-	# Reset input buffer
-	s.flushInput()
-	# Reset movefield counter
-	k = 0
-	c = 0
-	# Turn on led
-	brigthness(1)
-	time.sleep(0.2)
-
-	# Restart the axis
-	homeZ()
-	wait()
-
-	homeX()
-	wait()
-
-	homeY()
-	wait()
-
-	y(1400,1,150)
-	time.sleep(2)
-	print ('y ok')
-	x(1300,1,300)
-	time.sleep(1)
-	print ('x ok')
-	z(15000,1,300)
-	print ('z ok')
-
-### Led ###
-def brigthness(b):
-	s.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(b)).encode())
-	time.sleep(0.01)
+	def writeLed(self, ledState):
+		self.serPort.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(ledState)).encode())
