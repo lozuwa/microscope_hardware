@@ -12,7 +12,6 @@ class autofocus:
     def focus(self):
         # Calculate the maximum value
         max_ = max(self.coefficients)
-        pos = self.positions.index(max_)
+        pos = self.coefficients.index(max_)+1
         # Go back to the desired position
-        for i in range( 10-pos ):
-            z(500, 0, 500)
+        return self.positions[-1]-pos

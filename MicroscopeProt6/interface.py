@@ -83,7 +83,8 @@ class axisMovement:
 	def zResponse(self, steps, dir, time_):
 		self.serPort.write(('z_r,'+str(steps)+','+str(dir)+','+str(time_)).encode())
 		time.sleep(0.01)
-		self.wait()
+		result, code = self.wait()
+		return code
 
 	def moveField(self, dir):
 		campos = 40
@@ -145,21 +146,27 @@ class axisMovement:
 		time.sleep(2)
 		self.zResponse(3500,1,300)
 
-		### Support functions ###
+	### Support functions ###
 	def wait(self, code = "o"):
 		counter = 0
 		time.sleep(0.01)
 		k = self.serPort.read().decode("utf-8")
-		#print(k)
-		while (k != code):
-			#print(k)
-			counter += 1
-			if counter == 600: # 6 seconds timeout
-				print("Counter exceeded")
-				break
-			k = self.serPort.read().decode("utf-8")
-			time.sleep(0.01)
-		print(k)
+		if k == "u":
+			print(k)
+			return ("done", k)
+		else:
+			while (k != code):
+				counter += 1
+				if counter == 600: # 6 seconds timeout
+					print("Counter exceeded")
+					break
+				k = self.serPort.read().decode("utf-8")
+				if k == "u":
+					print(k)
+					break
+				time.sleep(0.01)
+			print(k)
+			return ("done", k)
 
 	def writeLed(self, ledState):
 		self.serPort.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(ledState)).encode())

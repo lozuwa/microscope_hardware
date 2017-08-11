@@ -61,8 +61,9 @@ def on_connect(client, userdata, flags, rc):
 # Reply messages
 def on_message(client, userdata, msg):
     global enable, stepsz, time_
-    global startAutofocus, countAutofocus, countFrames
     global procZUp, procZDown
+    global autofocusState, hardwareCode, countFrames
+    global countPositions, saveAutofocusCoef
 
     if msg.topic == "/connect":
         if int(msg.payload) == 1:
@@ -70,7 +71,7 @@ def on_message(client, userdata, msg):
             print('server enabled')
         elif int(msg.payload) == 2:
             enable = False
-            print('server disabled')
+            print('server not enabled')
     if enable == True:
         if msg.topic == MOVEFIELD_TOPIC:
             if int(msg.payload)==1:
@@ -94,28 +95,35 @@ def on_message(client, userdata, msg):
                 ledState = axMov.led.get_state()
                 axMov.writeLed(ledState)
             print(msg.topic, msg.payload)
+        ##################################################################################
         elif msg.topic == AUTOFOCUS_TOPIC:
             print(msg.topic, msg.payload)
             if msg.payload.decode("utf-8") == "start":
                 axMov.homeZ()
-                startAutofocus = True
-                countAutofocus = 0
+                autofocusState = True
                 countFrames = 0
+        ##################################################################################
         elif msg.topic == VARIANCE_TOPIC:
-            if startAutofocus:
-                if countAutofocus < 10:
-                    if countFrames < 3:
-                        listAutofocus.append(float(msg.payload))
+            if autofocusState:
+                if hardwareCode != "u":
+                    if countFrames < 1:
+                        saveAutofocusCoef.append((countPositions, float(msg.payload)))
                         countFrames += 1
                     else:
-                        print("\n: {} {} {}".format(countAutofocus, len(listAutofocus), sum(listAutofocus)))
-                        axMov.zResponse(400, 1, 250)
+                        hardwareCode = axMov.zResponse(250, 1, 250)
+                        countPositions += 1
                         countFrames = 0
-                        countAutofocus += 1
                 else:
-                    startAutofocus = False
-                    print("\npublishing stop ...")
+                    autofocusState = False
+                    hardwareCode = "o"
                     publishMessage(AUTOFOCUS_TOPIC, "stop")
+                    aut = autofocus(saveAutofocusCoef)
+                    pos = aut.focus()
+                    print(saveAutofocusCoef)
+                    for i in range(8):
+                        hardwareCode = axMov.zResponse(250,0,250)
+                        print("Going back {}".format(i))
+        ##################################################################################
         elif msg.topic == ZUP_TOPIC:
             if int(msg.payload) == 1:
                 print(msg.topic, int(msg.payload))
@@ -147,17 +155,20 @@ def publishMessage(topic, message):
 if __name__ == '__main__':
     # Global variables
     global stepsz, time_, enable
-    global startAutofocus, countAutofocus, countFrames
     global procZUp, procZDown
     stepsz = 200
     time_ = 250
     enable = False
-    startAutofocus = False
-    countAutofocus = 0
+    procZUp = Process(target = zUp)
+    procZDown = Process(target = zDown)
+    # Autofocus variables
+    global autofocusState, hardwareCode, countFrames
+    global countPositions, saveAutofocusCoef
+    autofocusState = False
+    hardwareCode = "o"
     countFrames = 0
-    listAutofocus = []
-    procZUp = Process(target=zUp)
-    procZDown = Process(target=zDown)
+    countPositions = 0
+    saveAutofocusCoef = []
 
     #client.connect('test.mosquitto.org', 1883, 60)
     client.connect('192.168.3.174', 1883, 60)
