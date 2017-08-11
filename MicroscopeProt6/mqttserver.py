@@ -100,17 +100,21 @@ def on_message(client, userdata, msg):
             print(msg.topic, msg.payload)
             if msg.payload.decode("utf-8") == "start":
                 axMov.homeZ()
+                time.sleep(2)
                 autofocusState = True
                 countFrames = 0
         ##################################################################################
         elif msg.topic == VARIANCE_TOPIC:
             if autofocusState:
                 if hardwareCode != "u":
-                    if countFrames < 1:
+                    if countFrames < 10:
+                        #print(msg.payload)
                         saveAutofocusCoef.append((countPositions, float(msg.payload)))
                         countFrames += 1
                     else:
-                        hardwareCode = axMov.zResponse(250, 1, 250)
+                        hardwareCode = axMov.zResponse(500, 1, 500)
+                        time.sleep(1.5)
+                        print("Hardware (mqtt) code: {}".format(hardwareCode))
                         countPositions += 1
                         countFrames = 0
                 else:
@@ -120,9 +124,11 @@ def on_message(client, userdata, msg):
                     aut = autofocus(saveAutofocusCoef)
                     pos = aut.focus()
                     print(saveAutofocusCoef)
-                    for i in range(8):
-                        hardwareCode = axMov.zResponse(250,0,250)
-                        print("Going back {}".format(i))
+                    print("Need to go back {} positions".format(pos))
+                    if pos >= 0:
+                        for i in range(pos):
+                            print("Going back {}".format(i))
+                            hardwareCode = axMov.zResponse(250,0,500)
         ##################################################################################
         elif msg.topic == ZUP_TOPIC:
             if int(msg.payload) == 1:

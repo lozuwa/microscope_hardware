@@ -125,22 +125,37 @@ void z(int pasos, int direccion, int timpo) {
 }
 
 void z_r(int pasos, int direccion, int timpo) {
+  /// Enable direction and motor
   digitalWrite(direccionZ, direccion);
   digitalWrite(enablez, 0);
+  /// Init bool state
+  /// when 
+  bool state = false;
+  /// Write steps 
   for (int i = 0; i < pasos; i++) {
-    if(direccion == 1 and digitalRead(endZtop)==0){
-      Serial.write("u\n");
+    /// In case the axis stops with the top button
+    if(direccion == 1 and digitalRead(endZtop) == 0){
+      state = true;
       break;
     }
-    if(direccion == 0 and digitalRead(endZ)==0){
-      Serial.write("d\n");
+    /// In case the axis stops with the bottom button
+    else if(direccion == 0 and digitalRead(endZ) == 0){
       break;
     }
-    move_(stepsZ, timpo);
+    else{
+      move_(stepsZ, timpo);
+    }
   }
+  // Disable motor and variable home
   digitalWrite(enablez, 1);
   B_homeZ = 1;
-  Serial.write("o\n");
+  // Write result
+  if (state == true){
+    Serial.write("u\n");  
+  }
+  else{
+    Serial.write("o\n");
+  }
 }
 
 void y(int pasos, int direccion, int timpo) {

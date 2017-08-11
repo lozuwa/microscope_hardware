@@ -35,7 +35,7 @@ class serialPort:
 		self.baudrate = baudrate
 
 	def get_baudrate(self, baudrate):
-		return self.baudrate	
+		return self.baudrate
 
 ### Led ###
 class Led:
@@ -57,7 +57,7 @@ class axisMovement:
 		self.led = Led(state = 0)
 		# Variables
 		self.fieldCounter = 0
-		
+
 	def x(self, steps, dir, time_):
 		self.serPort.write(('x,'+str(steps)+','+str(dir)+','+str(time_)).encode())
 		time.sleep(0.01)
@@ -82,9 +82,9 @@ class axisMovement:
 
 	def zResponse(self, steps, dir, time_):
 		self.serPort.write(('z_r,'+str(steps)+','+str(dir)+','+str(time_)).encode())
-		time.sleep(0.01)
 		result, code = self.wait()
-		return code
+		#print("Hardware code: {}".format(code))
+		#return code
 
 	def moveField(self, dir):
 		campos = 40
@@ -151,22 +151,15 @@ class axisMovement:
 		counter = 0
 		time.sleep(0.01)
 		k = self.serPort.read().decode("utf-8")
-		if k == "u":
-			print(k)
-			return ("done", k)
-		else:
-			while (k != code):
-				counter += 1
-				if counter == 600: # 6 seconds timeout
-					print("Counter exceeded")
-					break
+		while (True):
+			counter += 1
+			if k == code or k == "u" or counter == 600:
+				break
+			else:
 				k = self.serPort.read().decode("utf-8")
-				if k == "u":
-					print(k)
-					break
 				time.sleep(0.01)
-			print(k)
-			return ("done", k)
+		print("wait function: ", k)
+		return ("done", k)
 
 	def writeLed(self, ledState):
 		self.serPort.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(ledState)).encode())
