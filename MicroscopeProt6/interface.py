@@ -1,6 +1,6 @@
 # Author: Khalil Nallar
 # Company: pfm medical
-# Description: Supporting functions for microscope movement
+# Description: Supporting functions for microscope's movement feature
 
 import serial
 import os, sys, time
@@ -84,7 +84,12 @@ class axisMovement:
 		self.serPort.write(('z_r,'+str(steps)+','+str(dir)+','+str(time_)).encode())
 		result, code = self.wait()
 		#print("Hardware code: {}".format(code))
-		#return code
+		return code
+
+	def zUp(self, steps = 250, dir = 1, time_ = 250):
+		self.serPort.write(('zUp,'+str(steps)+','+str(dir)+','+str(time_)).encode())
+		result, code = self.wait()
+		return code
 
 	def moveField(self, dir):
 		campos = 40
@@ -163,3 +168,40 @@ class axisMovement:
 
 	def writeLed(self, ledState):
 		self.serPort.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(ledState)).encode())
+
+
+"""
+##################################################################################
+        elif msg.topic == AUTOFOCUS_TOPIC:
+            print(msg.topic, msg.payload)
+            if msg.payload.decode("utf-8") == "start":
+                axMov.homeZ()
+                time.sleep(0.5)
+                autofocusState = True
+                countFrames = 0
+        ##################################################################################
+        elif msg.topic == VARIANCE_TOPIC:
+            if autofocusState:
+                if hardwareCode != "u":
+                    if countFrames < 1:
+                        print(msg.payload)
+                        saveAutofocusCoef.append((countPositions, float(msg.payload)))
+                        countFrames += 1
+                    else:
+                        hardwareCode = axMov.zResponse(500, 1, 1000)
+                        print("Hardware (mqtt) code: {}".format(hardwareCode))
+                        countPositions += 1
+                        countFrames = 0
+                else:
+                    autofocusState = False
+                    hardwareCode = "o"
+                    publishMessage(AUTOFOCUS_TOPIC, "stop")
+                    aut = autofocus(saveAutofocusCoef)
+                    pos = aut.focus()
+                    print(saveAutofocusCoef)
+                    print("Need to go back {} positions".format(pos))
+                    if pos >= 0:
+                        for i in range(pos):
+                            print("Going back {}".format(i))
+                            hardwareCode = axMov.zResponse(250,0,500)
+"""

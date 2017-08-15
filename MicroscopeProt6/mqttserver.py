@@ -7,6 +7,7 @@ from interface import *
 from autofocus import *
 # Thread
 from multiprocessing import Process
+from multiprocessing import Pool
 
 # Constant variables
 AUTOFOCUS_TOPIC = "/autofocus"
@@ -28,20 +29,35 @@ axMov = axisMovement()
 def zUp():
     global stepsz
     while(1):
-        print('zup ', os.getpid())
+        #print('zup ', os.getpid())
         axMov.z(stepsz, 1, time_)
         time.sleep(0.01)
 
 def zDown():
     global stepsz
     while(1):
-        print('zdown ', os.getpid())
+        #print('zdown ', os.getpid())
         axMov.z(stepsz, 0, time_)
         time.sleep(0.01)
 
-def timeStamp():
+def moveZ():
+    hardwareCode = "i"
+    # Move motor
+    while(True):
+        hardwareCode = axMov.zResponse(250,1,250)
+        if hardwareCode == "u":
+            Process(target = publishMessage, args = (AUTOFOCUS_TOPIC, "stop")).start()
+            break
+        time.sleep(0.01)
+    return "done"
+
+def keepAlive():
+    pass
+    time.sleep(10)
+
+def timestamp():
     now = datetime.datetime
-    return str(now.microsecond)
+    return str(now.minute)+str(now.second)+str(now.microsecond)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -64,7 +80,7 @@ def on_message(client, userdata, msg):
     global procZUp, procZDown
     global autofocusState, hardwareCode, countFrames
     global countPositions, saveAutofocusCoef
-
+    
     if msg.topic == "/connect":
         if int(msg.payload) == 1:
             enable = True
@@ -100,20 +116,21 @@ def on_message(client, userdata, msg):
             print(msg.topic, msg.payload)
             if msg.payload.decode("utf-8") == "start":
                 axMov.homeZ()
-                time.sleep(2)
+                time.sleep(0.5)
                 autofocusState = True
                 countFrames = 0
+                publishMessage(AUTOFOCUS_TOPIC, "get")
         ##################################################################################
         elif msg.topic == VARIANCE_TOPIC:
             if autofocusState:
                 if hardwareCode != "u":
-                    if countFrames < 10:
-                        #print(msg.payload)
+                    if countFrames < 1:
+                        print(msg.payload)
                         saveAutofocusCoef.append((countPositions, float(msg.payload)))
                         countFrames += 1
                     else:
-                        hardwareCode = axMov.zResponse(500, 1, 500)
-                        time.sleep(1.5)
+                        hardwareCode = axMov.zResponse(250, 1, 250)
+                        publishMessage(AUTOFOCUS_TOPIC, "get")
                         print("Hardware (mqtt) code: {}".format(hardwareCode))
                         countPositions += 1
                         countFrames = 0
@@ -121,14 +138,7 @@ def on_message(client, userdata, msg):
                     autofocusState = False
                     hardwareCode = "o"
                     publishMessage(AUTOFOCUS_TOPIC, "stop")
-                    aut = autofocus(saveAutofocusCoef)
-                    pos = aut.focus()
-                    print(saveAutofocusCoef)
-                    print("Need to go back {} positions".format(pos))
-                    if pos >= 0:
-                        for i in range(pos):
-                            print("Going back {}".format(i))
-                            hardwareCode = axMov.zResponse(250,0,500)
+                    print("***", saveAutofocusCoef)
         ##################################################################################
         elif msg.topic == ZUP_TOPIC:
             if int(msg.payload) == 1:
@@ -155,10 +165,10 @@ def on_message(client, userdata, msg):
     else:
         print('server not enabled')
 
-def publishMessage(topic, message):
-    client.publish(topic, str(message), 2)
+def publishMessage(topic, message, qos = 2):
+    client.publish(topic, str(message), qos)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Global variables
     global stepsz, time_, enable
     global procZUp, procZDown
