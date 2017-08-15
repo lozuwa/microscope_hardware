@@ -163,7 +163,7 @@ class axisMovement:
 			else:
 				k = self.serPort.read().decode("utf-8")
 				time.sleep(0.01)
-		print("wait function: ", k)
+		#print("wait function: ", k)
 		return ("done", k)
 
 	def writeLed(self, ledState):

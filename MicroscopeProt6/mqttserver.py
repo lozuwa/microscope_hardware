@@ -80,7 +80,7 @@ def on_message(client, userdata, msg):
     global procZUp, procZDown
     global autofocusState, hardwareCode, countFrames
     global countPositions, saveAutofocusCoef
-    
+
     if msg.topic == "/connect":
         if int(msg.payload) == 1:
             enable = True
@@ -115,8 +115,9 @@ def on_message(client, userdata, msg):
         elif msg.topic == AUTOFOCUS_TOPIC:
             print(msg.topic, msg.payload)
             if msg.payload.decode("utf-8") == "start":
+                print("****************************Autofocus sequence****************************")
                 axMov.homeZ()
-                time.sleep(0.5)
+                time.sleep(2)
                 autofocusState = True
                 countFrames = 0
                 publishMessage(AUTOFOCUS_TOPIC, "get")
@@ -139,6 +140,11 @@ def on_message(client, userdata, msg):
                     hardwareCode = "o"
                     publishMessage(AUTOFOCUS_TOPIC, "stop")
                     print("***", saveAutofocusCoef)
+                    aut = autofocus(saveAutofocusCoef)
+                    print(aut.focus())
+                    for i in range(aut.focus()):
+                        axMov.zResponse(250, 0, 250)
+                    print("****************************End autofocus sequence****************************")
         ##################################################################################
         elif msg.topic == ZUP_TOPIC:
             if int(msg.payload) == 1:
