@@ -85,9 +85,6 @@ void loop() {
       //Serial.print("moviendo eje z, " + pasos +" pasos, en direccion " + direccion + ",en " + timpo +" milisegundos por paso");
       z_r(pasos.toInt(), direccion.toInt(), timpo.toInt());
     }
-    else if (eje == "zUp") {
-      zUp(timpo.toInt());
-    }
     else if (eje == "homeX") {
       homeX();
     }
@@ -127,17 +124,6 @@ void z(int pasos, int direccion, int timpo) {
   }
   digitalWrite(enablez, 1);
   B_homeZ = 1;
-}
-
-void zUp(int timpo) {
-  digitalWrite(enablez, 0);
-  digitalWrite(direccionZ, 1);
-  while (digitalRead(endZtop) != 0) {
-    move_(stepsZ, timpo);
-  }
-  B_homeZ = 0;
-  digitalWrite(enablez, 1);
-  Serial.write("o\n");
 }
 
 void z_r(int pasos, int direccion, int timpo) {

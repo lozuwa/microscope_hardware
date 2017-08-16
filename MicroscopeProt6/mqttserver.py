@@ -117,10 +117,22 @@ def on_message(client, userdata, msg):
             if msg.payload.decode("utf-8") == "start":
                 print("****************************Autofocus sequence****************************")
                 axMov.homeZ()
-                time.sleep(2)
+                time.sleep(0.1)
                 autofocusState = True
                 countFrames = 0
                 publishMessage(AUTOFOCUS_TOPIC, "get")
+            elif msg.payload.decode("utf-8") == "stop":
+                print("***", saveAutofocusCoef)
+                aut = autofocus(saveAutofocusCoef)
+                goBack = aut.focus()
+                print("Go back ", goBack)
+                time.sleep(1)
+                for i in range(goBack):
+                    time.sleep(0.2)
+                    axMov.zResponse(350, 0, 250)
+                countPositions = 0
+                saveAutofocusCoef = []
+                print("****************************End autofocus sequence****************************")
         ##################################################################################
         elif msg.topic == VARIANCE_TOPIC:
             if autofocusState:
@@ -139,12 +151,6 @@ def on_message(client, userdata, msg):
                     autofocusState = False
                     hardwareCode = "o"
                     publishMessage(AUTOFOCUS_TOPIC, "stop")
-                    print("***", saveAutofocusCoef)
-                    aut = autofocus(saveAutofocusCoef)
-                    print(aut.focus())
-                    for i in range(aut.focus()):
-                        axMov.zResponse(250, 0, 250)
-                    print("****************************End autofocus sequence****************************")
         ##################################################################################
         elif msg.topic == ZUP_TOPIC:
             if int(msg.payload) == 1:
