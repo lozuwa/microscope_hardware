@@ -1,9 +1,12 @@
 #ip 192.168.3.174
 
+# General purpose
+import os
+import sys 
+import time
 # MQTT
 import paho.mqtt.client as mqtt
-# Supporting libraries
-import os, time, numpy as np
+# Support libraries
 from Interface import *
 # Thread
 from multiprocessing import Process
@@ -226,6 +229,21 @@ if __name__ == '__main__':
     global enable
     enable = False
 
+    if sys.argv[1] == 1:
+        ID = "pfm'S pc"
+	BROKER = "192.168.3.174"
+	PORT = 1883
+    elif sys.argv[1] == 2:
+        ID = "rodrigo's pc"
+        BROKER = "192.168.3.213"
+	PORT = 1883
+    else:
+        ID = "Cloud server"
+        BROKER = "test.mosquitto.org"
+        PORT = 1883
+
+    print("Connecting to {} through {}. ID: {}".format(BROKER, PORT, ID))
+
     # Background processes
     proc_z_up = Process(target=z_up)
     proc_z_down = Process(target=z_down)
@@ -235,7 +253,7 @@ if __name__ == '__main__':
     proc_x_right = Process(target=x_right)
 
     #client.connect('test.mosquitto.org', 1883, 60)
-    client.connect('192.168.3.174', 1883, 60)
+    client.connect(BROKER, PORT, timeout = 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_start()
