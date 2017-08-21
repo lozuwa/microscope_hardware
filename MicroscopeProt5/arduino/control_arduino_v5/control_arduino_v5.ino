@@ -104,8 +104,11 @@ void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
   digitalWrite(enablez, 0);
   for (int i = 0; i < pasos; i++) {
-    //Serial.println(digitalRead(endZtop));
     if(direccion == 1 and digitalRead(endZtop)==0){
+      Serial.write("ok");
+      break;
+    }
+    if(direccion == 0 and digitalRead(endZ)==0){
       Serial.write("ok");
       break;
     }
