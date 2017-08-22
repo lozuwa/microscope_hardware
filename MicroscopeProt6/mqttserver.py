@@ -23,7 +23,7 @@ ZUP_TOPIC = "/zu"
 client = mqtt.Client()
 
 # Instantiate classes
-axMov = axisMovement()
+axMov = axisMovement(port = 1)
 
 # Support functions
 def zUp():
@@ -117,7 +117,7 @@ def on_message(client, userdata, msg):
             if msg.payload.decode("utf-8") == "start":
                 print("****************************Autofocus sequence****************************")
                 axMov.homeZ()
-                time.sleep(0.1)
+                time.sleep(0.01)
                 autofocusState = True
                 countFrames = 0
                 publishMessage(AUTOFOCUS_TOPIC, "get")
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     global stepsz, time_, enable
     global procZUp, procZDown
     stepsz = 200
-    time_ = 250
+    time_ = 500
     enable = False
     procZUp = Process(target = zUp)
     procZDown = Process(target = zDown)

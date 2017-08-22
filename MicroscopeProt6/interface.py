@@ -50,9 +50,9 @@ class Led:
 
 ### Individual axis move ###
 class axisMovement:
-	def __init__(self):
+	def __init__(self, port = 0):
 		# Other classes inst
-		self.serPortClass = serialPort(portNumber = 0, baudrate = 115200)
+		self.serPortClass = serialPort(portNumber = port, baudrate = 115200)
 		self.serPort = self.serPortClass.port
 		self.led = Led(state = 0)
 		# Variables
