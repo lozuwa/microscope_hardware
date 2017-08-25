@@ -23,20 +23,20 @@ ZUP_TOPIC = "/zu"
 client = mqtt.Client()
 
 # Instantiate classes
-axMov = axisMovement(port = 1)
+axMov = axisMovement(port = 0)
 
 # Support functions
 def zUp():
     global stepsz
     while(1):
-        #print('zup ', os.getpid())
+        #print("zup ", os.getpid())
         axMov.z(stepsz, 1, time_)
         time.sleep(0.01)
 
 def zDown():
     global stepsz
     while(1):
-        #print('zdown ', os.getpid())
+        #print("zdown ", os.getpid())
         axMov.z(stepsz, 0, time_)
         time.sleep(0.01)
 
@@ -66,13 +66,13 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("/connect")
     client.subscribe("/zu")
     client.subscribe("/zd")
-    client.subscribe('/led')
-    client.subscribe('/steps')
-    client.subscribe('/home')
-    client.subscribe('/movefield')
+    client.subscribe("/led")
+    client.subscribe("/steps")
+    client.subscribe("/home")
+    client.subscribe("/movefield")
     # Autofocus
-    client.subscribe('/autofocus')
-    client.subscribe('/variance')
+    client.subscribe("/autofocus")
+    client.subscribe("/variance")
 
 # Reply messages
 def on_message(client, userdata, msg):
@@ -84,15 +84,15 @@ def on_message(client, userdata, msg):
     if msg.topic == "/connect":
         if int(msg.payload) == 1:
             enable = True
-            print('server enabled')
+            print("server enabled")
         elif int(msg.payload) == 2:
             enable = False
-            print('server not enabled')
+            print("server not enabled")
     if enable == True:
         if msg.topic == MOVEFIELD_TOPIC:
-            if int(msg.payload)==1:
+            if int(msg.payload) == 1:
                 axMov.moveField(1)
-            if int(msg.payload)==0:
+            if int(msg.payload) == 0:
                 axMov.moveField(0)
         elif msg.topic == HOME_TOPIC:
             axMov.home()
@@ -162,7 +162,7 @@ def on_message(client, userdata, msg):
                     procZUp.terminate()
                     procZUp = Process(target=zUp)
                 except:
-                    print('There was a problem with zu process')
+                    print("There was a problem with zu process")
         elif msg.topic == ZDOWN_TOPIC:
             if int(msg.payload) == 1:
                 print(msg.topic, int(msg.payload))
@@ -173,9 +173,9 @@ def on_message(client, userdata, msg):
                     procZDown.terminate()
                     procZDown = Process(target=zDown)
                 except:
-                    print('There was a problem with zd process')
+                    print("There was a problem with zd process")
     else:
-        print('server not enabled')
+        print("server not enabled")
 
 def publishMessage(topic, message, qos = 2):
     client.publish(topic, str(message), qos)
@@ -198,8 +198,8 @@ if __name__ == "__main__":
     countPositions = 0
     saveAutofocusCoef = []
 
-    #client.connect('test.mosquitto.org', 1883, 60)
-    client.connect('192.168.3.174', 1883, 60)
+    #client.connect("test.mosquitto.org", 1883, 60)
+    client.connect("192.168.3.193", 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()

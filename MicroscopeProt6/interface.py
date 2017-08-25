@@ -92,29 +92,10 @@ class axisMovement:
 		return code
 
 	def moveField(self, dir):
-		campos = 40
 		if dir == 0:
-			self.fieldCounter -= 1
-			if self.fieldCounter < campos-1 and self.fieldCounter != -1:
-				self.x(40,0,5000)
-			elif self.fieldCounter == campos-1:
-				self.y(80,1,5000)
-			elif self.fieldCounter > campos-1 and self.fieldCounter < (campos*2)-1:
-				self.x(40,1,5000)
-			elif self.fieldCounter == -1:
-				self.y(90,1,5000)
-				self.fieldCounter = 0
-		elif dir:
-			self.fieldCounter += 1
-			if self.fieldCounter < campos:
-				self.x(40,1,5000)
-			elif self.fieldCounter == campos:
-				self.y(30,0,4000)
-			elif self.fieldCounter > campos and self.fieldCounter < campos*2:
-				self.x(40,0,5000)
-			elif self.fieldCounter == campos*2:
-				self.y(60,0,4000)
-				self.fieldCounter = 0
+			self.x(40,1,5000)
+		elif dir == 1:
+			self.x(40,0,5000)
 
 	def homeZ(self):
 		self.serPort.write('homeZ'.encode())
