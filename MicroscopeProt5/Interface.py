@@ -2,8 +2,13 @@
 # Company: pfm medical
 # Description: Supporting functions for microscope movement
 
+# Hardware interface
 import serial
-import os, sys, time
+# General purpose
+import os
+import sys
+import time
+# Threads 
 from multiprocessing import Process
 
 ### Global variables ###
