@@ -227,11 +227,11 @@ if __name__ == '__main__':
     global enable
     enable = False
 
-    if sys.argv[1] == 1:
+    if sys.argv[1] == "1":
         ID = "pfm'S pc"
         BROKER = "192.168.3.193"
         PORT = 1883
-    elif sys.argv[1] == 2:
+    elif sys.argv[1] == "2":
         ID = "rodrigo's pc"
         BROKER = "192.168.3.213"
         PORT = 1883
@@ -250,8 +250,7 @@ if __name__ == '__main__':
     proc_x_left = Process(target=x_left)
     proc_x_right = Process(target=x_right)
 
-    #client.connect('test.mosquitto.org', 1883, 60)
-    client.connect(BROKER, PORT, 60)
+    client.connect("192.168.3.193", PORT, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_start()

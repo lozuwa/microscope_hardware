@@ -52,6 +52,11 @@ void loop() {
   //digitalWrite(enablez, 0);
   //delay(300);
 
+  digitalWrite(enable , 1);
+  digitalWrite(direccionZ , 0);
+  digitalWrite(direccionY , 0);
+  digitalWrite(direccionX , 0);
+  //endStop();
   
   if (Serial.available() > 0) {
     String tx = Serial.readString();
@@ -98,16 +103,20 @@ void brillo_(int brillo) {
 }
 void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
-  digitalWrite(enablez, 0);
+  digitalWrite(enable, 0);
   for (int i = 0; i < pasos; i++) {
     digitalWrite(stepsZ, 1);
     delayMicroseconds(timpo);
     digitalWrite(stepsZ, 0);
     delayMicroseconds(timpo);
   }
+
   //delay(500);
   digitalWrite(enablez, 1);
   //  Serial.write("o");
+
+  digitalWrite(enable, 1);
+  Serial.write("o");
 }
 void y(int pasos, int direccion, int timpo) {
   digitalWrite(enabley, 0);
