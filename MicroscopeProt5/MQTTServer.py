@@ -231,12 +231,12 @@ if __name__ == '__main__':
 
     if sys.argv[1] == 1:
         ID = "pfm'S pc"
-	BROKER = "192.168.3.174"
-	PORT = 1883
+        BROKER = "192.168.3.174"
+        PORT = 1883
     elif sys.argv[1] == 2:
         ID = "rodrigo's pc"
         BROKER = "192.168.3.213"
-	PORT = 1883
+        PORT = 1883
     else:
         ID = "Cloud server"
         BROKER = "test.mosquitto.org"
