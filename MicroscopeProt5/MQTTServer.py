@@ -10,8 +10,6 @@ import paho.mqtt.client as mqtt
 from Interface import *
 # Thread
 from multiprocessing import Process
-import eventlet
-eventlet.monkey_patch()
 
 # Initialize mqtt client
 client = mqtt.Client()
@@ -231,7 +229,7 @@ if __name__ == '__main__':
 
     if sys.argv[1] == 1:
         ID = "pfm'S pc"
-        BROKER = "192.168.3.174"
+        BROKER = "192.168.3.193"
         PORT = 1883
     elif sys.argv[1] == 2:
         ID = "rodrigo's pc"
@@ -253,7 +251,7 @@ if __name__ == '__main__':
     proc_x_right = Process(target=x_right)
 
     #client.connect('test.mosquitto.org', 1883, 60)
-    client.connect(BROKER, PORT, timeout = 60)
+    client.connect(BROKER, PORT, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_start()
