@@ -250,7 +250,7 @@ if __name__ == '__main__':
     proc_x_left = Process(target=x_left)
     proc_x_right = Process(target=x_right)
 
-    client.connect("192.168.3.193", PORT, 60)
+    client.connect(BROKER, PORT, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_start()
