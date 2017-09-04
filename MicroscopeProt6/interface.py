@@ -81,9 +81,10 @@ class axisMovement:
 		time.sleep(0.01)
 
 	def zResponse(self, steps, dir, time_):
-		self.serPort.write(('z_r,'+str(steps)+','+str(dir)+','+str(time_)).encode())
+		#self.serPort.write(('z_r,'+str(steps)+','+str(dir)+','+str(time_)).encode())
+		self.serPort.write(('z,'+str(steps)+','+str(dir)+','+str(time_)).encode())
 		result, code = self.wait()
-		#print("Hardware code: {}".format(code))
+		print("Hardware code: {}".format(code))
 		return code
 
 	def zUp(self, steps = 250, dir = 1, time_ = 250):
@@ -93,9 +94,9 @@ class axisMovement:
 
 	def moveField(self, dir):
 		if dir == 0:
-			self.x(40,1,5000)
+			self.y(10,1,5000)
 		elif dir == 1:
-			self.x(40,0,5000)
+			self.y(10,0,5000)
 
 	def homeZ(self):
 		self.serPort.write('homeZ'.encode())

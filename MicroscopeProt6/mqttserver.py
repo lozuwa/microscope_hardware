@@ -23,21 +23,21 @@ ZUP_TOPIC = "/zu"
 client = mqtt.Client()
 
 # Instantiate classes
-axMov = axisMovement(port = 0)
+axMov = axisMovement(port = int(sys.argv[1]))
 
 # Support functions
 def zUp():
     global stepsz
     while(1):
         #print("zup ", os.getpid())
-        axMov.z(stepsz, 1, time_)
+        axMov.zResponse(stepsz, 1, time_)
         time.sleep(0.01)
 
 def zDown():
     global stepsz
     while(1):
         #print("zdown ", os.getpid())
-        axMov.z(stepsz, 0, time_)
+        axMov.zResponse(stepsz, 0, time_)
         time.sleep(0.01)
 
 def moveZ():
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     global stepsz, time_, enable
     global procZUp, procZDown
     stepsz = 200
-    time_ = 500
+    time_ = 2000
     enable = False
     procZUp = Process(target = zUp)
     procZDown = Process(target = zDown)
