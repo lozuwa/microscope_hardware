@@ -1,6 +1,8 @@
-# Author: Khalil Nallar
-# Company: pfm medical
-# Description: Supporting functions for microscope's movement feature
+"""
+Author: Khalil Nallar
+Company: pfm medical
+Description: Supporting functions for microscope's movement feature
+"""
 
 import serial
 import os, sys, time
@@ -92,11 +94,21 @@ class axisMovement:
 		result, code = self.wait()
 		return code
 
-	def moveField(self, dir):
+	def moveFieldY(self, dir):
 		if dir == 0:
-			self.y(10,1,5000)
-		elif dir == 1:
 			self.y(10,0,5000)
+		elif dir == 1:
+			self.y(10,1,5000)
+		else:
+			pass
+
+	def moveFieldX(self, dir):
+		if dir == 0:
+			self.x(10,0,5000)
+		elif dir == 1:
+			self.x(10,1,5000)
+		else:
+			pass
 
 	def homeZ(self):
 		self.serPort.write('homeZ'.encode())
@@ -149,4 +161,41 @@ class axisMovement:
 		return ("done", k)
 
 	def writeLed(self, ledState):
-		self.serPort.write(('l,'+str(0)+','+str(0)+','+str(0)+','+str(ledState)).encode())
+		self.serPort.write(('l,'+str(0)+','+str(0)+','+\
+						str(0)+','+str(ledState)).encode())
+
+"""
+##################################################################################
+        elif msg.topic == AUTOFOCUS_TOPIC:
+            print(msg.topic, msg.payload)
+            if msg.payload.decode("utf-8") == "start":
+                axMov.homeZ()
+                time.sleep(0.5)
+                autofocusState = True
+                countFrames = 0
+        ##################################################################################
+        elif msg.topic == VARIANCE_TOPIC:
+            if autofocusState:
+                if hardwareCode != "u":
+                    if countFrames < 1:
+                        print(msg.payload)
+                        saveAutofocusCoef.append((countPositions, float(msg.payload)))
+                        countFrames += 1
+                    else:
+                        hardwareCode = axMov.zResponse(500, 1, 1000)
+                        print("Hardware (mqtt) code: {}".format(hardwareCode))
+                        countPositions += 1
+                        countFrames = 0
+                else:
+                    autofocusState = False
+                    hardwareCode = "o"
+                    publishMessage(AUTOFOCUS_TOPIC, "stop")
+                    aut = autofocus(saveAutofocusCoef)
+                    pos = aut.focus()
+                    print(saveAutofocusCoef)
+                    print("Need to go back {} positions".format(pos))
+                    if pos >= 0:
+                        for i in range(pos):
+                            print("Going back {}".format(i))
+                            hardwareCode = axMov.zResponse(250,0,500)
+"""

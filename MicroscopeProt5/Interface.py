@@ -2,12 +2,21 @@
 # Company: pfm medical
 # Description: Supporting functions for microscope movement
 
+# Hardware interface
 import serial
-import os, sys, time
+# General purpose
+import os
+import sys
+import time
+# Threads 
 from multiprocessing import Process
 
 ### Global variables ###
+<<<<<<< HEAD
 s = serial.Serial("/dev/ttyACM0", 115200) #'/dev/ttyACM0',115200)
+=======
+s = serial.Serial("/dev/ttyACM1", 115200)# '/dev/ttyACM0'
+>>>>>>> 309710359ce45d5ff7ad5bcffacb4d4784789755
 c = 0
 
 ### Move ###
@@ -71,24 +80,24 @@ def change(dir):
         if dir == 0:
             c -= 1
             if c < campos-1 and c!=-1:
-                x(40,0,5000)
+                y(40,0,5000)
             elif c == campos-1:
-                y(80,1,5000)
+                x(80,1,5000)
             elif c > campos-1 and c < (campos*2)-1:
-                x(40,1,5000)
+                y(40,1,5000)
             elif c == -1:
-                y(90,1,5000)
+                x(90,1,5000)
                 c = 0
         elif dir:
             c += 1
             if c < campos:
-                x(40,1,5000)
+                y(40,1,5000)
             elif c == campos:
-                y(30,0,4000)
+                x(30,0,4000)
             elif c > campos and c < campos*2:
-                x(40,0,5000)
+                y(40,0,5000)
             elif c == campos*2:
-                y(60,0,4000)
+                x(60,0,4000)
                 c = 0
 
 def wait(axis):

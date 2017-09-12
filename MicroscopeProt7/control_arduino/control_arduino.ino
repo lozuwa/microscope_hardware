@@ -12,6 +12,7 @@
 #define endY 10
 //#define endZ 9
 
+
 String eje, pasos, direccion, timpo, brillo;
 byte brillo_actual = 0;
 byte B_endStopX = 0;
@@ -44,6 +45,7 @@ void setup() {
 
 void loop() {
   Serial.flush();
+  //endStop();
   
   //digitalWrite(enablez, 1);
   //delay(300);
@@ -101,15 +103,13 @@ void brillo_(int brillo) {
 }
 void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
-  digitalWrite(enablez, 0);
-  delay(100);
+  digitalWrite(enable, 0);
   for (int i = 0; i < pasos; i++) {
     digitalWrite(stepsZ, 1);
     delayMicroseconds(timpo);
     digitalWrite(stepsZ, 0);
     delayMicroseconds(timpo);
   }
-  delay(100);
 
   //delay(500);
   digitalWrite(enablez, 1);
