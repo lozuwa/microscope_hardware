@@ -23,7 +23,7 @@ ZUP_TOPIC = "/zu"
 client = mqtt.Client()
 
 # Instantiate classes
-axMov = axisMovement(port = 1)
+axMov = axisMovement(port = 0)
 
 # Support functions
 def zUp():
@@ -52,8 +52,8 @@ def moveZ():
     return "done"
 
 def keepAlive():
-    pass
-    time.sleep(10)
+    publishMessage("/microscope", "keep alive")
+    time.sleep(60)
 
 def timestamp():
     now = datetime.datetime
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     global stepsz, time_, enable
     global procZUp, procZDown
     stepsz = 200
-    time_ = 500
+    time_ = 800
     enable = False
     procZUp = Process(target = zUp)
     procZDown = Process(target = zDown)
@@ -202,4 +202,7 @@ if __name__ == "__main__":
     client.connect('192.168.3.174', 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
-    client.loop_forever()
+    client.loop_start()
+
+    while(1):
+        keepAlive()

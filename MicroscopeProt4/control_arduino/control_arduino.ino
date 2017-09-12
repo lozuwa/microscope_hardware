@@ -4,12 +4,13 @@
 #define direccionZ 6
 #define stepsY 4
 #define direccionY 7
-#define enable 8
+#define enablex A1
+#define enabley 8
+#define enablez A0
 #define luz 12
 #define endX 11
 #define endY 10
 //#define endZ 9
-#define enablez A0
 
 String eje, pasos, direccion, timpo, brillo;
 byte brillo_actual=0;
@@ -23,7 +24,9 @@ void setup() {
   pinMode(stepsZ, OUTPUT);
   pinMode(direccionZ, OUTPUT);
 
-  pinMode(enable, OUTPUT);
+  pinMode(enablex, OUTPUT);
+  pinMode(enabley, OUTPUT);
+  
   pinMode(enablez, OUTPUT);
 
   pinMode(luz, OUTPUT);
@@ -32,7 +35,8 @@ void setup() {
   pinMode(endY, INPUT_PULLUP);
 
   digitalWrite(enablez, 1);
-  digitalWrite(enable , 1);
+  digitalWrite(enablex , 1);
+  digitalWrite(enabley , 1);
   digitalWrite(direccionZ, 0);
 
   Serial.begin(115200);
@@ -41,7 +45,9 @@ void setup() {
 
 void loop() {
   Serial.flush();
-  digitalWrite(enable , 1);
+  digitalWrite(enablex , 1);
+  digitalWrite(enabley , 1);
+  digitalWrite(enablez , 1);
   digitalWrite(direccionZ , 0);
   digitalWrite(direccionY , 0);
   digitalWrite(direccionX , 0);
@@ -90,17 +96,19 @@ void brillo_(int brillo){
 void z(int pasos, int direccion, int timpo) {
   digitalWrite(direccionZ, direccion);
   digitalWrite(enablez, 0);
+  delay(100);
   for (int i = 0; i < pasos; i++) {
     digitalWrite(stepsZ, 1);
     delayMicroseconds(timpo);
     digitalWrite(stepsZ, 0);
     delayMicroseconds(timpo);
   }
+  delay(100);
   digitalWrite(enablez, 1);
   Serial.write("o");
 }
 void y(int pasos, int direccion, int timpo) {
-  digitalWrite(enable, 0);
+  digitalWrite(enabley, 0);
   digitalWrite(direccionY, direccion);
   for (int i = 0; i < pasos; i++) {
     digitalWrite(stepsY, 1);
@@ -108,10 +116,10 @@ void y(int pasos, int direccion, int timpo) {
     digitalWrite(stepsY, 0);
     delayMicroseconds(timpo);
   }
-  digitalWrite(enable , 1);
+  digitalWrite(enabley , 1);
 }
 void x(int pasos, int direccion, int timpo) {
-  digitalWrite(enable, 0);
+  digitalWrite(enablex, 0);
   digitalWrite(direccionX, direccion);
   for (int i = 0; i < pasos; i++) {
     digitalWrite(stepsX, 1);
@@ -119,7 +127,7 @@ void x(int pasos, int direccion, int timpo) {
     digitalWrite(stepsX, 0);
     delayMicroseconds(timpo);
   }
-  digitalWrite(enable , 1);
+  digitalWrite(enablex , 1);
 }
 void endStop(){
   if(digitalRead(endX)==0 and B_endStopX==0){
