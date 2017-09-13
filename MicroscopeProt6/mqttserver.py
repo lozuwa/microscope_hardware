@@ -185,11 +185,7 @@ if __name__ == "__main__":
     global stepsz, time_, enable
     global procZUp, procZDown
     stepsz = 200
-<<<<<<< HEAD
-    time_ = 800
-=======
     time_ = 2000
->>>>>>> 309710359ce45d5ff7ad5bcffacb4d4784789755
     enable = False
     procZUp = Process(target = zUp)
     procZDown = Process(target = zDown)

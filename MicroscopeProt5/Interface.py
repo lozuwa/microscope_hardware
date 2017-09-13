@@ -12,11 +12,7 @@ import time
 from multiprocessing import Process
 
 ### Global variables ###
-<<<<<<< HEAD
-s = serial.Serial("/dev/ttyACM0", 115200) #'/dev/ttyACM0',115200)
-=======
-s = serial.Serial("/dev/ttyACM1", 115200)# '/dev/ttyACM0'
->>>>>>> 309710359ce45d5ff7ad5bcffacb4d4784789755
+s = serial.Serial("/dev/ttyACM0", 115200)# '/dev/ttyACM0'
 c = 0
 
 ### Move ###

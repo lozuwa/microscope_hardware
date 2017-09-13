@@ -74,6 +74,8 @@ def on_connect(client, userdata, flags, rc):
     # Autofocus
     client.subscribe("/autofocus")
     client.subscribe("/variance")
+    # Microscope
+    client.subscribe("/microscope")
 
 # Reply messages
 def on_message(client, userdata, msg):
@@ -81,6 +83,8 @@ def on_message(client, userdata, msg):
     global procZUp, procZDown
     global autofocusState, hardwareCode, countFrames
     global countPositions, saveAutofocusCoef
+
+    print(msg.topic, msg.payload)
 
     if msg.topic == MOVEFIELDX_TOPIC:
         if int(msg.payload) == 1:
@@ -190,7 +194,7 @@ if __name__ == "__main__":
     # Global variables
     global stepsz, time_
     global procZUp, procZDown
-    stepsz = 200
+    stepsz = 5
     time_ = 2000
     procZUp = Process(target = zUp)
     procZDown = Process(target = zDown)
