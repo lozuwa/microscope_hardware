@@ -52,8 +52,8 @@ def moveZ():
     return "done"
 
 def keepAlive():
-    pass
-    time.sleep(10)
+    publishMessage("/microscope", "keep alive")
+    time.sleep(60)
 
 def timestamp():
     now = datetime.datetime
@@ -202,4 +202,7 @@ if __name__ == "__main__":
     client.connect("192.168.3.193", 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
-    client.loop_forever()
+    client.loop_start()
+
+    while(1):
+        keepAlive()

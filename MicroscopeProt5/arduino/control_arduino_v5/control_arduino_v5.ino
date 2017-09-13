@@ -1,4 +1,4 @@
-#define stepsX 2
+r#define stepsX 2
 #define direccionX 5
 #define stepsZ 3
 #define direccionZ 6
