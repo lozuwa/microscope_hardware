@@ -186,7 +186,7 @@ if __name__ == "__main__":
     global procZUp, procZDown
     stepsz = 200
     time_ = 2000
-    enable = False
+    enable = True
     procZUp = Process(target = zUp)
     procZDown = Process(target = zDown)
     # Autofocus variables
