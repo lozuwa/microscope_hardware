@@ -229,6 +229,7 @@ if __name__ == '__main__':
 
     if sys.argv[1] == "1":
         ID = "pfm'S pc"
+        #BROKER = "192.168.3.174"
         BROKER = "192.168.3.193"
         PORT = 1883
     elif sys.argv[1] == "2":
@@ -249,7 +250,6 @@ if __name__ == '__main__':
     proc_y_back = Process(target=y_backward)
     proc_x_left = Process(target=x_left)
     proc_x_right = Process(target=x_right)
-
     client.connect(BROKER, PORT, 60)
     client.on_connect = on_connect
     client.on_message = on_message
