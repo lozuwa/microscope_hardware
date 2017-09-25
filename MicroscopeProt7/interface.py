@@ -96,17 +96,17 @@ class axisMovement:
 
 	def moveFieldY(self, dir):
 		if dir == 0:
-			self.y(10,0,5000)
+			self.y(10, 0, 5000)
 		elif dir == 1:
-			self.y(10,1,5000)
+			self.y(10, 1, 5000)
 		else:
 			pass
 
 	def moveFieldX(self, dir):
 		if dir == 0:
-			self.x(10,0,5000)
+			self.x(10, 0, 5000)
 		elif dir == 1:
-			self.x(10,1,5000)
+			self.x(10, 1, 5000)
 		else:
 			pass
 

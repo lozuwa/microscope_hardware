@@ -208,7 +208,7 @@ if __name__ == "__main__":
     saveAutofocusCoef = []
 
     #client.connect("test.mosquitto.org", 1883, 60)
-    client.connect("192.168.3.193", 1883, 60)
+    client.connect("192.168.0.104", 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
