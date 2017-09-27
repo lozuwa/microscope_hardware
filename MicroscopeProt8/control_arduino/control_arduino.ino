@@ -121,56 +121,49 @@ void enableLed(int brillo) {
   */
   digitalWrite(luz, brillo);
 }
-
+int t = 0;
+int d = 0;
 void z(int pasos, int direccion, int timpo) {
-  /** Function that controls the movement of the motor in the Z axis
-    :param pasos: input int that defines the number of steps
-    :param direccion: input int that defines the direction to move
-    :param timpo: input int that defines the amount of delay in
-                  microseconds for each movement of the motor
-  */
-  /** Variables */
   bool movementState = false;
-  bool homeState = false;
-  bool topState = false;
-  bool bottomState = false;
-  /** Set direction and enable motor */
-  digitalWrite(direccionZ, direccion);
+  
+  
+  digitalWrite(direccionZ,direccion);
+  
   digitalWrite(enableZ, 0);
   for (int i = 0; i < pasos; i++) {
-    
-    /** If the autofocus top button is pressed */
     if (digitalRead(endZt) == 1 and direccion == 1) {
       Serial.write("d");
       movementState = true;
+      t++;
       break;
-      topState = true;
     }
-    /** If the autofocus bottom button is pressed */
     else if (digitalRead(endZd) == 1 and direccion == 0) {
       Serial.write("c");
       movementState = true;
+      d++;
       break;
-      bottomState = true;
     }
-    /** If movement is allowed */
-    else {
-      Serial.write(bottomState);
+    else{
       digitalWrite(stepsZ, 1);
       delayMicroseconds(timpo);
       digitalWrite(stepsZ, 0);
       delayMicroseconds(timpo);
     }
   }
-  /** Response */
   if (movementState == false) {
     Serial.write("o");
+    t=0;
+    d=0;
   }
-  else {
-    //continue;
+  else if (movementState == true and (t == 1 or d == 1)) {
+    for (int i = 0; i < 50; i++) {
+      digitalWrite(stepsZ, 1);
+      delayMicroseconds(timpo);
+      digitalWrite(stepsZ, 0);
+      delayMicroseconds(timpo);
+    }
   }
-  /** Disable motor */
-  digitalWrite(enableZ, 1);
+  //digitalWrite(enableZ, 1);
 }
 
 void y(int pasos, int direccion, int timpo) {
