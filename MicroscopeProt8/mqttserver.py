@@ -19,40 +19,14 @@ import time
 import datetime
 # Tensor manipulation
 import numpy as np
-# Thread
-from multiprocessing import Process
-from multiprocessing import Pool
 # Supporting libraries
 from interface import *
 from autofocus import *
 from utils import *
+from ops import *
 
 # Initialize mqtt client
 client = mqtt.Client()
-
-# Instantiate classes
-PORT = sys.argv[1]
-axMov = axisMovement(port = int(PORT))
-
-# Support functions
-def zUp():
-    """
-    """
-    global stepsz
-    while(1):
-        #print("zup ", os.getpid())
-        axMov.zResponse(stepsz, 1, time_)
-        time.sleep(0.01)
-
-def zDown():
-    """
-
-    """
-    global stepsz
-    while(1):
-        #print("zdown ", os.getpid())
-        axMov.zResponse(stepsz, 0, time_)
-        time.sleep(0.01)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -73,54 +47,29 @@ def on_connect(client, userdata, flags, rc):
 
 # Reply messages
 def on_message(client, userdata, msg):
-    global stepsz, time_
+    global STEPSZ, TIME
     global procZUp, procZDown
     global autofocusState, hardwareCode, countFrames
     global countPositions, saveAutofocusCoef
-
+    # Feedback
     print(msg.topic, msg.payload)
-
+    # Conditions
     if msg.topic == MOVEFIELDX_TOPIC:
-        if int(msg.payload) == 1:
-            axMov.moveFieldX(1)
-        elif int(msg.payload) == 0:
-            axMov.moveFieldX(0)
-        else:
-            pass
+        moveFieldX(msg.payload)
     elif msg.topic == MOVEFIELDY_TOPIC:
-        if int(msg.payload) == 1:
-            axMov.moveFieldY(1)
-        elif int(msg.payload) == 0:
-            axMov.moveFieldY(0)
-        else:
-            pass
+        moveFieldY(msg.payload)
     elif msg.topic == HOME_TOPIC:
-        axMov.home()
+        home()
     elif msg.topic == STEPS_TOPIC:
-        stepsz = float(msg.payload)*3
-        if stepsz <= 30:
-            stepsz = 30
-        else:
-            pass
-        print(msg.topic, stepsz)
+        STEPSZ = float(msg.payload)*3
     elif msg.topic == LED_TOPIC:
-        if int(msg.payload) == 0 :
-            axMov.led.setState(0)
-            ledState = axMov.led.getState()
-            axMov.writeLed(ledState)
-        elif int(msg.payload) == 1:
-            axMov.led.setState(1)
-            ledState = axMov.led.getState()
-            axMov.writeLed(ledState)
-        else:
-            pass
-        print(msg.topic, msg.payload)
+        led(msg.payload)
     ##################################################################################
     elif msg.topic == AUTOFOCUS_TOPIC:
         print(msg.topic, msg.payload)
         if msg.payload.decode("utf-8") == "start":
             print("****************************Autofocus sequence****************************")
-            axMov.homeZ()
+            homeZ()
             time.sleep(0.01)
             autofocusState = True
             countFrames = 0
@@ -142,7 +91,7 @@ def on_message(client, userdata, msg):
     ##################################################################################
     elif msg.topic == VARIANCE_TOPIC:
         if autofocusState:
-            if hardwareCode != "u":
+            if hardwareCode != "t":
                 if countFrames < 1:
                     print(msg.payload)
                     saveAutofocusCoef.append((countPositions, float(msg.payload)))
@@ -158,28 +107,32 @@ def on_message(client, userdata, msg):
                 hardwareCode = "o"
                 publishMessage(AUTOFOCUS_TOPIC, "stop")
     ##################################################################################
+    elif msg.topic == "/automatic":
+        # Home
+        homeXY()
+        # Direction x
+        directionX = True
+        # Start at home
+        for i in range(300):
+            # Move X
+            if directionX:
+                moveFieldX(1)
+            else:
+                movefieldX(0)
+            # Move Y
+            if (i % 50 == 0):
+                moveFieldY(1)
+                # Invert X direction
+                directionX = not directionX
+            else:
+                pass
+    ##################################################################################
     elif msg.topic == ZUP_TOPIC:
-        if int(msg.payload) == 1:
-            print(msg.topic, int(msg.payload))
-            procZUp.start()
-        elif int(msg.payload) == 2:
-            try:
-                print(msg.topic, int(msg.payload))
-                procZUp.terminate()
-                procZUp = Process(target=zUp)
-            except:
-                print("There was a problem with zu process")
+        moveFieldZUp(msg.payload)
     elif msg.topic == ZDOWN_TOPIC:
-        if int(msg.payload) == 1:
-            print(msg.topic, int(msg.payload))
-            procZDown.start()
-        elif int(msg.payload) == 2:
-            try:
-                print(msg.topic, int(msg.payload))
-                procZDown.terminate()
-                procZDown = Process(target=zDown)
-            except:
-                print("There was a problem with zd process")
+        moveFieldZDown(msg.payload)
+    else:
+        pass
 
 def publishMessage(topic,
                     message,
@@ -198,15 +151,6 @@ def publishMessage(topic,
     client.publish(topic, message, qos)
 
 if __name__ == "__main__":
-    # Global variables
-    global stepsz
-    global time_
-    global procZUp
-    global procZDown
-    stepsz = 5
-    time_ = 2000
-    procZUp = Process(target = zUp)
-    procZDown = Process(target = zDown)
     # Autofocus variables
     global autofocusState
     global hardwareCode
@@ -219,8 +163,8 @@ if __name__ == "__main__":
     countPositions = 0
     saveAutofocusCoef = []
 
-    #client.connect("test.mosquitto.org", 1883, 60)
-    client.connect("192.168.3.193", 1883, 60)
+    # Connect to mqtt client
+    client.connect(IP, PORT, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()

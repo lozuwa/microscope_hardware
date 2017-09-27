@@ -108,7 +108,8 @@ class Led:
 		"""
 		self.state = int(state)
 
-	def setState(self, state):
+	def setState(self,\
+					state):
 		self.state = int(state)
 
 	def getState(self):
