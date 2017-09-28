@@ -58,7 +58,7 @@ def keepAlive():
 
 def timestamp():
     now = datetime.datetime
-    return str(now.minute)+str(now.second)+str(now.microsecond)
+    return str(now.minute) + str(now.second) + str(now.microsecond)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -83,9 +83,8 @@ def on_message(client, userdata, msg):
     global procZUp, procZDown
     global autofocusState, hardwareCode, countFrames
     global countPositions, saveAutofocusCoef
-
     print(msg.topic, msg.payload)
-
+    # Movement field
     if msg.topic == MOVEFIELDX_TOPIC:
         if int(msg.payload) == 1:
             axMov.moveFieldX(1)
@@ -110,7 +109,7 @@ def on_message(client, userdata, msg):
             pass
         print(msg.topic, stepsz)
     elif msg.topic == LED_TOPIC:
-        if int(msg.payload) == 0 :
+        if int(msg.payload) == 0:
             axMov.led.set_state(0)
             ledState = axMov.led.get_state()
             axMov.writeLed(ledState)
@@ -186,29 +185,35 @@ def on_message(client, userdata, msg):
                 procZDown = Process(target=zDown)
             except:
                 print("There was a problem with zd process")
+    else:
+        pass
 
 def publishMessage(topic, message, qos = 2):
     client.publish(topic, str(message), qos)
 
 if __name__ == "__main__":
     # Global variables
-    global stepsz, time_
-    global procZUp, procZDown
+    global stepsz
+    global time_
+    global procZUp
+    global procZDown
     stepsz = 5
     time_ = 2000
     procZUp = Process(target = zUp)
     procZDown = Process(target = zDown)
     # Autofocus variables
-    global autofocusState, hardwareCode, countFrames
-    global countPositions, saveAutofocusCoef
+    global autofocusState
+    global hardwareCode
+    global countFrames
+    global countPositions
+    global saveAutofocusCoef
     autofocusState = False
     hardwareCode = "o"
     countFrames = 0
     countPositions = 0
     saveAutofocusCoef = []
-
     #client.connect("test.mosquitto.org", 1883, 60)
-    client.connect("192.168.3.193", 1883, 60)
+    client.connect("192.168.0.104", 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
