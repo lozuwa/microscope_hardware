@@ -110,7 +110,7 @@ def on_message(client, userdata, msg):
             pass
         print(msg.topic, stepsz)
     elif msg.topic == LED_TOPIC:
-        if int(msg.payload) == 0 :
+        if int(msg.payload) == 0:
             axMov.led.set_state(0)
             ledState = axMov.led.get_state()
             axMov.writeLed(ledState)
@@ -192,8 +192,10 @@ def publishMessage(topic, message, qos = 2):
 
 if __name__ == "__main__":
     # Global variables
-    global stepsz, time_
-    global procZUp, procZDown
+    global stepsz
+    global time_
+    global procZUp
+    global procZDown
     stepsz = 5
     time_ = 2000
     procZUp = Process(target = zUp)

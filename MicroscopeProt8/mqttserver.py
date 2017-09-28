@@ -1,64 +1,32 @@
+"""
+Author: Rodrigo Loza
+Company: pfm 
+Description: Main program for microscope's hardware
+Documentation:
+* /zu -> controls the z axis to move up
+* /zd -> controls the z axis to move down
+* /led -> turns on the led
+* /steps -> controls the number of steps for XY axis
+* /home -> resets the motors of the microscope
+* /movefieldx -> controls the x axis
+* /movefieldy -> controls the y axis
+"""
 # MQTT
 import paho.mqtt.client as mqtt
-# Supporting libraries
-import os, time, numpy as np
+# General purpose
+import os
+import time
 import datetime
+# Tensor manipulation
+import numpy as np
+# Supporting libraries
 from interface import *
 from autofocus import *
-# Thread
-from multiprocessing import Process
-from multiprocessing import Pool
-
-# Constant variables
-AUTOFOCUS_TOPIC = "/autofocus"
-VARIANCE_TOPIC = "/variance"
-LED_TOPIC = "/led"
-MOVEFIELDX_TOPIC = "/movefieldx"
-MOVEFIELDY_TOPIC = "/movefieldy"
-STEPS_TOPIC = "/steps"
-HOME_TOPIC = "/home"
-ZDOWN_TOPIC = "/zd"
-ZUP_TOPIC = "/zu"
+from utils import *
+from ops import *
 
 # Initialize mqtt client
 client = mqtt.Client()
-
-# Instantiate classes
-axMov = axisMovement(port = int(sys.argv[1]))
-
-# Support functions
-def zUp():
-    global stepsz
-    while(1):
-        #print("zup ", os.getpid())
-        axMov.zResponse(stepsz, 1, time_)
-        time.sleep(0.01)
-
-def zDown():
-    global stepsz
-    while(1):
-        #print("zdown ", os.getpid())
-        axMov.zResponse(stepsz, 0, time_)
-        time.sleep(0.01)
-
-def moveZ():
-    hardwareCode = "i"
-    # Move motor
-    while(True):
-        hardwareCode = axMov.zResponse(250,1,250)
-        if hardwareCode == "u":
-            Process(target = publishMessage, args = (AUTOFOCUS_TOPIC, "stop")).start()
-            break
-        time.sleep(0.01)
-    return "done"
-
-def keepAlive():
-    pass
-    time.sleep(10)
-
-def timestamp():
-    now = datetime.datetime
-    return str(now.minute) + str(now.second) + str(now.microsecond)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -79,53 +47,27 @@ def on_connect(client, userdata, flags, rc):
 
 # Reply messages
 def on_message(client, userdata, msg):
-    global stepsz, time_
+    global STEPSZ, TIME
     global procZUp, procZDown
     global autofocusState, hardwareCode, countFrames
     global countPositions, saveAutofocusCoef
     print(msg.topic, msg.payload)
-    # Movement field
     if msg.topic == MOVEFIELDX_TOPIC:
-        if int(msg.payload) == 1:
-            axMov.moveFieldX(1)
-        elif int(msg.payload) == 0:
-            axMov.moveFieldX(0)
-        else:
-            pass
+        moveFieldX(msg.payload)
     elif msg.topic == MOVEFIELDY_TOPIC:
-        if int(msg.payload) == 1:
-            axMov.moveFieldY(1)
-        elif int(msg.payload) == 0:
-            axMov.moveFieldY(0)
-        else:
-            pass
+        moveFieldY(msg.payload)
     elif msg.topic == HOME_TOPIC:
-        axMov.home()
+        home()
     elif msg.topic == STEPS_TOPIC:
-        stepsz = float(msg.payload)*3
-        if stepsz <= 30:
-            stepsz = 30
-        else:
-            pass
-        print(msg.topic, stepsz)
+        STEPSZ = float(msg.payload)*3
     elif msg.topic == LED_TOPIC:
-        if int(msg.payload) == 0:
-            axMov.led.set_state(0)
-            ledState = axMov.led.get_state()
-            axMov.writeLed(ledState)
-        elif int(msg.payload) == 1:
-            axMov.led.set_state(1)
-            ledState = axMov.led.get_state()
-            axMov.writeLed(ledState)
-        else:
-            pass
-        print(msg.topic, msg.payload)
+        led(msg.payload)
     ##################################################################################
     elif msg.topic == AUTOFOCUS_TOPIC:
         print(msg.topic, msg.payload)
         if msg.payload.decode("utf-8") == "start":
             print("****************************Autofocus sequence****************************")
-            axMov.homeZ()
+            homeZ()
             time.sleep(0.01)
             autofocusState = True
             countFrames = 0
@@ -147,7 +89,7 @@ def on_message(client, userdata, msg):
     ##################################################################################
     elif msg.topic == VARIANCE_TOPIC:
         if autofocusState:
-            if hardwareCode != "u":
+            if hardwareCode != "t":
                 if countFrames < 1:
                     print(msg.payload)
                     saveAutofocusCoef.append((countPositions, float(msg.payload)))
@@ -163,44 +105,50 @@ def on_message(client, userdata, msg):
                 hardwareCode = "o"
                 publishMessage(AUTOFOCUS_TOPIC, "stop")
     ##################################################################################
+    elif msg.topic == "/automatic":
+        # Home
+        homeXY()
+        # Direction x
+        directionX = True
+        # Start at home
+        for i in range(300):
+            # Move X
+            if directionX:
+                moveFieldX(1)
+            else:
+                movefieldX(0)
+            # Move Y
+            if (i % 50 == 0):
+                moveFieldY(1)
+                # Invert X direction
+                directionX = not directionX
+            else:
+                pass
+    ##################################################################################
     elif msg.topic == ZUP_TOPIC:
-        if int(msg.payload) == 1:
-            print(msg.topic, int(msg.payload))
-            procZUp.start()
-        elif int(msg.payload) == 2:
-            try:
-                print(msg.topic, int(msg.payload))
-                procZUp.terminate()
-                procZUp = Process(target=zUp)
-            except:
-                print("There was a problem with zu process")
+        moveFieldZUp(msg.payload)
     elif msg.topic == ZDOWN_TOPIC:
-        if int(msg.payload) == 1:
-            print(msg.topic, int(msg.payload))
-            procZDown.start()
-        elif int(msg.payload) == 2:
-            try:
-                print(msg.topic, int(msg.payload))
-                procZDown.terminate()
-                procZDown = Process(target=zDown)
-            except:
-                print("There was a problem with zd process")
+        moveFieldZDown(msg.payload)
     else:
         pass
 
-def publishMessage(topic, message, qos = 2):
-    client.publish(topic, str(message), qos)
+def publishMessage(topic,
+                    message,
+                    qos = 2):
+    """
+    Publishes a mqtt message
+    :param topic: input string that defines the target topic
+    :param message: input string that denotes the content of the message
+    :param qos: input int that defines the type of qos for the mqtt communication
+    """
+    # Assert variables
+    assert type(topic) == str, VARIABLE_IS_NOT_STR
+    assert type(message) == str, VARIABLE_IS_NOT_STR
+    assert type(qos) == int, VARIABLE_IS_NOT_INT
+    # Publish message
+    client.publish(topic, message, qos)
 
 if __name__ == "__main__":
-    # Global variables
-    global stepsz
-    global time_
-    global procZUp
-    global procZDown
-    stepsz = 5
-    time_ = 2000
-    procZUp = Process(target = zUp)
-    procZDown = Process(target = zDown)
     # Autofocus variables
     global autofocusState
     global hardwareCode
@@ -212,8 +160,9 @@ if __name__ == "__main__":
     countFrames = 0
     countPositions = 0
     saveAutofocusCoef = []
-    #client.connect("test.mosquitto.org", 1883, 60)
-    client.connect("192.168.0.104", 1883, 60)
+
+    # Connect to mqtt client
+    client.connect(IP, PORT, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()

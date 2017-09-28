@@ -1,21 +1,44 @@
-#define stepsX 2
-#define stepsY 3
-#define stepsZ 4
-#define direccionX 5
-#define direccionY 6
-#define direccionZ 7
-#define enableX A4
+/**
+  Author: Khalil Nallar
+  Company: pfm medical
+  Description: Script that controls the logic on the microscope's hardware.
+  Documentation:
+  ------------
+   Z axis
+  ------------
+  - h -> response when the home top button is pressed
+  - d -> response when the autofocus top button is pressed
+  - c -> response when the autofocus bottom button is pressed
+  ------------
+   Y axis
+  ------------
+  -
+  ------------
+   X axis
+  ------------
+  -
+*/
 #define enableY A5
+#define enableX A4
 #define enableZ 8
-#define endX 9
-#define endY 10
-#define endZc A0
+#define direccionY 5
+#define direccionX 6
+#define direccionZ 7
+#define stepsY 2
+#define stepsX 3
+#define stepsZ 4
+#define endY 9
+#define endX 10
+#define endZt A0
+#define endZc A2
 #define endZd A1
-#define endZt A2
 #define luz A3
 
-
-String eje, pasos, direccion, timpo, brillo;
+String eje = "";
+String pasos = "";
+String direccion = "";
+String timpo = "";
+String brillo = "";
 byte brillo_actual = 0;
 
 void setup() {
@@ -49,14 +72,14 @@ void setup() {
 }
 
 void loop() {
+  /** Loop function */
+  /** Clean serial */
   Serial.flush();
-
-  //Serial.println(digitalRead(endZt));
-  //Serial.println(digitalRead(endZd);
-  
+  /** Serial available */
+  //Serial.println(digitalRead(endZc));
   if (Serial.available() > 0) {
     String tx = Serial.readString();
-
+    /** Parse the strings */
     eje = tx.substring(0, tx.indexOf(","));
     tx = tx.substring(eje.length() + 1);
     pasos = tx.substring(0, tx.indexOf(","));
@@ -66,7 +89,7 @@ void loop() {
     timpo = tx.substring(0, tx.indexOf(","));
     tx = tx.substring(timpo.length() + 1);
     brillo = tx.substring(0, tx.indexOf(","));
-
+    /** Conditions for parsing */
     if (eje == "x") {
       //Serial.println("moviendo eje x, " + pasos +" pasos, en direccion " + direccion + ",en " + timpo +" milisegundos por paso");
       x(pasos.toInt(), direccion.toInt(), timpo.toInt());
@@ -80,52 +103,120 @@ void loop() {
       z(pasos.toInt(), direccion.toInt(), timpo.toInt());
     }
     else if (brillo.toInt() != brillo_actual) {
-      brillo_(brillo.toInt());
+      enableLed(brillo.toInt());
       brillo_actual = brillo.toInt();
-      //Serial.println("ok");
     }
     else {
       return;
     }
   }
+  else {
+    //continue;
+  }
 }
-void brillo_(int brillo) {
+
+void enableLed(int brillo) {
+  /** Function that controls the led state
+    :param brillow: input int that defines the led state
+  */
   digitalWrite(luz, brillo);
 }
+int t = 0;
+int d = 0;
 void z(int pasos, int direccion, int timpo) {
-  digitalWrite(direccionZ, direccion);
+  bool movementState = false;
+  
+  
+  digitalWrite(direccionZ,direccion);
+  
   digitalWrite(enableZ, 0);
   for (int i = 0; i < pasos; i++) {
-    digitalWrite(stepsZ, 1);
-    delayMicroseconds(timpo);
-    digitalWrite(stepsZ, 0);
-    delayMicroseconds(timpo);
+    if (digitalRead(endZt) == 1 and direccion == 1) {
+      Serial.write("d");
+      movementState = true;
+      t++;
+      break;
+    }
+    else if (digitalRead(endZd) == 1 and direccion == 0) {
+      Serial.write("c");
+      movementState = true;
+      d++;
+      break;
+    }
+    else{
+      digitalWrite(stepsZ, 1);
+      delayMicroseconds(timpo);
+      digitalWrite(stepsZ, 0);
+      delayMicroseconds(timpo);
+    }
   }
-
-  //delay(500);
-  digitalWrite(enableZ, 1);
-  Serial.write("o");
+  if (movementState == false) {
+    Serial.write("o");
+    t=0;
+    d=0;
+  }
+  else if (movementState == true and (t == 1 or d == 1)) {
+    for (int i = 0; i < 50; i++) {
+      digitalWrite(stepsZ, 1);
+      delayMicroseconds(timpo);
+      digitalWrite(stepsZ, 0);
+      delayMicroseconds(timpo);
+    }
+  }
+  //digitalWrite(enableZ, 1);
 }
+
 void y(int pasos, int direccion, int timpo) {
+  /** Function that controls the movement of the motor in the Y axis
+    :param pasos: input int that defines the number of steps
+    :param direccion: input int that defines the direction to move
+    :param timpo: input int that defines the amount of delay in
+                  microseconds for each movement of the motor
+  */
+  /** Set direction and enable motor */
   digitalWrite(enableY, 0);
   digitalWrite(direccionY, direccion);
   for (int i = 0; i < pasos; i++) {
-    digitalWrite(stepsY, 1);
-    delayMicroseconds(timpo);
-    digitalWrite(stepsY, 0);
-    delayMicroseconds(timpo);
+    /** If the endstop is pressed */
+    if (direccion == 1 && digitalRead(endY) == 0) {
+      break;
+    }
+    /** If momevement is allowed */
+    else {
+      digitalWrite(stepsY, 1);
+      delayMicroseconds(timpo);
+      digitalWrite(stepsY, 0);
+      delayMicroseconds(timpo);
+    }
   }
+  /** Disable motor */
   digitalWrite(enableY , 1);
 }
+
 void x(int pasos, int direccion, int timpo) {
+  /** Function that controls the movement of the motor in the X axis
+    :param pasos: input int that defines the number of steps
+    :param direccion: input int that defines the direction to move
+    :param timpo: input int that defines the amount of delay in
+                  microseconds for each movement of the motor
+  */
+  /** Set direction and enable motor */
+  //Serial.println(digitalRead(endX));
   digitalWrite(enableX, 0);
   digitalWrite(direccionX, direccion);
   for (int i = 0; i < pasos; i++) {
-    digitalWrite(stepsX, 1);
-    delayMicroseconds(timpo);
-    digitalWrite(stepsX, 0);
-    delayMicroseconds(timpo);
+    /** If the motor has reached the endstop */
+    if (direccion == 1 && digitalRead(endX) == 0) {
+      break;
+    }
+    /** If movement is allowed */
+    else {
+      digitalWrite(stepsX, 1);
+      delayMicroseconds(timpo);
+      digitalWrite(stepsX, 0);
+      delayMicroseconds(timpo);
+    }
   }
+  /** Disable motor */
   digitalWrite(enableX , 1);
 }
-
