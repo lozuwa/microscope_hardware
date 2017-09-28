@@ -44,6 +44,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("/variance")
     # Microscope
     client.subscribe("/microscope")
+    # Automatic
+    client.subscribe("/automatic")
 
 # Reply messages
 def on_message(client, userdata, msg):
@@ -112,6 +114,7 @@ def on_message(client, userdata, msg):
         directionX = True
         # Start at home
         for i in range(300):
+            print(i)
             # Move X
             if directionX:
                 moveFieldX(1)
