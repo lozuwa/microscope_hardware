@@ -40,24 +40,24 @@ def on_connect(client, userdata, flags, rc):
 # Reply messages
 def on_message(client, userdata, msg):
     global counter
-    print(msg.topic, msg.payload)
     if msg.topic == "/automatic":
         if msg.payload.decode("utf-8") == "start":
             print("Starting autofocus sequence ...")
             time.sleep(1)
-            publishMessage("/autofocus", "get")
+            publishMessage("/variance", "get")
             counter = 0
         else:
             pass
     elif msg.topic == "/variance":
-        if counter <= 10:
-            print("Received message: ", msg.payload)
-            time.sleep(1)
-            print("Publishing get autofocus")
-            publishMessage("/autofocus", "get")
-            counter += 1
-        else:
-            print("Finished ", counter)
+        if msg.payload.decode("utf-8").split(";")[0] == "message":
+            if counter <= 100:
+                print("Received message: ", msg.payload, counter)
+                time.sleep(1)
+                print("Publishing get autofocus")
+                publishMessage("/variance", "get")
+                counter += 1
+            else:
+                print("Finished ", counter)
     else:
         pass
     
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     counter = 0
     stateStop = False
     #client.connect("test.mosquitto.org", 1883, 60)
-    client.connect("192.168.0.102", 1883, 60)
+    client.connect("192.168.0.104", 1883, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
