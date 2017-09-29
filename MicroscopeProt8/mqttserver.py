@@ -113,18 +113,28 @@ def on_message(client, userdata, msg):
         # Direction x
         directionX = True
         # Start at home
-        for i in range(300):
-            print(i)
+        for i in range(1600):
+            publishMessage(topic = "/microscope",\
+                            message = "pic;sample",\
+                            qos = 2)
             # Move X
             if directionX:
                 moveFieldX(1)
             else:
-                movefieldX(0)
+                moveFieldX(0)
             # Move Y
             if (i % 50 == 0):
-                moveFieldY(1)
+                moveFieldY(0)
+                moveFieldY(0)
                 # Invert X direction
                 directionX = not directionX
+                # Take picture
+                publishMessage(topic = "/microscope",\
+                            message = "pic;sample",\
+                            qos = 2)
+            elif (i % 75 == 0):
+                pass
+                #autofocus()
             else:
                 pass
     ##################################################################################
