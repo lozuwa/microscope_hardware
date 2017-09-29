@@ -34,7 +34,7 @@ class serialPort:
 		assert type(portNumber) == int, VARIABLE_IS_NOT_INT
 		assert type(baudrate) == int, VARIABLE_IS_NOT_INT
 		# Instantiate variables
-		self.portNumber = "".join(["COM", str(portNumber)])
+		self.portNumber = "".join(["/dev/ttyACM", str(portNumber)])
 		self.baudrate = int(baudrate)
 		self.startPort()
 

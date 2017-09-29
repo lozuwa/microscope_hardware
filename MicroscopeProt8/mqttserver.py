@@ -66,46 +66,10 @@ def on_message(client, userdata, msg):
         led(msg.payload)
     ##################################################################################
     elif msg.topic == AUTOFOCUS_TOPIC:
-        print(msg.topic, msg.payload)
-        if msg.payload.decode("utf-8") == "start":
-            print("****************************Autofocus sequence****************************")
-            homeZ()
-            time.sleep(0.01)
-            autofocusState = True
-            countFrames = 0
-            publishMessage(AUTOFOCUS_TOPIC, "get")
-        elif msg.payload.decode("utf-8") == "stop":
-            print("***", saveAutofocusCoef)
-            aut = autofocus(saveAutofocusCoef)
-            goBack = aut.focus()
-            print("Go back ", goBack)
-            time.sleep(1)
-            for i in range(goBack):
-                time.sleep(0.2)
-                axMov.zResponse(350, 0, 250)
-            countPositions = 0
-            saveAutofocusCoef = []
-            print("****************************End autofocus sequence****************************")
-        else:
-            pass
+        pass
     ##################################################################################
     elif msg.topic == VARIANCE_TOPIC:
-        if autofocusState:
-            if hardwareCode != "t":
-                if countFrames < 1:
-                    print(msg.payload)
-                    saveAutofocusCoef.append((countPositions, float(msg.payload)))
-                    countFrames += 1
-                else:
-                    hardwareCode = axMov.zResponse(250, 1, 250)
-                    publishMessage(AUTOFOCUS_TOPIC, "get")
-                    print("Hardware (mqtt) code: {}".format(hardwareCode))
-                    countPositions += 1
-                    countFrames = 0
-            else:
-                autofocusState = False
-                hardwareCode = "o"
-                publishMessage(AUTOFOCUS_TOPIC, "stop")
+        pass
     ##################################################################################
     elif msg.topic == "/automatic":
         # Home
@@ -174,13 +138,8 @@ if __name__ == "__main__":
     countPositions = 0
     saveAutofocusCoef = []
 
-<<<<<<< HEAD
-    #client.connect("test.mosquitto.org", 1883, 60)
-    client.connect("192.168.0.104", 1883, 60)
-=======
     # Connect to mqtt client
     client.connect(IP, PORT, 60)
->>>>>>> b1d929f87f56d56696fc09815362b6c959e659c7
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()

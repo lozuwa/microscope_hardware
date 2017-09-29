@@ -1,16 +1,15 @@
 """
 Author: Rodrigo Loza
 Company: pfm 
-Description: Main program for microscope's hardware
-Documentation:
-* /zu -> controls the z axis to move up
-* /zd -> controls the z axis to move down
-* /led -> turns on the led
-* /steps -> controls the number of steps for XY axis
-* /home -> resets the motors of the microscope
-* /movefieldx -> controls the x axis
-* /movefieldy -> controls the y axis
+Description: Dummy for autofocus control
+Algorithm:
+1. Send start to /autofocus
+2. Script starts a process that sends a /variance get to the smartphone 
+   retrieving the current variance of the laplace transform of the image 
+3. Once each message is received, the motor is moved
+4. Stream ends when counter is reached
 """
+
 # MQTT
 import paho.mqtt.client as mqtt
 # General purpose
@@ -50,9 +49,9 @@ def on_message(client, userdata, msg):
             pass
     elif msg.topic == "/variance":
         if msg.payload.decode("utf-8").split(";")[0] == "message":
-            if counter <= 100:
+            if counter <= 20:
                 print("Received message: ", msg.payload, counter)
-                time.sleep(1)
+                time.sleep(0.1)
                 print("Publishing get autofocus")
                 publishMessage("/variance", "get")
                 counter += 1
