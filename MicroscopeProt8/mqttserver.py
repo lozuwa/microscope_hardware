@@ -44,6 +44,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("/variance")
     # Microscope
     client.subscribe("/microscope")
+    # Automatic
+    client.subscribe("/automatic")
 
 # Reply messages
 def on_message(client, userdata, msg):
