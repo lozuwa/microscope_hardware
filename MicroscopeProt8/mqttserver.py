@@ -49,11 +49,9 @@ def on_connect(client, userdata, flags, rc):
 
 # Reply messages
 def on_message(client, userdata, msg):
-    global STEPSZ, TIME
-    global procZUp, procZDown
-    global autofocusState, hardwareCode, countFrames
-    global countPositions, saveAutofocusCoef
-    print(msg.topic, msg.payload)
+    global counter
+    global scanning
+    #print(msg.topic, msg.payload)
     if msg.topic == MOVEFIELDX_TOPIC:
         moveFieldX(msg.payload)
     elif msg.topic == MOVEFIELDY_TOPIC:
@@ -66,46 +64,48 @@ def on_message(client, userdata, msg):
         led(msg.payload)
     ##################################################################################
     elif msg.topic == AUTOFOCUS_TOPIC:
-        print(msg.topic, msg.payload)
         if msg.payload.decode("utf-8") == "start":
-            print("****************************Autofocus sequence****************************")
-            homeZ()
-            time.sleep(0.01)
-            autofocusState = True
-            countFrames = 0
-            publishMessage(AUTOFOCUS_TOPIC, "get")
-        elif msg.payload.decode("utf-8") == "stop":
-            print("***", saveAutofocusCoef)
-            aut = autofocus(saveAutofocusCoef)
-            goBack = aut.focus()
-            print("Go back ", goBack)
+            print("Starting autofocus sequence ...")
+            # 1. Restart z motor to bottom button
+            moveFieldZDown("2000")
             time.sleep(1)
-            for i in range(goBack):
-                time.sleep(0.2)
-                axMov.zResponse(350, 0, 250)
-            countPositions = 0
-            saveAutofocusCoef = []
-            print("****************************End autofocus sequence****************************")
+            # 2. Start scanning
+            publishMessage("/variance", "get")
+            counter = 0
+            scanning = []
+            search = []
         else:
             pass
     ##################################################################################
     elif msg.topic == VARIANCE_TOPIC:
-        if autofocusState:
-            if hardwareCode != "t":
-                if countFrames < 1:
-                    print(msg.payload)
-                    saveAutofocusCoef.append((countPositions, float(msg.payload)))
-                    countFrames += 1
-                else:
-                    hardwareCode = axMov.zResponse(250, 1, 250)
-                    publishMessage(AUTOFOCUS_TOPIC, "get")
-                    print("Hardware (mqtt) code: {}".format(hardwareCode))
-                    countPositions += 1
-                    countFrames = 0
+        if msg.payload.decode("utf-8").split(";")[0] == "message":
+            # 3. Scanning (20 fields)
+            if counter <= 20:
+                # Receive and save values
+                print("Received message: ", msg.payload, counter)
+                scanning.append(msg.payload.decode("utf-8").split(";")[1])
+                time.sleep(0.1)
+                # Move motor up
+                moveZUp()
+                time.sleep(0.5)
+                # Get another value
+                print("Publishing get autofocus")
+                publishMessage("/variance", "get")
+                counter += 1
+            # 4. Search for max value after scanning
             else:
-                autofocusState = False
-                hardwareCode = "o"
-                publishMessage(AUTOFOCUS_TOPIC, "stop")
+                # Receive and save values
+                print("Finished scanning: ", msg.payload, counter)
+                localVal = msg.payload.decode("utf-8").split(";")[1]
+                time.sleep(0.1)
+                # Compare localVal to max index
+                if math.abs(localVal - np.max(scanning)) < 1:
+                    print("Found focus point")
+                else:
+                    moveZDown()
+                    time.sleep(0.5)
+        else:
+            pass
     ##################################################################################
     elif msg.topic == "/automatic":
         # Home
@@ -162,25 +162,13 @@ def publishMessage(topic,
     client.publish(topic, message, qos)
 
 if __name__ == "__main__":
-    # Autofocus variables
-    global autofocusState
-    global hardwareCode
-    global countFrames
-    global countPositions
-    global saveAutofocusCoef
-    autofocusState = False
-    hardwareCode = "o"
-    countFrames = 0
-    countPositions = 0
-    saveAutofocusCoef = []
-
-<<<<<<< HEAD
-    #client.connect("test.mosquitto.org", 1883, 60)
-    client.connect("192.168.0.104", 1883, 60)
-=======
+    # Variables
+    global counter
+    global scanning
+    counter = 0
+    scanning = []
     # Connect to mqtt client
     client.connect(IP, PORT, 60)
->>>>>>> b1d929f87f56d56696fc09815362b6c959e659c7
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()

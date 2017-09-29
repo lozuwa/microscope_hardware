@@ -57,6 +57,18 @@ def zDown():
         axMov.zResponse(STEPSZ, 0, TIME)
         time.sleep(0.01)
 
+def moveZUp():
+    """
+    Moves the z motor up a single quantity of steps
+    """
+    axMov.zResponse(STEPSZ, 1, TIME)
+
+def moveZDown():
+    """
+    Moves the z motor down a single quantity of steps
+    """
+    axMov.zResponse(STEPSZ, 0, TIME)
+
 def moveFieldX(message):
     """
     Function to move the motors in the x axis

@@ -43,6 +43,7 @@ def on_message(client, userdata, msg):
     if msg.topic == "/automatic":
         if msg.payload.decode("utf-8") == "start":
             print("Starting autofocus sequence ...")
+            # Restart z motor to bottom button
             time.sleep(1)
             publishMessage("/variance", "get")
             counter = 0
@@ -50,12 +51,14 @@ def on_message(client, userdata, msg):
             pass
     elif msg.topic == "/variance":
         if msg.payload.decode("utf-8").split(";")[0] == "message":
-            if counter <= 100:
+            # Scanning
+            if counter <= 100: # End stop up
                 print("Received message: ", msg.payload, counter)
-                time.sleep(1)
+                time.sleep(0.1) # Move motor up
                 print("Publishing get autofocus")
                 publishMessage("/variance", "get")
                 counter += 1
+            # Search for max value
             else:
                 print("Finished ", counter)
     else:
@@ -89,3 +92,28 @@ if __name__ == "__main__":
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
+
+"""
+Version 0
+global counter
+    if msg.topic == "/automatic":
+        if msg.payload.decode("utf-8") == "start":
+            print("Starting autofocus sequence ...")
+            time.sleep(1)
+            publishMessage("/variance", "get")
+            counter = 0
+        else:
+            pass
+    elif msg.topic == "/variance":
+        if msg.payload.decode("utf-8").split(";")[0] == "message":
+            if counter <= 100: # End stop up
+                print("Received message: ", msg.payload, counter)
+                time.sleep(0.1) # Move motor up
+                print("Publishing get autofocus")
+                publishMessage("/variance", "get")
+                counter += 1
+            else:
+                print("Finished ", counter)
+    else:
+        pass
+"""

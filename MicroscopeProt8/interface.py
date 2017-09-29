@@ -180,14 +180,6 @@ class axisMovement:
 		print("Hardware code: {}".format(code))
 		return code
 
-	def zUp(self,\
-			steps = 250,\
-			dir = 1,\
-			time_ = 250):
-		self.serPort.write(("zUp,"+str(steps)+","+str(dir)+","+str(time_)).encode())
-		result, code = self.wait()
-		return code
-
 	def moveFieldY(self,\
 					dir):
 		if dir == 0:
@@ -212,12 +204,10 @@ class axisMovement:
 
 	def homeX(self):
 		self.serPort.write("homeX".encode())
-		#self.x(10000, 1, 500)
 		self.wait()
 
 	def homeY(self):
 		self.serPort.write("homeY".encode())
-		#self.y(10000, 1, 500)
 		self.wait()
 
 	def wait(self,\

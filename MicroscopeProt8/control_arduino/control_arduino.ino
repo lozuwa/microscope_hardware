@@ -132,10 +132,7 @@ int t = 0;
 int d = 0;
 void z(int pasos, int direccion, int timpo) {
   bool movementState = false;
-  
-  
   digitalWrite(direccionZ,direccion);
-  
   digitalWrite(enableZ, 0);
   for (int i = 0; i < pasos; i++) {
     if (digitalRead(endZt) == 1 and direccion == 1) {
@@ -159,8 +156,8 @@ void z(int pasos, int direccion, int timpo) {
   }
   if (movementState == false) {
     Serial.write("o");
-    t=0;
-    d=0;
+    t = 0;
+    d = 0;
   }
   else if (movementState == true and (t == 1 or d == 1)) {
     for (int i = 0; i < 50; i++) {
