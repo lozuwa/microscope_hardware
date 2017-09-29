@@ -18,17 +18,17 @@
   ------------
   -
 */
-#define enableX A5
-#define enableY A4
+#define enableY A5
+#define enableX A4
 #define enableZ 8
-#define direccionX 5
-#define direccionY 6
+#define direccionY 5
+#define direccionX 6
 #define direccionZ 7
-#define stepsX 2
-#define stepsY 3
+#define stepsY 2
+#define stepsX 3
 #define stepsZ 4
-#define endX 9
-#define endY 10
+#define endY 9
+#define endX 10
 #define endZt A0
 #define endZc A2
 #define endZd A1
@@ -102,6 +102,12 @@ void loop() {
       //Serial.print("moviendo eje z, " + pasos +" pasos, en direccion " + direccion + ",en " + timpo +" milisegundos por paso");
       z(pasos.toInt(), direccion.toInt(), timpo.toInt());
     }
+    else if (eje == "homeX") {
+      homeX();
+    }
+    else if (eje == "homeY") {
+      homeY();
+    }
     else if (brillo.toInt() != brillo_actual) {
       enableLed(brillo.toInt());
       brillo_actual = brillo.toInt();
@@ -121,6 +127,7 @@ void enableLed(int brillo) {
   */
   digitalWrite(luz, brillo);
 }
+
 int t = 0;
 int d = 0;
 void z(int pasos, int direccion, int timpo) {
@@ -191,6 +198,8 @@ void y(int pasos, int direccion, int timpo) {
   }
   /** Disable motor */
   digitalWrite(enableY , 1);
+  /** Response */
+  Serial.write("o");
 }
 
 void x(int pasos, int direccion, int timpo) {
@@ -219,4 +228,52 @@ void x(int pasos, int direccion, int timpo) {
   }
   /** Disable motor */
   digitalWrite(enableX , 1);
+  /** Response */
+  Serial.write("o");
+}
+
+void homeX() {
+  int timpo = 500;
+  /** Enable motor */
+  digitalWrite(enableX, 0);
+  digitalWrite(direccionX, 1);
+  while(true){
+    if (digitalRead(endX) == 0) {
+      break;
+    }
+    else {
+      digitalWrite(stepsX, 1);
+      delayMicroseconds(timpo);
+      digitalWrite(stepsX, 0);
+      delayMicroseconds(timpo);
+    }
+  }
+  /** Disable motor */
+  digitalWrite(enableX , 1);
+  /** Response */
+  Serial.write("o"); 
+}
+
+void homeY() {
+  int timpo = 500;
+  /** Set direction and enable motor */
+  digitalWrite(enableY, 0);
+  digitalWrite(direccionY, 1);
+  while (true) {
+    /** If the endstop is pressed */
+    if (digitalRead(endY) == 0) {
+      break;
+    }
+    /** If momevement is allowed */
+    else {
+      digitalWrite(stepsY, 1);
+      delayMicroseconds(timpo);
+      digitalWrite(stepsY, 0);
+      delayMicroseconds(timpo);
+    }
+  }
+  /** Disable motor */
+  digitalWrite(enableY , 1);
+  /** Response */
+  Serial.write("o");
 }

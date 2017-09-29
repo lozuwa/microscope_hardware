@@ -28,31 +28,7 @@ from autofocus import *
 from utils import *
 
 # Initialize mqtt client
-client = mqtt.Client()
-
-# Instantiate classes
-PORT = sys.argv[1]
-axMov = axisMovement(port = int(PORT))
-
-# Support functions
-def zUp():
-    """
-    """
-    global stepsz
-    while(1):
-        #print("zup ", os.getpid())
-        axMov.zResponse(stepsz, 1, time_)
-        time.sleep(0.01)
-
-def zDown():
-    """
-
-    """
-    global stepsz
-    while(1):
-        #print("zdown ", os.getpid())
-        axMov.zResponse(stepsz, 0, time_)
-        time.sleep(0.01)
+client = mqtt.Client(clean_session = True)
 
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
@@ -62,15 +38,10 @@ def on_connect(client, userdata, flags, rc):
     
 # Reply messages
 def on_message(client, userdata, msg):
-    if msg.topic == "/autofocus":
-        publishMessage("/autofocus",
-                        "get",
-                        qos = 2)
-    elif msg.topic == "/variance":
-        print(msg.topic, msg.payload)
-    else:
-        pass
-
+    global counter
+    global stateStop
+    print(msg.topic, msg.payload)
+    
 def publishMessage(topic,
                     message,
                     qos = 2):
@@ -85,9 +56,13 @@ def publishMessage(topic,
     assert type(message) == str, VARIABLE_IS_NOT_STR
     assert type(qos) == int, VARIABLE_IS_NOT_INT
     # Publish message
-    client.publish(topic, message, qos)
+    client.publish(topic, message, qos = qos, retain = False)
 
 if __name__ == "__main__":
+    global counter
+    global stateStop
+    counter = 0
+    stateStop = False
     #client.connect("test.mosquitto.org", 1883, 60)
     client.connect("192.168.0.102", 1883, 60)
     client.on_connect = on_connect

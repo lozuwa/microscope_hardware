@@ -108,7 +108,8 @@ class Led:
 		"""
 		self.state = int(state)
 
-	def setState(self, state):
+	def setState(self,\
+					state):
 		self.state = int(state)
 
 	def getState(self):
@@ -211,10 +212,12 @@ class axisMovement:
 
 	def homeX(self):
 		self.serPort.write("homeX".encode())
+		#self.x(10000, 1, 500)
 		self.wait()
 
 	def homeY(self):
 		self.serPort.write("homeY".encode())
+		#self.y(10000, 1, 500)
 		self.wait()
 
 	### HOME ###
