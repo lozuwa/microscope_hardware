@@ -109,7 +109,7 @@ def homeXY():
     """
     Function to restart the XY motors
     """
-    #axMov.homeX()
+    axMov.homeX()
     axMov.homeY()
 
 def led(message):

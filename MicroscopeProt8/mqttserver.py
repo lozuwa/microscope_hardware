@@ -67,13 +67,13 @@ def on_message(client, userdata, msg):
         if msg.payload.decode("utf-8") == "start":
             print("Starting autofocus sequence ...")
             # 1. Restart z motor to bottom button
-            moveFieldZDown("2000")
+            for k in range(2000):
+                moveFieldZDown("1")
             time.sleep(1)
             # 2. Start scanning
             publishMessage("/variance", "get")
             counter = 0
             scanning = []
-            search = []
         else:
             pass
     ##################################################################################
@@ -117,13 +117,16 @@ def on_message(client, userdata, msg):
             publishMessage(topic = "/microscope",\
                             message = "pic;sample",\
                             qos = 2)
+            time.sleep(1)
             # Move X
             if directionX:
                 moveFieldX(1)
+                print("Move X {}".format(i))
             else:
                 moveFieldX(0)
             # Move Y
             if (i % 50 == 0):
+                print("Move Y {}".format(i))
                 moveFieldY(0)
                 moveFieldY(0)
                 # Invert X direction
@@ -132,9 +135,10 @@ def on_message(client, userdata, msg):
                 publishMessage(topic = "/microscope",\
                             message = "pic;sample",\
                             qos = 2)
+                time.sleep(1)
             elif (i % 75 == 0):
-                pass
-                #autofocus()
+                #publishMessage("/autofocus", "get")
+                print("Autofocus sample")
             else:
                 pass
     ##################################################################################

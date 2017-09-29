@@ -7,8 +7,8 @@
    Z axis
   ------------
   - h -> response when the home top button is pressed
-  - d -> response when the autofocus top button is pressed
-  - c -> response when the autofocus bottom button is pressed
+  - t -> response when the autofocus top button is pressed
+  - d -> response when the autofocus bottom button is pressed
   ------------
    Y axis
   ------------
@@ -136,13 +136,13 @@ void z(int pasos, int direccion, int timpo) {
   digitalWrite(enableZ, 0);
   for (int i = 0; i < pasos; i++) {
     if (digitalRead(endZt) == 1 and direccion == 1) {
-      Serial.write("d");
+      Serial.write("t");
       movementState = true;
       t++;
       break;
     }
     else if (digitalRead(endZd) == 1 and direccion == 0) {
-      Serial.write("c");
+      Serial.write("d");
       movementState = true;
       d++;
       break;
