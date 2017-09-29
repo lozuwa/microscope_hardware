@@ -117,7 +117,7 @@ def led(message):
         pass
 
 # Instantiate movement class
-axMov = axisMovement(port = int(0))
+axMov = axisMovement(port = int(5))
 
 # Init processes
 global procZUp

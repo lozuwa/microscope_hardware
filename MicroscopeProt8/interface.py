@@ -34,7 +34,7 @@ class serialPort:
 		assert type(portNumber) == int, VARIABLE_IS_NOT_INT
 		assert type(baudrate) == int, VARIABLE_IS_NOT_INT
 		# Instantiate variables
-		self.portNumber = "".join(["/dev/ttyACM", str(portNumber)])
+		self.portNumber = "".join(["COM", str(portNumber)])
 		self.baudrate = int(baudrate)
 		self.startPort()
 
@@ -217,21 +217,6 @@ class axisMovement:
 	def homeY(self):
 		self.serPort.write("homeY".encode())
 		self.wait()
-
-	### HOME ###
-	def home(self):
-		# Reset input buffer
-		self.serPort.flushInput()
-		# Restart the axis
-		self.homeZ()
-		self.homeX()
-		self.homeY()
-		# Move axis to intial position
-		self.y(1400,1,150)
-		time.sleep(2)
-		self.x(1300,1,300)
-		time.sleep(2)
-		self.zResponse(3500,1,300)
 
 	def wait(self,\
 			code = "o"):
