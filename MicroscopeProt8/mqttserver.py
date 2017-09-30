@@ -78,6 +78,7 @@ def on_message(client, userdata, msg):
             publishMessage("/variance", "get")
             counter = 0
             scanning = []
+            code = "-1"
         else:
             pass
     ##################################################################################
@@ -118,7 +119,8 @@ def on_message(client, userdata, msg):
         led("1")
         time.sleep(1)
         # Home
-        homeXY()
+        homeX()
+        homeY()
         # Put slide in
         for i in range(30):
             moveFieldX(0)
@@ -143,7 +145,7 @@ def on_message(client, userdata, msg):
             # Move Y
             if (i % 40 == 0):
                 print("Move X {}".format(i))
-                for j in range(3):
+                for j in range(5):
                     moveFieldX(0)
                 # Invert X direction
                 directionY = not directionY
