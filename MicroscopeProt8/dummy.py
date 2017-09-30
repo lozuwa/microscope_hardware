@@ -32,14 +32,13 @@ client = mqtt.Client(clean_session = True)
 # Subscribe topics
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
-    client.subscribe("/automatic")
     client.subscribe("/variance")
     client.subscribe("/autofocus")
     
 # Reply messages
 def on_message(client, userdata, msg):
     global counter
-    if msg.topic == "/automatic":
+    if msg.topic == "/autofocus":
         if msg.payload.decode("utf-8") == "start":
             print("Starting autofocus sequence ...")
             time.sleep(1)
@@ -80,7 +79,6 @@ def publishMessage(topic,
 
 if __name__ == "__main__":
     global counter
-    global stateStop
     counter = 0
     stateStop = False
     #client.connect("test.mosquitto.org", 1883, 60)
@@ -88,3 +86,28 @@ if __name__ == "__main__":
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
+
+"""
+Version 0
+global counter
+    if msg.topic == "/automatic":
+        if msg.payload.decode("utf-8") == "start":
+            print("Starting autofocus sequence ...")
+            time.sleep(1)
+            publishMessage("/variance", "get")
+            counter = 0
+        else:
+            pass
+    elif msg.topic == "/variance":
+        if msg.payload.decode("utf-8").split(";")[0] == "message":
+            if counter <= 100: # End stop up
+                print("Received message: ", msg.payload, counter)
+                time.sleep(0.1) # Move motor up
+                print("Publishing get autofocus")
+                publishMessage("/variance", "get")
+                counter += 1
+            else:
+                print("Finished ", counter)
+    else:
+        pass
+"""

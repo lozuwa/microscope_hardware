@@ -15,6 +15,8 @@ Documentation:
 import paho.mqtt.client as mqtt
 # General purpose
 import os
+import sys
+import math
 import time
 import datetime
 # Tensor manipulation
@@ -49,11 +51,9 @@ def on_connect(client, userdata, flags, rc):
 
 # Reply messages
 def on_message(client, userdata, msg):
-    global STEPSZ, TIME
-    global procZUp, procZDown
-    global autofocusState, hardwareCode, countFrames
-    global countPositions, saveAutofocusCoef
-    print(msg.topic, msg.payload)
+    global counter
+    global scanning
+    #print(msg.topic, msg.payload)
     if msg.topic == MOVEFIELDX_TOPIC:
         moveFieldX(msg.payload)
     elif msg.topic == MOVEFIELDY_TOPIC:
@@ -66,41 +66,92 @@ def on_message(client, userdata, msg):
         led(msg.payload)
     ##################################################################################
     elif msg.topic == AUTOFOCUS_TOPIC:
-        pass
+        if msg.payload.decode("utf-8") == "start":
+            print("Starting autofocus sequence ...")
+            # 1. Restart z motor to bottom button
+            code = moveZDown()
+            time.sleep(1)
+            # 2. Start scanning
+            publishMessage("/variance", "get")
+            counter = 0
+            scanning = []
+        else:
+            pass
     ##################################################################################
     elif msg.topic == VARIANCE_TOPIC:
-        pass
+        if msg.payload.decode("utf-8").split(";")[0] == "message":
+            # 3. Scanning (20 fields)
+            if counter <= 20:
+                # Receive and save values
+                print("Received message: ", msg.payload, counter)
+                scanning.append(float(msg.payload.decode("utf-8").split(";")[1]))
+                time.sleep(0.1)
+                # Move motor up
+                code = moveZUp()
+                # Get another value
+                print("Publishing get autofocus")
+                publishMessage("/variance", "get")
+                counter += 1
+            # 4. Search for max value after scanning
+            else:
+                # Receive and save values
+                print("Finished scanning: ", msg.payload, counter)
+                localVal = float(msg.payload.decode("utf-8").split(";")[1])
+                time.sleep(0.1)
+                # Compare localVal to max index
+                if np.abs(localVal - max(scanning)) < 1:
+                    print("Found focus point")
+                else:
+                    moveZDown()
+                    time.sleep(0.5)
+        else:
+            pass
     ##################################################################################
     elif msg.topic == "/automatic":
+        # Led
+        led("1")
+        time.sleep(1)
         # Home
         homeXY()
+        # Put slide in
+        for i in range(30):
+            moveFieldX(0)
+        for i in range(5):
+            moveFieldY(0)
         # Direction x
-        directionX = True
+        directionY = True
         # Start at home
         for i in range(1600):
+            i+=1
             publishMessage(topic = "/microscope",\
                             message = "pic;sample",\
                             qos = 2)
+            time.sleep(1)
             # Move X
-            if directionX:
-                moveFieldX(1)
+            if directionY:
+                moveFieldY(0)
+                print("Move Y {}".format(i))
             else:
-                moveFieldX(0)
+                moveFieldY(1)
+                print("Move Y {}".format(i))
             # Move Y
-            if (i % 50 == 0):
-                moveFieldY(0)
-                moveFieldY(0)
+            if (i % 40 == 0):
+                print("Move X {}".format(i))
+                for j in range(3):
+                    moveFieldX(0)
                 # Invert X direction
-                directionX = not directionX
+                directionY = not directionY
                 # Take picture
                 publishMessage(topic = "/microscope",\
                             message = "pic;sample",\
                             qos = 2)
+                time.sleep(1)
             elif (i % 75 == 0):
-                pass
-                #autofocus()
+                #publishMessage("/autofocus", "start")
+                print("Autofocus sample")
             else:
                 pass
+
     ##################################################################################
     elif msg.topic == ZUP_TOPIC:
         moveFieldZUp(msg.payload)
@@ -126,18 +177,11 @@ def publishMessage(topic,
     client.publish(topic, message, qos)
 
 if __name__ == "__main__":
-    # Autofocus variables
-    global autofocusState
-    global hardwareCode
-    global countFrames
-    global countPositions
-    global saveAutofocusCoef
-    autofocusState = False
-    hardwareCode = "o"
-    countFrames = 0
-    countPositions = 0
-    saveAutofocusCoef = []
-
+    # Variables
+    global counter
+    global scanning
+    counter = 0
+    scanning = []
     # Connect to mqtt client
     client.connect(IP, PORT, 60)
     client.on_connect = on_connect

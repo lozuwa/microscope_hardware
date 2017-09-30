@@ -57,6 +57,22 @@ def zDown():
         axMov.zResponse(STEPSZ, 0, TIME)
         time.sleep(0.01)
 
+def moveZUp():
+    """
+    Moves the z motor up a single quantity of steps
+    """
+    code = axMov.zResponse(STEPSZ, 1, TIME)
+    time.sleep(0.01)
+    return code
+
+def moveZDown():
+    """
+    Moves the z motor down a single quantity of steps
+    """
+    code = axMov.zResponse(STEPSZ, 0, TIME)
+    time.sleep(0.01)
+    return code
+
 def moveFieldX(message):
     """
     Function to move the motors in the x axis
@@ -97,8 +113,8 @@ def homeXY():
     """
     Function to restart the XY motors
     """
-    #axMov.homeX()
     axMov.homeY()
+    axMov.homeX()
 
 def led(message):
     """
