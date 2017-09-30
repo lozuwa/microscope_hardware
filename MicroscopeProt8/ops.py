@@ -103,18 +103,29 @@ def home():
     """
     axMov.home()
 
-def homeZ():
+def homeZTop():
     """
     Function to restart the Z motor
     """
-    axMov.homeZ()
-
-def homeXY():
+    axMov.homeZTop()
+    
+def homeZBottom():
     """
-    Function to restart the XY motors
+    Function to restart the Z motor
+    """
+    axMov.homeZBottom()
+
+def homeX():
+    """
+    Function to restart the X motor
+    """
+    axMov.homeX()
+    
+def homeY():
+    """
+    Function to restart the Y motor
     """
     axMov.homeY()
-    axMov.homeX()
 
 def led(message):
     """
@@ -133,7 +144,7 @@ def led(message):
         pass
 
 # Instantiate movement class
-axMov = axisMovement(port = int(0))
+axMov = axisMovement(port = int(1))
 
 # Init processes
 global procZUp

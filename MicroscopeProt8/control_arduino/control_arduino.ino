@@ -78,7 +78,8 @@ void loop() {
   /** Serial available */
   //Serial.println(digitalRead(endZc));
   if (Serial.available() > 0) {
-    Serial.println(tx);
+    /** Read String */
+    String tx = Serial.readString();
     /** Parse the strings */
     eje = tx.substring(0, tx.indexOf(","));
     tx = tx.substring(eje.length() + 1);
@@ -108,6 +109,12 @@ void loop() {
     else if (eje == "homeY") {
       homeY();
     }
+    else if (eje == "homeZBottom") {
+      homeZBottom();
+    }
+    else if (eje == "homeZTop") {
+      homeZTop();
+    }
     else if (brillo.toInt() != brillo_actual) {
       enableLed(brillo.toInt());
       brillo_actual = brillo.toInt();
@@ -132,7 +139,7 @@ int t = 0;
 int d = 0;
 void z(int pasos, int direccion, int timpo) {
   bool movementState = false;
-  digitalWrite(direccionZ,direccion);
+  digitalWrite(direccionZ, direccion);
   digitalWrite(enableZ, 0);
   for (int i = 0; i < pasos; i++) {
     if (digitalRead(endZt) == 1 and direccion == 1) {
@@ -230,11 +237,11 @@ void x(int pasos, int direccion, int timpo) {
 }
 
 void homeX() {
-  int timpo = 500;
+  int timpo = 1000;
   /** Enable motor */
   digitalWrite(enableX, 0);
   digitalWrite(direccionX, 1);
-  while(true){
+  while(true) {
     if (digitalRead(endX) == 0) {
       break;
     }
@@ -252,7 +259,7 @@ void homeX() {
 }
 
 void homeY() {
-  int timpo = 500;
+  int timpo = 1000;
   /** Set direction and enable motor */
   digitalWrite(enableY, 0);
   digitalWrite(direccionY, 1);
@@ -271,6 +278,64 @@ void homeY() {
   }
   /** Disable motor */
   digitalWrite(enableY , 1);
+  /** Response */
+  Serial.write("o");
+}
+
+void homeZBottom() {
+  int timpo = 500;
+  /** Function that resets the z motor to the bottom */
+  /** Enable motor and set direction */
+  digitalWrite(direccionZ, 0);
+  digitalWrite(enableZ, 0);
+  while(true) {
+      if (digitalRead(endZd) == 1) {
+        for (int i = 0; i < 50; i++) {
+          digitalWrite(stepsZ, 1);
+          delayMicroseconds(timpo);
+          digitalWrite(stepsZ, 0);
+          delayMicroseconds(timpo);
+        }
+        break;
+      }
+      else{
+        digitalWrite(stepsZ, 1);
+        delayMicroseconds(timpo);
+        digitalWrite(stepsZ, 0);
+        delayMicroseconds(timpo);
+      }
+  }
+  /** Disable motor */
+  digitalWrite(enableZ, 1);
+  /** Response */
+  Serial.write("o");
+}
+
+void homeZTop() {
+  int timpo = 500;
+  /** Function that resets the z motor to the top */
+  /** Enable motor and set direction */
+  digitalWrite(direccionZ, 1);
+  digitalWrite(enableZ, 0);
+  while(true) {
+      if (digitalRead(endZt) == 1) {
+        for (int i = 0; i < 50; i++) {
+          digitalWrite(stepsZ, 1);
+          delayMicroseconds(timpo);
+          digitalWrite(stepsZ, 0);
+          delayMicroseconds(timpo);
+        }
+        break;
+      }
+      else {
+        digitalWrite(stepsZ, 1);
+        delayMicroseconds(timpo);
+        digitalWrite(stepsZ, 0);
+        delayMicroseconds(timpo);
+      }
+  }
+  /** Disable motor */
+  digitalWrite(enableZ, 1);
   /** Response */
   Serial.write("o");
 }

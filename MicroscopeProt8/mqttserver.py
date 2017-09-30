@@ -53,6 +53,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global counter
     global scanning
+    global code
     #print(msg.topic, msg.payload)
     if msg.topic == MOVEFIELDX_TOPIC:
         moveFieldX(msg.payload)
@@ -69,9 +70,11 @@ def on_message(client, userdata, msg):
         if msg.payload.decode("utf-8") == "start":
             print("Starting autofocus sequence ...")
             # 1. Restart z motor to bottom button
-            code = moveZDown()
+            print("Restart Z motor to bottom")
+            homeZBottom()
             time.sleep(1)
             # 2. Start scanning
+            print("Publishing get variance")
             publishMessage("/variance", "get")
             counter = 0
             scanning = []
@@ -81,15 +84,16 @@ def on_message(client, userdata, msg):
     elif msg.topic == VARIANCE_TOPIC:
         if msg.payload.decode("utf-8").split(";")[0] == "message":
             # 3. Scanning (20 fields)
-            if counter <= 20:
+            #if counter <= 20:
+            if str(code) != "t":
                 # Receive and save values
                 print("Received message: ", msg.payload, counter)
                 scanning.append(float(msg.payload.decode("utf-8").split(";")[1]))
-                time.sleep(0.1)
+                #time.sleep(0.1)
                 # Move motor up
                 code = moveZUp()
                 # Get another value
-                print("Publishing get autofocus")
+                print("Publishing get autofocus ", code)
                 publishMessage("/variance", "get")
                 counter += 1
             # 4. Search for max value after scanning
@@ -97,13 +101,15 @@ def on_message(client, userdata, msg):
                 # Receive and save values
                 print("Finished scanning: ", msg.payload, counter)
                 localVal = float(msg.payload.decode("utf-8").split(";")[1])
+                print("value ", np.abs(localVal - max(scanning)))
                 time.sleep(0.1)
                 # Compare localVal to max index
-                if np.abs(localVal - max(scanning)) < 1:
+                if np.abs(localVal - max(scanning)) < 100:
                     print("Found focus point")
                 else:
                     moveZDown()
-                    time.sleep(0.5)
+                    print("Publishing get autofocus ", code)
+                    publishMessage("/variance", "get")
         else:
             pass
     ##################################################################################
@@ -180,8 +186,10 @@ if __name__ == "__main__":
     # Variables
     global counter
     global scanning
+    global code
     counter = 0
     scanning = []
+    code = "-1"
     # Connect to mqtt client
     client.connect(IP, PORT, 60)
     client.on_connect = on_connect

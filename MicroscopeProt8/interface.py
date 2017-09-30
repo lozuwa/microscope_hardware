@@ -201,8 +201,12 @@ class axisMovement:
 		else:
 			pass
 
-	def homeZ(self):
-		self.serPort.write("homeZ".encode())
+	def homeZTop(self):
+		self.serPort.write("homeZTop".encode())
+		self.wait()
+
+	def homeZBottom(self):
+		self.serPort.write("homeZBottom".encode())
 		self.wait()
 
 	def homeX(self):
@@ -224,13 +228,14 @@ class axisMovement:
 		time.sleep(0.01)
 		k = self.serPort.read().decode("utf-8")
 		while (True):
+			print("here")
 			counter += 1
-			if k == code or counter == 600:
+			if k == code or k == "t" or k == "d" or counter == 600:
 				break
 			else:
 				k = self.serPort.read().decode("utf-8")
 				time.sleep(0.01)
-		#print("wait function: ", k)
+		print("wait function: ", k)
 		return ("done", k)
 
 	def writeLed(self,\

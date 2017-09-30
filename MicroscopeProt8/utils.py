@@ -26,5 +26,5 @@ MOVEFIELDY_TOPIC = "/movefieldy"
 
 # Motor resolutions
 TIME = 2000
-STEPSZ = 50
+STEPSZ = 100
 
