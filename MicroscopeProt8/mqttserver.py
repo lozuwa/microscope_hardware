@@ -48,12 +48,17 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("/microscope")
     # Automatic
     client.subscribe("/automatic")
+    client.subscribe("/move")
 
 # Reply messages
 def on_message(client, userdata, msg):
-    global counter
+    # Autofocus
+    global counterAutofocus
     global scanning
     global code
+    # Automatic
+    global counterAutomatic
+    global directionY
     #print(msg.topic, msg.payload)
     if msg.topic == MOVEFIELDX_TOPIC:
         moveFieldX(msg.payload)
@@ -68,6 +73,10 @@ def on_message(client, userdata, msg):
     ##################################################################################
     elif msg.topic == AUTOFOCUS_TOPIC:
         if msg.payload.decode("utf-8") == "start":
+            # Restart variables
+            counterAutofocus = 0
+            scanning = []
+            code = "-1"
             print("Starting autofocus sequence ...")
             # 1. Restart z motor to bottom button
             print("Restart Z motor to bottom")
@@ -76,19 +85,16 @@ def on_message(client, userdata, msg):
             # 2. Start scanning
             print("Publishing get variance")
             publishMessage("/variance", "get")
-            counter = 0
-            scanning = []
-            code = "-1"
         else:
             pass
     ##################################################################################
     elif msg.topic == VARIANCE_TOPIC:
         if msg.payload.decode("utf-8").split(";")[0] == "message":
             # 3. Scanning (20 fields)
-            #if counter <= 20:
+            #if counterAutofocus <= 20:
             if str(code) != "t":
                 # Receive and save values
-                print("Received message: ", msg.payload, counter)
+                print("Received message: ", msg.payload, counterAutofocus)
                 scanning.append(float(msg.payload.decode("utf-8").split(";")[1]))
                 #time.sleep(0.1)
                 # Move motor up
@@ -96,16 +102,17 @@ def on_message(client, userdata, msg):
                 # Get another value
                 print("Publishing get autofocus ", code)
                 publishMessage("/variance", "get")
-                counter += 1
+                counterAutofocus += 1
             # 4. Search for max value after scanning
             else:
                 # Receive and save values
-                print("Finished scanning: ", msg.payload, counter)
+                print("Finished scanning: ", msg.payload, counterAutofocus)
                 localVal = float(msg.payload.decode("utf-8").split(";")[1])
-                print("value ", np.abs(localVal - max(scanning)))
                 time.sleep(0.1)
                 # Compare localVal to max index
-                if np.abs(localVal - max(scanning)) < 100:
+                compare = np.abs(localVal - max(scanning))
+                print("value ", compare)
+                if (compare < 100) or (localVal >= scanning):
                     print("Found focus point")
                 else:
                     moveZDown()
@@ -115,51 +122,53 @@ def on_message(client, userdata, msg):
             pass
     ##################################################################################
     elif msg.topic == "/automatic":
-        # Led
-        led("1")
-        time.sleep(1)
-        # Home
-        homeX()
-        homeY()
-        # Put slide in
-        for i in range(30):
-            moveFieldX(0)
-        for i in range(5):
-            moveFieldY(0)
-        # Direction x
-        directionY = True
-        # Start at home
-        for i in range(1600):
-            i+=1
-            publishMessage(topic = "/microscope",\
-                            message = "pic;sample",\
-                            qos = 2)
-            time.sleep(1)
-            # Move X
-            if directionY:
+        if msg.payload.decode("utf-8") == "start":
+            # Restart variables
+            counterAutomatic = 0
+            directionY = True
+            # Led
+            led("1")
+            time.sleep(0.5)
+            # Home
+            homeY()
+            homeX()
+            # Put slide in
+            for i in range(40):
+                moveFieldX(0)
+            for i in range(15):
                 moveFieldY(0)
-                print("Move Y {}".format(i))
-            else:
-                moveFieldY(1)
-                print("Move Y {}".format(i))
-            # Move Y
-            if (i % 40 == 0):
-                print("Move X {}".format(i))
-                for j in range(5):
-                    moveFieldX(0)
-                # Invert X direction
-                directionY = not directionY
-                # Take picture
-                publishMessage(topic = "/microscope",\
-                            message = "pic;sample",\
-                            qos = 2)
-                time.sleep(1)
-            elif (i % 75 == 0):
-                #publishMessage("/autofocus", "start")
-                print("Autofocus sample")
-            else:
-                pass
-
+            publishMessage("/move", "1")
+        else:
+            pass
+    elif msg.topic == "/move":
+        # Take picture
+        publishMessage("/microscope", "pic;sample")
+        time.sleep(1)
+        # Move Y
+        if directionY:
+            moveFieldY(1)
+            print("Move Y {}".format(counterAutomatic))
+        else:
+            moveFieldY(0)
+            print("Move Y {}".format(counterAutomatic))
+        # Move X
+        if (counterAutomatic % 40 == 0):
+            print("Move X {}".format(counterAutomatic))
+            for j in range(5):
+                moveFieldX(0)
+            # Invert Y direction
+            directionY = not directionY
+        elif (counterAutomatic % 75 == 0):
+            #publishMessage("/autofocus", "start")
+            print("Autofocus")
+        else:
+            pass
+        # Keep moving or stop
+        if counterAutomatic == 20:
+            pass
+        else:
+            publishMessage("/move", "")
+            counterAutomatic += 1;
     ##################################################################################
     elif msg.topic == ZUP_TOPIC:
         moveFieldZUp(msg.payload)
@@ -185,15 +194,50 @@ def publishMessage(topic,
     client.publish(topic, message, qos)
 
 if __name__ == "__main__":
-    # Variables
+    # Autofocus
     global counter
     global scanning
     global code
     counter = 0
     scanning = []
     code = "-1"
+    # Automatic
+    global counterAutomatic
+    global directionY
+    counterAutomatic = 0
+    directionY = True
     # Connect to mqtt client
     client.connect(IP, PORT, 60)
     client.on_connect = on_connect
     client.on_message = on_message
     client.loop_forever()
+
+"""
+# Direction Y
+directionY = True
+for i in range(1600):
+    i += 1
+    time.sleep(1)
+    # Move X
+    if directionY:
+        moveFieldY(0)
+        print("Move Y {}".format(i))
+    else:
+        moveFieldY(1)
+        print("Move Y {}".format(i))
+    # Move Y
+    if (i % 40 == 0):
+        print("Move X {}".format(i))
+        for j in range(5):
+            moveFieldX(0)
+        # Invert X direction
+        directionY = not directionY
+        # Take picture
+        publishMessage("/variance", "get")
+        time.sleep(1)
+    elif (i % 75 == 0):
+        #publishMessage("/autofocus", "start")
+        print("Autofocus sample")
+    else:
+        pass
+"""

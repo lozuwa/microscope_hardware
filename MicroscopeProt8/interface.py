@@ -147,7 +147,8 @@ class axisMovement:
 		self.serPort.write(("x,"+str(steps)+","+str(dir)+","+str(time_)).encode())
 		time.sleep(0.01)
 		result, code = self.wait()
-		print("Hardware code: {}".format(code))
+		#print("Hardware code: {}".format(code))
+		return code
 
 	def y(self,\
 			steps,\
@@ -163,7 +164,8 @@ class axisMovement:
 		self.serPort.write(("y,"+str(steps*2)+","+str(dir)+","+str(time_)).encode())
 		time.sleep(0.01)
 		result, code = self.wait()
-		print("Hardware code: {}".format(code))
+		#print("Hardware code: {}".format(code))
+		return code
 
 	def z(self,\
 			steps,\
@@ -180,7 +182,7 @@ class axisMovement:
 		#self.serPort.write(("z_r,"+str(steps)+","+str(dir)+","+str(time_)).encode())
 		self.serPort.write(("z,"+str(steps)+","+str(dir)+","+str(time_)).encode())
 		result, code = self.wait(code = hardwareCode)
-		print("Hardware code: {}".format(code))
+		#print("Hardware code: {}".format(code))
 		return code
 
 	def moveFieldY(self,\
@@ -228,14 +230,14 @@ class axisMovement:
 		time.sleep(0.01)
 		k = self.serPort.read().decode("utf-8")
 		while (True):
-			print("here")
+			#print("here")
 			counter += 1
 			if k == code or k == "t" or k == "d" or counter == 600:
 				break
 			else:
 				k = self.serPort.read().decode("utf-8")
 				time.sleep(0.01)
-		print("wait function: ", k)
+		#print("wait function: ", k)
 		return ("done", k)
 
 	def writeLed(self,\
