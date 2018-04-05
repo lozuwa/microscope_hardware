@@ -1,6 +1,6 @@
 # README #
 
-* This repo contains the hardware part of all the click medical prototypes. 
+* Moved to a private repository for intelectual property reasons. Nonetheless, the scripts here might serve as an initial point if you want to build an automatic microscope.
 
 ### What is this repository for? ###
 
