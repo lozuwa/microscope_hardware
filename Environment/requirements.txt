@@ -54,7 +54,7 @@ et-xmlfile==1.0.1
 eventlet==0.21.0
 fastcache==1.0.2
 Flask==0.12
-Flask-Cors==3.0.2
+Flask-Cors==3.0.9
 floyd-cli==0.9.5
 future==0.16.0
 gapic-google-cloud-vision-v1==0.90.3
